@@ -212,7 +212,7 @@ public abstract class ComboBox2<K,D,D2>
 
 			K key = getChosenKey();
 			try {
-				dbChange(() -> setBoundColumnObject(key));
+				dbChange(() -> setColumnObject(key));
 			} catch (SQLException ex) {
 				logger.log(Level.ERROR, (String) null, ex);
 			}
@@ -635,7 +635,7 @@ public abstract class ComboBox2<K,D,D2>
 			// Setting to true from false, select the nullItem;
 			// Events are a problem. After SSDBNavImpl.setSelectionPending
 			// the following ends up in ComboBox2Listener.actionPerformed()
-			// then into setBoundColumnText then exception in RowSetOps.updateColumnText.
+			// then into setColumnText then exception in RowSetOps.updateColumnText.
 			// TODO: merge this into adjustForNullItem, to avoid extra unregister/register
 			//
 			// Or better, with cleaner event model, like Navigator events,
@@ -1456,7 +1456,7 @@ public abstract class ComboBox2<K,D,D2>
 	
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
-	 * getBoundColumnText().
+	 * getColumnText().
 	 */
 	@SuppressWarnings({"BroadCatchBlock", "TooBroadCatch", "UseSpecificCatch"})
 	private void updateComponent() {
@@ -1471,11 +1471,11 @@ public abstract class ComboBox2<K,D,D2>
 			// Maybe insures blank in case of later exception.
 			setSelectionPending(true);
 
-			logger.log(DEBUG, ()->sf("%s: getBoundColumnText() - %s",
-					getColumnForLog(), getBoundColumnText()));
+			logger.log(DEBUG, ()->sf("%s: getColumnText() - %s",
+					getColumnForLog(), getColumnText()));
 
 			// https://github.com/bpangburn/swingset/issues/46
-			K targetValue = getBoundColumnObject(getKeyType());
+			K targetValue = getColumnObject(getKeyType());
 			
 			logger.log(DEBUG, () -> sf("%s: targetValue - %s",  getColumnForLog(), targetValue));
 			

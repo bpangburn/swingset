@@ -83,7 +83,7 @@ public class Slider extends JSlider implements SSComponent
 				return;
 
 			try {
-				dbChange(() -> setBoundColumnObject(getValue()));
+				dbChange(() -> setColumnObject(getValue()));
 			} catch (SQLException ex) {
 				logger.log(Level.ERROR, (String) null, ex);
 			}
@@ -128,13 +128,13 @@ public class Slider extends JSlider implements SSComponent
 	 * specified RowSet column.
 	 *
 	 * @param rowsModel          datasource to be used.
-	 * @param boundColumnName name of the column to which this slider should be
+	 * @param columnName name of the column to which this slider should be
 	 *                         bound
 	 * @throws java.sql.SQLException SQLException
 	 */
-	public Slider(RowsModel rowsModel, String boundColumnName) throws java.sql.SQLException {
+	public Slider(RowsModel rowsModel, String columnName) throws java.sql.SQLException {
 		this();
-		rowsModel.bind(this, boundColumnName);
+		rowsModel.bind(this, columnName);
 	}
 
 	/** {@inheritDoc } */
@@ -169,12 +169,12 @@ public class Slider extends JSlider implements SSComponent
 				protected void updateSSComponent()
 				{
 					try {
-						Integer n = getBoundColumnObject(Integer.class);
+						Integer n = getColumnObject(Integer.class);
 						setValue(n != null ? n : 0);
 					} catch (final NumberFormatException _nfe) {
 						// TODO: Hmm, probably should be an SQL conversion error.
 						// Output the text value
-						String columnValue = getBoundColumnText();
+						String columnValue = getColumnText();
 						logger.log(Level.ERROR, getColumnForLog() + ": Number Format Exception. Cannot update slider to " + columnValue,
 								_nfe);
 					}

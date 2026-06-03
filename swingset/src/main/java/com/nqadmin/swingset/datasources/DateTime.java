@@ -119,7 +119,7 @@ public class DateTime
 	public static boolean isHandledDateTimeComp(RSC comp)
 	{
 		return comp instanceof JTextComponent
-				&& dateTimeHandled.contains(comp.getBoundColumnJDBCType());
+				&& dateTimeHandled.contains(comp.getColumnJDBCType());
 	}
 
 	/**
@@ -179,7 +179,7 @@ public class DateTime
 
 	private static List<DateTimeFormatter> getInternalDateTimeParsers(RSC comp)
 	{
-		return getInternalDateTimeParsers(comp.getBoundColumnJDBCType(),
+		return getInternalDateTimeParsers(comp.getColumnJDBCType(),
 										  comp.getSSFormat());
 	}
 	private static List<DateTimeFormatter> getInternalDateTimeParsers(
@@ -277,7 +277,7 @@ public class DateTime
 		for (DateTimeFormatter formatter : formatters) {
 			try {
 				Temporal dto = null;
-				switch(comp.getBoundColumnJDBCType()) {
+				switch(comp.getColumnJDBCType()) {
 				case TIME -> dto = LocalTime.parse(text, formatter);
 				case DATE -> dto = LocalDate.parse(text, formatter);
 				case TIMESTAMP -> {
@@ -331,7 +331,7 @@ public class DateTime
 		DtoParse dtoParse = internalDateTimeColumnParse(text, comp);
 		if (dtoParse.isError())
 			return null;
-		JDBCType jdbcType = comp.getBoundColumnJDBCType();
+		JDBCType jdbcType = comp.getColumnJDBCType();
 		Temporal dto = dtoParse.dto();
 		return switch(jdbcType) {
 		case DATE -> Date.valueOf((LocalDate) dto);
@@ -351,9 +351,9 @@ public class DateTime
 	 */
 	public static String getDateTimeText(RSC comp) throws SQLException
 	{
-		JDBCType jdbcType = comp.getBoundColumnJDBCType();
+		JDBCType jdbcType = comp.getColumnJDBCType();
 		// TODO: should there be a way to do a switch on type, use getDate...?
-		Object o = comp.getRowSet().getObject(comp.getBoundColumnIndex());
+		Object o = comp.getRowSet().getObject(comp.getColumnIndex());
 		// TODO: derived 3rd arg from comp.getSSFormat
 		return getDateTimeText(o, jdbcType, null);
 	}
@@ -368,7 +368,7 @@ public class DateTime
 	 */
 	public static String getDateTimeText(Object jdbcDateTimeObject, RSC comp)
 	{
-		JDBCType jdbcType = comp.getBoundColumnJDBCType();
+		JDBCType jdbcType = comp.getColumnJDBCType();
 		// TODO: derived 3rd arg from comp.getSSFormat
 		return getDateTimeText(jdbcDateTimeObject, jdbcType, null);
 	}

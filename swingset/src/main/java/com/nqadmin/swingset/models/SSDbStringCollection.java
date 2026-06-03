@@ -130,7 +130,7 @@ public class SSDbStringCollection extends SSAbstractCollection {
 	 */
 	@Override
 	public Object readData(SSComponent comp) throws SQLException {
-		String dbstring = comp.getBoundColumnText();
+		String dbstring = comp.getColumnText();
 		return toArray(getJDBCType(), dbstring);
 	}
 
@@ -155,7 +155,7 @@ public class SSDbStringCollection extends SSAbstractCollection {
 		// Combine the array of strings into a single String
 		String result = String.join(separator, arr);
 		// and write it to the database
-		comp.setBoundColumnText(result);
+		comp.setColumnText(result);
 	}
 
 	// TODO: use a common parse String to Object

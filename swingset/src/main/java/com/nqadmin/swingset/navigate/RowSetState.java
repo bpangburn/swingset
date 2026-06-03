@@ -271,7 +271,7 @@ public class RowSetState
 	 * @return true if primary key else false
 	 */
 	public static boolean isKey(RSC comp) {
-		return getRowSetState(comp.getRowSet()).isKey(comp.getBoundColumnName());
+		return getRowSetState(comp.getRowSet()).isKey(comp.getColumnName());
 	}
 
 	/**

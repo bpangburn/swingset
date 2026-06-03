@@ -86,7 +86,7 @@ public class Label extends JLabel implements SSComponent
 				return;
 
 			try {
-				dbChange(() -> setBoundColumnText(getText()));
+				dbChange(() -> setColumnText(getText()));
 			} catch (SQLException ex) {
 				logger.log(Level.ERROR, (String) null, ex);
 			}
@@ -130,11 +130,11 @@ public class Label extends JLabel implements SSComponent
 	 * column.
 	 *
 	 * @param rowsModel          datasource to be used.
-	 * @param boundColumnName name of the column to which this label should be bound
+	 * @param columnName name of the column to which this label should be bound
 	 */
-	public Label(RowsModel rowsModel, String boundColumnName) {
+	public Label(RowsModel rowsModel, String columnName) {
 		this();
-		rowsModel.bind(this, boundColumnName);
+		rowsModel.bind(this, columnName);
 	}
 
 	/** {@inheritDoc } */
@@ -154,11 +154,11 @@ public class Label extends JLabel implements SSComponent
 			hook = new Hook(this) {
 				/**
 				 * Updates the value stored and displayed in the SwingSet
-				 * component based on getBoundColumnText()
+				 * component based on getColumnText()
 				 */
 				@Override
 				protected void updateSSComponent() {
-					final String text = getBoundColumnText();
+					final String text = getColumnText();
 					logger.log(Level.DEBUG, ()->sf("%s: Setting label to %s.", getColumnForLog(), text));
 					setText(text);
 				}

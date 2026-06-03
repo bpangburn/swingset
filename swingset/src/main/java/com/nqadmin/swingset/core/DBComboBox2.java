@@ -327,7 +327,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 */
 	@Override
 	protected boolean isComboBoxNavigator() {
-		return getBoundColumnName() == null;
+		return getColumnName() == null;
 	}
 
 	/**

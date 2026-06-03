@@ -71,7 +71,7 @@ public class SSDbArray extends SSAbstractCollection {
 	/** {@inheritDoc } */
 	@Override
 	public Object readData(SSComponent comp) throws SQLException {
-		Array array = comp.getBoundColumnArray();
+		Array array = comp.getColumnArray();
 		if (array == null)
 			return null;
 		return array.getArray();
@@ -84,6 +84,6 @@ public class SSDbArray extends SSAbstractCollection {
 			throw new IllegalArgumentException("Must be an array");
 
 		SSJDBCArray array = new SSJDBCArray(data, getJDBCType());
-		comp.setBoundColumnArray(array);
+		comp.setColumnArray(array);
 	}
 }

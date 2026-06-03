@@ -145,7 +145,7 @@ public enum UndoRedo
 		if (!isUndoRedoEnabled(comp))
 			return;
 		logger.log(DEBUG, () -> sf("%s: %s for %s", cmd,
-				comp.getClass().getSimpleName(), comp.getBoundColumnName()));
+				comp.getClass().getSimpleName(), comp.getColumnName()));
 		try {
 			NavigateState navState = comp.getRowsModel().getNavState();
 			Change change = navState.doUndoRedo(comp, cmd);

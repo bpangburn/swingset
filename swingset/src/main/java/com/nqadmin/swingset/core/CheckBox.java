@@ -67,7 +67,7 @@ import static java.sql.JDBCType.*;
  * Used to display values stored in the database as a boolean.
  * The CheckBox can be bound to a numeric or boolean database column. 
  * The boolean value is converted to the data base type by the
- * {@linkplain #setBoundColumnObject(java.lang.Object) } infrastructure.
+ * {@link #setColumnObject(java.lang.Object)} infrastructure.
  * Currently, Dec 2024, if bound to a numeric database column, a checked
  * CheckBox puts a '1' to the database and an unchecked CheckBox puts a '0'.
  * <p>
@@ -88,7 +88,7 @@ public class CheckBox extends JCheckBox implements SSComponent
 		public void itemStateChanged(final ItemEvent ie)
 		{
 			try {
-				dbChange(() -> setBoundColumnObject(isSelected()));
+				dbChange(() -> setColumnObject(isSelected()));
 			} catch (SQLException ex) {
 				logger.log(Level.ERROR, (String) null, ex);
 			}
@@ -110,12 +110,12 @@ public class CheckBox extends JCheckBox implements SSComponent
 	 * given RowSet.
 	 *
 	 * @param rowsModel        model for a rowSet
-	 * @param boundColumnName name of the column to which this check box should be
+	 * @param columnName name of the column to which this check box should be
 	 *                         bound
 	 */
-	public CheckBox(RowsModel rowsModel, final String boundColumnName) {
+	public CheckBox(RowsModel rowsModel, final String columnName) {
 		this(null);
-		rowsModel.bind(this, boundColumnName);
+		rowsModel.bind(this, columnName);
 	}
 
 	/**
@@ -160,14 +160,14 @@ public class CheckBox extends JCheckBox implements SSComponent
 			hook = new Hook(this) {
 				/**
 				 * Updates the value stored and displayed in the SwingSet component
-				 * based on getBoundColumnText()
+				 * based on getColumnText()
 				 */
 				@Override
 				protected void updateSSComponent()
 				{
-					logger.log(Level.DEBUG, () -> sf("%s: getBoundColumnText() - %s",getColumnForLog(), getBoundColumnText()));
+					logger.log(Level.DEBUG, () -> sf("%s: getColumnText() - %s",getColumnForLog(), getColumnText()));
 					
-					Boolean value = getBoundColumnObject(Boolean.class);
+					Boolean value = getColumnObject(Boolean.class);
 					setSelected(value == null ? false : value);
 				}
 				

@@ -68,13 +68,13 @@ public class SSImage extends Image
 	 * rowSet.
 	 *
 	 * @param rowsModel          - RowSet from/to which data has to be read/written
-	 * @param _boundColumnName - column in the rowSet to which the component should
+	 * @param columnName - column in the rowSet to which the component should
 	 *                         be bound.
 	 */
-	public SSImage(RowsModel rowsModel, String _boundColumnName)
+	public SSImage(RowsModel rowsModel, String columnName)
 	{
 		
-		super(rowsModel, _boundColumnName);
+		super(rowsModel, columnName);
 	}
 
 	/**
@@ -82,14 +82,14 @@ public class SSImage extends Image
 	 * rowSet.
 	 *
 	 * @param rowSet          - RowSet from/to which data has to be read/written
-	 * @param _boundColumnName - column in the rowSet to which the component should
+	 * @param columnName - column in the rowSet to which the component should
 	 *                         be bound.
 	 * @deprecated use RowsModel insted of RowSet
 	 */
 	@Deprecated
-	public SSImage(RowSet rowSet, String _boundColumnName)
+	public SSImage(RowSet rowSet, String columnName)
 	{
-		super(findRowsModel(rowSet), _boundColumnName);
+		super(findRowsModel(rowSet), columnName);
 	}
 
 }

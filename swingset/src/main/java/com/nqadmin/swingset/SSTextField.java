@@ -76,10 +76,10 @@ public class SSTextField extends TextField
 	 * Creates a SSTextField instance and binds it to the specified RowSet column.
 	 *
 	 * @param rowsModel          datasource to be used
-	 * @param _boundColumnName name of the column to which this label should be bound
+	 * @param columnName name of the column to which this label should be bound
 	 */
-	public SSTextField(RowsModel rowsModel, String _boundColumnName) {
-		super(rowsModel, _boundColumnName);
+	public SSTextField(RowsModel rowsModel, String columnName) {
+		super(rowsModel, columnName);
 	}
 
 	/**

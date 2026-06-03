@@ -87,12 +87,12 @@ public class SSSlider extends Slider {
 	 * specified RowSet column.
 	 *
 	 * @param rowsModel          datasource to be used.
-	 * @param boundColumnName name of the column to which this slider should be
+	 * @param columnName name of the column to which this slider should be
 	 *                         bound
 	 * @throws java.sql.SQLException SQLException
 	 */
-	public SSSlider(RowsModel rowsModel, String boundColumnName) throws java.sql.SQLException {
-		super(rowsModel, boundColumnName);
+	public SSSlider(RowsModel rowsModel, String columnName) throws java.sql.SQLException {
+		super(rowsModel, columnName);
 	}
 
 	/**
@@ -100,13 +100,13 @@ public class SSSlider extends Slider {
 	 * specified RowSet column.
 	 *
 	 * @param _rowSet          datasource to be used.
-	 * @param _boundColumnName name of the column to which this slider should be
+	 * @param columnName name of the column to which this slider should be
 	 *                         bound
 	 * @throws java.sql.SQLException SQLException
 	 * @deprecated use RowsModel insted of RowSet
 	 */
 	@Deprecated
-	public SSSlider(final RowSet _rowSet, final String _boundColumnName) throws java.sql.SQLException {
-		super(findRowsModel(_rowSet), _boundColumnName);
+	public SSSlider(final RowSet _rowSet, final String columnName) throws java.sql.SQLException {
+		super(findRowsModel(_rowSet), columnName);
 	}
 } // end public class SSSlider extends JSlider

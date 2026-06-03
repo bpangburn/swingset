@@ -62,7 +62,7 @@ import com.nqadmin.swingset.navigate.RowsModel;
  */
 // TODO: getAllowNull() is an issue
 // TODO: some of these must carefully be specified to only use a subset of the
-//		 methods. The getBoundColumn[Text/Object] could be problematic.
+//		 methods. The getColumn[Text/Object] could be problematic.
 //		They should have a way to check for recursion.
 public interface RSC
 {
@@ -125,34 +125,34 @@ public interface RSC
 	/**
 	 * @return the column index in the rowset
 	 */
-	int getBoundColumnIndex();
+	int getColumnIndex();
 
 	/**
 	 * @return the column name in the rowset
 	 */
-	String getBoundColumnName();
+	String getColumnName();
 
 	/**
 	 * @return The JDBCType of the column in the rowset
 	 */
-	JDBCType getBoundColumnJDBCType();
+	JDBCType getColumnJDBCType();
 
 	/**
 	 * @return column value as a String
 	 */
-	String getBoundColumnText();
-	//Object getBoundColumnObject() throws SQLException;
+	String getColumnText();
+	//Object getColumnObject() throws SQLException;
 
 	/**
 	 * Returns an Object of the specified type
 	 * representing the value in the bound database column.
 	 *
-	 * Note a null is never converted into ""; use getBoundColumnText for that.
+	 * Note a null is never converted into ""; use getColumnText for that.
 	 * @param <T> type to return
 	 * @param clazz Class of returned type
 	 * @return column object
 	 */
-	<T> T getBoundColumnObject(Class<T> clazz);
+	<T> T getColumnObject(Class<T> clazz);
 	//<T> T getTypedObject() throws SQLException;
 
 	/**

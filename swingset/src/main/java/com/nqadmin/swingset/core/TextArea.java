@@ -95,11 +95,11 @@ public class TextArea extends JTextArea implements SSComponent {
 	 * Creates a multi-line text box and binds it to the specified RowSet column.
 	 *
 	 * @param rowsModel          datasource to be used.
-	 * @param boundColumnName name of the column to which this text area should be bound
+	 * @param columnName name of the column to which this text area should be bound
 	 */
-	public TextArea(RowsModel rowsModel, String boundColumnName) {
+	public TextArea(RowsModel rowsModel, String columnName) {
 		this();
-		rowsModel.bind(this, boundColumnName);
+		rowsModel.bind(this, columnName);
 	}
 
 	/**
@@ -129,12 +129,12 @@ public class TextArea extends JTextArea implements SSComponent {
 			hook = new Hook(this) {
 				/**
 				 * Updates the value stored and displayed in the SwingSet
-				 * component based on getBoundColumnText()
+				 * component based on getColumnText()
 				 */
 				@Override
 				protected void updateSSComponent() {
 					
-					final String text = getBoundColumnText();
+					final String text = getColumnText();
 					logger.log(DEBUG, ()->sf("%s: Setting text area to %s.", getColumnForLog(), text));
 					setText(text);
 				}

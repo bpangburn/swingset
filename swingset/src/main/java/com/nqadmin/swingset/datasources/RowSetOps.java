@@ -348,9 +348,9 @@ public class RowSetOps {
 				return null;
 			return (UndoRedo.isUndoRedoEnabled(comp)
 					? (Array)UndoRedo.fetchCurrentChange(comp).value()
-					: comp.getRowSet().getArray(comp.getBoundColumnIndex()));
+					: comp.getRowSet().getArray(comp.getColumnIndex()));
 		} catch (SQLException ex) {
-			logger.log(ERROR, "SQL Exception for column " + comp.getBoundColumnName() + ".", ex);
+			logger.log(ERROR, "SQL Exception for column " + comp.getColumnName() + ".", ex);
 		}
 		return null;
 	}
@@ -368,7 +368,7 @@ public class RowSetOps {
 	{
 		return UndoRedo.isUndoRedoEnabled(comp)
 				? UndoRedo.fetchCurrentChange(comp).value()
-				: comp.getRowSet().getObject(comp.getBoundColumnIndex());
+				: comp.getRowSet().getObject(comp.getColumnIndex());
 	}
 
 	/**
@@ -384,7 +384,7 @@ public class RowSetOps {
 	public static Object getColumnObjectLegacy(RSC comp) throws SQLException
 	{
 		if(Boolean.TRUE)
-			return comp.getRowSet().getObject(comp.getBoundColumnIndex());
+			return comp.getRowSet().getObject(comp.getColumnIndex());
 		else
 			return getColumnObject2(comp);
 	}
@@ -406,8 +406,8 @@ public class RowSetOps {
 	private static Object getColumnObject2(RSC comp) throws SQLException
 	{
 		RowSet rs = comp.getRowSet();
-		int cIdx = comp.getBoundColumnIndex();
-		return switch (comp.getBoundColumnJDBCType()) {
+		int cIdx = comp.getColumnIndex();
+		return switch (comp.getColumnJDBCType()) {
 		case INTEGER, SMALLINT, TINYINT ->	rs.getInt(cIdx);
 		case BIGINT ->				rs.getLong(cIdx);
 		case REAL ->				rs.getFloat(cIdx);
@@ -420,7 +420,7 @@ public class RowSetOps {
 		case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR ->
 									rs.getString(cIdx);
 		default -> {
-			logger.log(WARNING, () -> "Unknown data type of " + comp.getBoundColumnJDBCType());
+			logger.log(WARNING, () -> "Unknown data type of " + comp.getColumnJDBCType());
 			yield rs.getObject(cIdx);
 		}
 		};
@@ -467,7 +467,7 @@ public class RowSetOps {
 	{
 		Object objectValue = UndoRedo.isUndoRedoEnabled(comp)
 				? UndoRedo.fetchCurrentChange(comp).value()
-				: comp.getRowSet().getObject(comp.getBoundColumnIndex());
+				: comp.getRowSet().getObject(comp.getColumnIndex());
 		return convertToType(objectValue, type);
 	}
 
@@ -482,7 +482,7 @@ public class RowSetOps {
 	private static <T> T getColumnObject2(RSC comp, Class<T> type)
 			throws SQLException
 	{
-		return comp.getRowSet().getObject(comp.getBoundColumnIndex() , type);
+		return comp.getRowSet().getObject(comp.getColumnIndex() , type);
 	}
 	
 	/**
@@ -497,7 +497,7 @@ public class RowSetOps {
 	public static String getColumnText(final SSComponent comp)
 	{
 		final RowSet rowSet = comp.getRowSet();
-		final int cIdx = comp.getBoundColumnIndex();
+		final int cIdx = comp.getColumnIndex();
 		String value = null;
 
 		try {
@@ -543,7 +543,7 @@ public class RowSetOps {
 	public static String getColumnObjectText(RSC comp)
 	{
 		final RowSet _rowSet = comp.getRowSet();
-		final String _columnName = comp.getBoundColumnName();
+		final String _columnName = comp.getColumnName();
 
 		String value = null;
 		try {
@@ -554,7 +554,7 @@ public class RowSetOps {
 
 			Object objectValue = UndoRedo.isUndoRedoEnabled(comp)
 					? UndoRedo.fetchCurrentChange(comp).value()
-					: comp.getRowSet().getObject(comp.getBoundColumnIndex());
+					: comp.getRowSet().getObject(comp.getColumnIndex());
 			if (objectValue == null)
 				return null;
 
@@ -740,7 +740,7 @@ public class RowSetOps {
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
 	public static void updateColumnArray(final SSComponent comp, final Array _updatedValue) throws SSSQLNullException, SQLException {
-		updateColumnArray(comp, comp.getRowSet(), _updatedValue, comp.getBoundColumnName(), comp.getAllowNull());
+		updateColumnArray(comp, comp.getRowSet(), _updatedValue, comp.getColumnName(), comp.getAllowNull());
 	}
 
 	/**
@@ -808,10 +808,10 @@ public class RowSetOps {
 			SSDBSupport.DbReader<RowSet, Integer, SSComponent, ?> columnReader = comp.getColumnReader();
 			if (columnReader != null)
 				return comp.getColumnReader()
-						.apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp);
+						.apply(comp.getRowSet(), comp.getColumnIndex(), comp);
 		}
 		
-		return rsc.getRowSet().getObject(rsc.getBoundColumnIndex());
+		return rsc.getRowSet().getObject(rsc.getColumnIndex());
 	}
 
 	/**
@@ -902,7 +902,7 @@ public class RowSetOps {
 			return;
 		}
 		final RowSet rowSet = comp.getRowSet();
-		final int columnIndex = comp.getBoundColumnIndex();
+		final int columnIndex = comp.getColumnIndex();
 		boolean allowNull = comp.getAllowNull();
 		logger.log(DEBUG, () -> comp.getColumnForLog() + " Update to: " + updatedValue + ". Allow null? [" + allowNull + "]");
 
@@ -921,7 +921,7 @@ public class RowSetOps {
 			}
 
 			//_rowSet.updateObject(_columnIndex, _updatedValue);
-			JDBCType jdbcType = comp.getBoundColumnJDBCType();
+			JDBCType jdbcType = comp.getColumnJDBCType();
 			// TODO: Maybe a component field that says use jdbc conversion.
 			//		 Better, checkDriverConvertToType(),
 			//		 so "obj = convertObjectTypeIfNeeded(...)"
@@ -986,7 +986,7 @@ public class RowSetOps {
 			throws SQLException
 	{
 		// Only do this for strings.
-		if (jdbcTypeToClass(comp.getBoundColumnJDBCType()) != String.class)
+		if (jdbcTypeToClass(comp.getColumnJDBCType()) != String.class)
 				return;
 
 		ForceConflict fc = defLookup(ForceConflict.class);
@@ -998,8 +998,8 @@ public class RowSetOps {
 			rs.execute();
 			rs.absolute(comp.getRowSet().getRow());
 			System.err.printf("FORCE_CONFLICT: %s\n",
-					rs.getObject(comp.getBoundColumnIndex()));
-			rs.updateString(comp.getBoundColumnIndex(), updatedValue + "_ForceConflict");
+					rs.getObject(comp.getColumnIndex()));
+			rs.updateString(comp.getColumnIndex(), updatedValue + "_ForceConflict");
 			rs.updateRow();
 		}
 	}
@@ -1026,7 +1026,7 @@ public class RowSetOps {
 		// TODO: This is only for debug
 		checkForceConflict(comp, updatedValue);
 		updateColumnText(comp, comp.getRowSet(), updatedValue,
-						 comp.getBoundColumnIndex(), comp.getAllowNull());
+						 comp.getColumnIndex(), comp.getAllowNull());
 	}
 
 	/**

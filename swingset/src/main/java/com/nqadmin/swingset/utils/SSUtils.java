@@ -440,7 +440,7 @@ public class SSUtils {
 	 */
 	public static String ssComponentToString(SSComponent comp)
 	{
-		return sf("%s, column=%s", objectID(comp.getRowSet()), comp.getBoundColumnName());
+		return sf("%s, column=%s", objectID(comp.getRowSet()), comp.getColumnName());
 	}
 
 	/**

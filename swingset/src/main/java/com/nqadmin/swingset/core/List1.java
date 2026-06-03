@@ -507,7 +507,7 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponent
 
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
-	 * getBoundColumnText()
+	 * getColumnText()
 	 * <p>
 	 * Call to this method should be coming from SSCommon and should already have
 	 * the Component listener removed
@@ -520,7 +520,7 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponent
 
 		Object array = null;
 		//
-		// TODO: Should getBoundColumnObject() be used here?
+		// TODO: Should getColumnObject() be used here?
 		//		 Seems like it, it's used just about everywhere else.
 		//
 		try {

@@ -280,14 +280,14 @@ public interface SSComponent extends RSC
 	 * bind(this.ssCommon);
 	 *
 	 * @param rowsModel holds RowSet to be used.
-	 * @param boundColumnName Name of the column to which this check box should be bound
+	 * @param columnName Name of the column to which this check box should be bound
 	 * 
-	 * @deprecated Use rowsModel.bind(sscomp, boundColumnName)
+	 * @deprecated Use rowsModel.bind(sscomp, columnName)
 	 */
 	@Deprecated
-	default void bind(RowsModel rowsModel, String boundColumnName)
+	default void bind(RowsModel rowsModel, String columnName)
 	{
-		getSSCommon().bind(rowsModel, boundColumnName);
+		getSSCommon().bind(rowsModel, columnName);
 	}
 
 	/**
@@ -304,13 +304,13 @@ public interface SSComponent extends RSC
 	/**
 	 * Transition support.
 	 * @param rowSet
-	 * @param boundColumnName
+	 * @param columnName
 	 * @deprecated use RowsModel not RowSet
 	 */
 	@Deprecated
-	default void bind(RowSet rowSet, String boundColumnName)
+	default void bind(RowSet rowSet, String columnName)
 	{
-		bind(findRowsModel(rowSet), boundColumnName);
+		bind(findRowsModel(rowSet), columnName);
 	}
 
 	/**
@@ -336,26 +336,26 @@ public interface SSComponent extends RSC
 	 * @return the database value as String to display in the SSComponent, may be from undo/redo stack.
 	 */
 	@Override
-	default String getBoundColumnText() {
-		return getSSCommon().getBoundColumnText();
+	default String getColumnText() {
+		return getSSCommon().getColumnText();
 	}
 
 	/**
 	 * Returns the Object for the bound database column
 	 * as returned by {@link RowSet#getObject(int) }.
 	 * <p>
-	 * Note a null is never converted into ""; use getBoundColumnText for that.
+	 * Note a null is never converted into ""; use getColumnText for that.
 	 * @return the value to display in the SSComponent, may be from undo/redo stack.
 	 */
 	// TODO: put this in RSC?
-	default Object getBoundColumnObject() {
-		return getSSCommon().getBoundColumnObject();
+	default Object getColumnObject() {
+		return getSSCommon().getColumnObject();
 	}
 
 	/** {@inheritDoc } */
 	@Override
-	default <T> T getBoundColumnObject(Class<T> clazz) {
-		return getSSCommon().getBoundColumnObject(clazz);
+	default <T> T getColumnObject(Class<T> clazz) {
+		return getSSCommon().getColumnObject(clazz);
 	}
 
 	/**
@@ -364,8 +364,8 @@ public interface SSComponent extends RSC
 	 * <p>
 	 * @return the value to display in the SSComponent, may be from undo/redo stack.
 	 */
-	default Array getBoundColumnArray() {
-		return getSSCommon().getBoundColumnArray();
+	default Array getColumnArray() {
+		return getSSCommon().getColumnArray();
 	}
 
 	/**
@@ -389,7 +389,7 @@ public interface SSComponent extends RSC
 	 * For exampe, see {@link com.nqadmin.swingset.core.Image} source code.
 	 * 
 	 * The {@code columnReader} is typically invoked like
-	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp)}.
+	 * {@code .apply(comp.getRowSet(), comp.getColumnIndex(), comp)}.
 	 * The comp is rarely used, and provided for complex situations. The
 	 * columnReader return the value fetched from the datbase.
 	 * 
@@ -406,7 +406,7 @@ public interface SSComponent extends RSC
 	 * For exampe, see {@link com.nqadmin.swingset.core.Image} source code.
 	 * 
 	 * The {@code columnReader} is typically invoked like
-	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp)}.
+	 * {@code .apply(comp.getRowSet(), comp.getColumnIndex(), comp)}.
 	 * The comp is rarely used, and provided for complex situations.
 	 * 
 	 * @param columnReader the DbReader used to fetch values from the database
@@ -434,11 +434,11 @@ public interface SSComponent extends RSC
 	 * in {@link RowSetOps#updateColumnText(com.nqadmin.swingset.utils.SSComponent, java.lang.String) }.
 	 * Does not commit the update row.
 	 *
-	 * @param boundColumnText the value to set in the bound database column
+	 * @param columnText the value to set in the bound database column
 	 * @return true if no error
 	 */
-	default boolean setBoundColumnText(final String boundColumnText) {
-		return getSSCommon().setBoundColumnText(boundColumnText);
+	default boolean setColumnText(final String columnText) {
+		return getSSCommon().setColumnText(columnText);
 	}
 
 	/**
@@ -446,11 +446,11 @@ public interface SSComponent extends RSC
 	 * method used by SwingSet component listeners to update the underlying RowSet.
 	 * Does not commit the update row.
 	 *
-	 * @param boundColumnObject the value to set in the bound database column
+	 * @param columnObject the value to set in the bound database column
 	 * @return true if no error
 	 */
-	default boolean setBoundColumnObject(final Object boundColumnObject) {
-		return getSSCommon().setBoundColumnObject(boundColumnObject);
+	default boolean setColumnObject(final Object columnObject) {
+		return getSSCommon().setColumnObject(columnObject);
 	}
 
 	/**
@@ -462,13 +462,13 @@ public interface SSComponent extends RSC
 	 * details on how arrays are read and written.
 	 * Does not commit the update row.
 	 *
-	 * @param boundColumnArray Array to write to bound database column
+	 * @param columnArray Array to write to bound database column
 	 * @return true if no error
 	 * @throws SQLException thrown if there is a problem writing the array to the
 	 *                      RowSet
 	 */
-	default boolean setBoundColumnArray(final Array boundColumnArray) throws SQLException {
-		return getSSCommon().setBoundColumnArray(boundColumnArray);
+	default boolean setColumnArray(final Array columnArray) throws SQLException {
+		return getSSCommon().setColumnArray(columnArray);
 	}
 
 	/**
@@ -494,7 +494,7 @@ public interface SSComponent extends RSC
 	 * For exampe, see {@link com.nqadmin.swingset.core.Image} source code.
 	 * 
 	 * The {@code columnWriter} is typically invoked like
-	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp, value)}.
+	 * {@code .apply(comp.getRowSet(), comp.getColumnIndex(), comp, value)}.
 	 * The comp is rarely used, and provided for complex situations.
 	 * 
 	 * @return the DbWriter used to update to the database
@@ -510,7 +510,7 @@ public interface SSComponent extends RSC
 	 * For exampe, see {@link com.nqadmin.swingset.core.Image} source code.
 	 * 
 	 * The {@code columnWriter} is typically invoked like
-	 * {@code .apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp, value)}.
+	 * {@code .apply(comp.getRowSet(), comp.getColumnIndex(), comp, value)}.
 	 * The comp is rarely used, and provided for complex situations.
 	 * 
 	 * @param columnWriter the DbWriter used to update the database
@@ -576,8 +576,8 @@ public interface SSComponent extends RSC
 	 *         bound
 	 */
 	@Override
-	default int getBoundColumnIndex() {
-		return getSSCommon().getBoundColumnIndex();
+	default int getColumnIndex() {
+		return getSSCommon().getColumnIndex();
 	}
 
 	/**
@@ -586,8 +586,8 @@ public interface SSComponent extends RSC
 	 * @return the bound column name
 	 */
 	@Override
-	default String getBoundColumnName() {
-		return getSSCommon().getBoundColumnName();
+	default String getColumnName() {
+		return getSSCommon().getColumnName();
 	}
 
 	/**
@@ -596,8 +596,8 @@ public interface SSComponent extends RSC
 	 * @return the enum value corresponding to the data type of the bound column
 	 */
 	@Override
-	default JDBCType getBoundColumnJDBCType() {
-		return getSSCommon().getBoundColumnJDBCType();
+	default JDBCType getColumnJDBCType() {
+		return getSSCommon().getColumnJDBCType();
 	}
 
 	/**
@@ -610,7 +610,7 @@ public interface SSComponent extends RSC
 	 */
 	@Deprecated
 	default int getBoundColumnType() {
-		return getBoundColumnJDBCType().getVendorTypeNumber();
+		return getColumnJDBCType().getVendorTypeNumber();
 	}
 
 	/**
@@ -624,7 +624,7 @@ public interface SSComponent extends RSC
 	}
 
 	/**
-	 * Get the backup text for log entries which is only used if boundColumnName is null.
+	 * Get the backup text for log entries which is only used if columnName is null.
 	 * 
 	 * @return text for log entries, null if never set
 	 */
@@ -633,8 +633,8 @@ public interface SSComponent extends RSC
 	}
 
 	/**
-	 * Set the text for log entries which is only used if boundColumnName is null.
-	 * @param logColumnName show this in log entry if boundColumnName is null
+	 * Set the text for log entries which is only used if columnName is null.
+	 * @param logColumnName show this in log entry if columnName is null
 	 */
 	default void setLogColumnName(final String logColumnName) {
 		getSSCommon().setLogColumnName(logColumnName);

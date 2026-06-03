@@ -109,7 +109,7 @@ public class RowSetModificationEvent extends EventObjectBacktrace
 	 */
 	public String getColumnName()
 	{
-		return getSource().getBoundColumnName();
+		return getSource().getColumnName();
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class RowSetModificationEvent extends EventObjectBacktrace
 	 */
 	public int getColumnIndex()
 	{
-		return getSource().getBoundColumnIndex();
+		return getSource().getColumnIndex();
 	}
 
 	/**

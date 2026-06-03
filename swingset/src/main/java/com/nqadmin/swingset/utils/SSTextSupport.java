@@ -220,7 +220,7 @@ public class SSTextSupport
 			// ISSUE: when decorator uses NavigateState.errorComponents,
 			// as accessed through RowsModel.hasError(comp), that state may
 			// still be there, since it's updated by RowSet event,
-			// which comes from setBoundColumnText.
+			// which comes from setColumnText.
 			try {
 				ssCommon.pendingDbChange = true;
 				if (!ssCommon.decorate()) {
@@ -233,7 +233,7 @@ public class SSTextSupport
 			boolean ok = true;
 			//boolean inErrorState = ssCommon.getRowsModel().hasError(ssCommon.getSSComponent());
 			try {
-				ok = ssCommon.setBoundColumnText(text);
+				ok = ssCommon.setColumnText(text);
 			} finally {
 				if (!ok) {
 					if (ssCommon.isRestoreOnError()) {

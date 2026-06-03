@@ -92,18 +92,18 @@ public class TextField extends JTextField implements SSComponent
 	 * Creates a TextField instance and binds it to the specified RowSet column.
 	 *
 	 * @param rowsModel        model for a RowSet
-	 * @param boundColumnName name of the column to which this label should be bound
+	 * @param columnName name of the column to which this label should be bound
 	 */
-	public TextField(RowsModel rowsModel, String boundColumnName) {
-		this(null, rowsModel, boundColumnName);
+	public TextField(RowsModel rowsModel, String columnName) {
+		this(null, rowsModel, columnName);
 	}
 
 	/** All the constructors feed through here */
-	private TextField(String text, RowsModel rowsModel, String boundColumnName) {
+	private TextField(String text, RowsModel rowsModel, String columnName) {
 		super(text);
 		finishSSCommon();
 		if (rowsModel != null)
-			rowsModel.bind(this, boundColumnName);
+			rowsModel.bind(this, columnName);
 	}
 
 	/**
@@ -150,12 +150,12 @@ public class TextField extends JTextField implements SSComponent
 			hook = new Hook(this) {
 				/**
 				 * Updates the value stored and displayed in the SwingSet
-				 * component based on getBoundColumnText()
+				 * component based on getColumnText()
 				 */
 				@Override
 				protected void updateSSComponent() {
 					
-					final String text = getBoundColumnText();
+					final String text = getColumnText();
 					logger.log(DEBUG, ()->sf("%s: Setting text field to %s.", getColumnForLog(), text));
 					setText(text);
 				}

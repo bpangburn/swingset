@@ -322,7 +322,7 @@ public final class RowsModel
 
 				// verify same column type and nullable.
 				String colName = entry.getValue();
-				JDBCType oldType = comp.getBoundColumnJDBCType();
+				JDBCType oldType = comp.getColumnJDBCType();
 				JDBCType newType = JDBCType.NULL;
 				try {
 					newType = RowSetOps.getJDBCColumnType(rs, colName);

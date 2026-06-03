@@ -110,7 +110,7 @@ final class UndoCol
 	private static Object initialValue(RSC comp) throws SQLException
 	{
 		//return isPreInsertOps(comp.getRowSet())
-		//		? null : comp.getRowSet().getObject(comp.getBoundColumnIndex());
+		//		? null : comp.getRowSet().getObject(comp.getColumnIndex());
 
 		// If doing preInsertOps, just use a null for the initial value
 		// (special case text field); the real value is on the way.

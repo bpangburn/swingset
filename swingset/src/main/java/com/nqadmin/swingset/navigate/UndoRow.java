@@ -129,7 +129,7 @@ final class UndoRow
 	private UndoCol getCol(RSC comp) throws SQLException
 	{
 		setupCols(comp.getRowSet());
-		int columnIdx = comp.getBoundColumnIndex();
+		int columnIdx = comp.getColumnIndex();
 		UndoCol col = cols[columnIdx];
 		if (col == null) {
 			col = new UndoCol(comp);
@@ -155,7 +155,7 @@ final class UndoRow
 	{
 		if (cols == null)
 			return false;
-		UndoCol col = cols[comp.getBoundColumnIndex()];
+		UndoCol col = cols[comp.getColumnIndex()];
 		return col != null && col.isDirty();
 	}
 
@@ -215,7 +215,7 @@ final class UndoRow
 	{
 		if (cols == null)
 			return UndoRedo.NO_CHANGE;
-		UndoCol col = cols[comp.getBoundColumnIndex()];
+		UndoCol col = cols[comp.getColumnIndex()];
 		if (col == null)
 			return UndoRedo.NO_CHANGE;
 		return col.findUndoRedoChange(cmd);

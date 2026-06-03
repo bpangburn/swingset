@@ -211,13 +211,13 @@ public class Image extends JPanel implements SSComponent
 	 * rowSet.
 	 *
 	 * @param rowsModel          - RowSet from/to which data has to be read/written
-	 * @param boundColumnName - column in the rowSet to which the component should
+	 * @param columnName - column in the rowSet to which the component should
 	 *                         be bound.
 	 */
-	public Image(RowsModel rowsModel, String boundColumnName)
+	public Image(RowsModel rowsModel, String columnName)
 	{
 		this();
-		rowsModel.bind(this, boundColumnName);
+		rowsModel.bind(this, columnName);
 	}
 
 	/** {@inheritDoc } */
@@ -339,7 +339,7 @@ public class Image extends JPanel implements SSComponent
 
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
-	 * getBoundColumnText().
+	 * getColumnText().
 	 * <p>
 	 * Call to this method should be coming from SSCommon and should already have
 	 * the Component listener removed.

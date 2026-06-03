@@ -51,7 +51,7 @@ public class DbDatePicker extends DatePicker implements SSComponent
 		public void dateChanged(final DateChangeEvent dce)
 		{
 			try {
-				dbChange(() -> setBoundColumnObject(dce.getNewDate()));
+				dbChange(() -> setColumnObject(dce.getNewDate()));
 			} catch (SQLException ex) {
 				logger.log(Logger.Level.ERROR, (String) null, ex);
 			}
@@ -141,8 +141,8 @@ public class DbDatePicker extends DatePicker implements SSComponent
 				@Override
 				protected void updateSSComponent()
 				{
-					logger.log(DEBUG, () -> sf("%s: getBoundColumnText() - %s",getColumnForLog(), getBoundColumnText()));
-					LocalDate value = getBoundColumnObject(LocalDate.class);
+					logger.log(DEBUG, () -> sf("%s: getBoundColumnText() - %s",getColumnForLog(), getColumnText()));
+					LocalDate value = getColumnObject(LocalDate.class);
 					setDate(value);
 				}
 				

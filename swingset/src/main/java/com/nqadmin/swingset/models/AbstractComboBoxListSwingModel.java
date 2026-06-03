@@ -670,16 +670,12 @@ public abstract class AbstractComboBoxListSwingModel {
 		// DefaultComboBoxModel (make sure Vector never gets referenced)
 		//
 		
-		// TODO: Add @Override and remove SuppressWarnings annotation post Java 8
-		@SuppressWarnings({"all","javadoc"})
 		/** {@inheritDoc} */
 		@Override
 		public void addAll(int index, Collection<? extends SSListItem> c) {
 			internalAddAll(index, c);
 		}
 		
-		// TODO: Add @Override and remove SuppressWarnings annotation post Java 8
-		@SuppressWarnings({"all","javadoc"})
 		/** {@inheritDoc} */
 		@Override
 		public void addAll(Collection<? extends SSListItem> c) {
@@ -1116,8 +1112,8 @@ public abstract class AbstractComboBoxListSwingModel {
 	}
 
 	/**
-	 * Create a list slice of the item list. There is no checking on the
- element index.<p>
+	 * Create a list slice of the item list. There is no checking on the element index.
+	 * <p>
 	 * If a returned element slice is not valid according to the
 	 * itemNumElems property, {@link #setItemNumElems},
 	 * then an attempt to use that slice
@@ -1263,8 +1259,6 @@ public abstract class AbstractComboBoxListSwingModel {
 		// protected boolean isModifiedLength = false;
 
 		/** a Remodel */
-		// TODO: See if we can remove "all" in later JDK, but may be IDE-specific.
-		@SuppressWarnings({"all","OverridableMethodCallInConstructor"})
 		protected Remodel() {
 			remodelTakeWriteLock();
 		}

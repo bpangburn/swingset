@@ -69,6 +69,7 @@ import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.core.DBComboBox2;
 import com.nqadmin.swingset.datasources.ConvertType;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.datasources.SSDBSupport.ConsumerSQL;
@@ -248,18 +249,18 @@ final class SSCommon
 	static final int NO_COLUMN_INDEX = -1;
 
 	/** Index of RowSet column to which the SwingSet component will be bound. */
-	private int boundColumnIndex = NO_COLUMN_INDEX;
+	private int columnIndex = NO_COLUMN_INDEX;
 
 	/** Column JDBCType enum. */
-	private JDBCType boundColumnJDBCType = java.sql.JDBCType.NULL;
+	private JDBCType columnJDBCType = java.sql.JDBCType.NULL;
 
 	/** Name of RowSet column to which the SwingSet component will be bound. */
-	private String boundColumnName = null;
+	private String columnName = null;
 	
 	/** EventListener use for detecting component changes for RowSet column binding. */
 	private EventListener eventListener = null;
 
-	/** Name for log in boundColumnName is not set. */
+	/** Name for log if columnName is not set. */
 	private String logColumnName = null;
 
 	/** true for component bound with RowSet not null. */
@@ -489,9 +490,9 @@ final class SSCommon
 		return fullyBound;
 	}
 
-	void bind(RowsModel rowsModel, String boundColumnName)
+	void bind(RowsModel rowsModel, String columnName)
 	{
-		bind(rowsModel, boundColumnName, true);
+		bind(rowsModel, columnName, true);
 	}
 
 	/**
@@ -501,16 +502,16 @@ final class SSCommon
 	 * bind(this.ssCommon);
 	 *
 	 * @param rowsModel holds RowSet to be used.
-	 * @param boundColumnName Name of the column to which this check box should be bound
+	 * @param columnName Name of the column to which this check box should be bound
 	 * @param doStart true means do everything, false means just do last step
 	 */
-	private void bind(RowsModel rowsModel, String boundColumnName, boolean doStart)
+	private void bind(RowsModel rowsModel, String columnName, boolean doStart)
 	{
 		Objects.requireNonNull(rowsModel);
 		RowSet rs = rowsModel.getRowSet();
 		if (rs != null) {
 			try {
-				getSSComponent().checkColumnType(RowSetOps.getJDBCColumnType(rs, boundColumnName));
+				getSSComponent().checkColumnType(RowSetOps.getJDBCColumnType(rs, columnName));
 			} catch (SQLException ex) {
 				// TODO: This should invalidate the RowsModel
 				throw new IllegalArgumentException("SQLException getting column type", ex);
@@ -518,7 +519,7 @@ final class SSCommon
 		}
 
 		if (doStart)
-			startBind(rowsModel, boundColumnName);
+			startBind(rowsModel, columnName);
 		else
 			completeBind();
 
@@ -531,10 +532,10 @@ final class SSCommon
 	 * startBind() to update Component;
 	 *
 	 * @param rowsModel        datasource to be used
-	 * @param boundColumnName name of the column to which this check box should be
+	 * @param columnName name of the column to which this check box should be
 	 *                         bound
 	 */
-	private void startBind(RowsModel rowsModel, String boundColumnName)
+	private void startBind(RowsModel rowsModel, String columnName)
 	{
 		Objects.requireNonNull(rowsModel);
 		verifyInitialized();
@@ -544,15 +545,15 @@ final class SSCommon
 			throw new IllegalStateException(sf("Component already bound to a model: %s %s %s/%s",
 					objectID(getSSComponent()), objectID(this.rowsModel),
 					objectID(rowsModel), objectID(rowsModel.getRowSet())));
-		if (this.boundColumnName != null)
+		if (this.columnName != null)
 			throw new IllegalStateException(getColumnForLog() + " already has columnName: " + objectID(rowsModel.getRowSet()));
-		// TODO: what's the meaning of an empty boundColumnName? should this be an error?
-		if (boundColumnName.isEmpty())
-			throw new IllegalStateException("Emply boundColumnName: " + objectID(rowsModel.getRowSet()));
+		// TODO: what's the meaning of an empty columnName? should this be an error?
+		if (columnName.isEmpty())
+			throw new IllegalStateException("Emply columnName: " + objectID(rowsModel.getRowSet()));
 
 		// Stash the model and columnName and housecleaning and get out if no RowSet
 		
-		this.boundColumnName = boundColumnName;
+		this.columnName = columnName;
 		this.rowsModel = rowsModel;
 		if (eventListener==null)
 			eventListener = getSSComponent().getSSComponentHook().getSSComponentListener();
@@ -576,14 +577,13 @@ final class SSCommon
 	private void completeBind()
 	{
 		try {
-			boundColumnJDBCType = JDBCType.valueOf(
-					RowSetOps.getColumnType(getRowSet(), boundColumnName));
+			columnJDBCType = JDBCType.valueOf(RowSetOps.getColumnType(getRowSet(), columnName));
 
 			// isNullable used a lot. Do it here.
-			isNullable = RowSetOps.isNullable(getRowSet(), boundColumnName);
+			isNullable = RowSetOps.isNullable(getRowSet(), columnName);
 			logger.log(TRACE, () -> sf("Column isNullable: %s.", isNullable));
 			logger.log(TRACE, () -> sf("Column bind succeeded: name=%s %s.",
-					boundColumnName, getRowSet()==null ? ", rowset=null" : ""));
+					columnName, getRowSet()==null ? ", rowset=null" : ""));
 
 			ssComponent.metadataChange();
 			fullyBound = true;
@@ -593,7 +593,7 @@ final class SSCommon
 	}
 
 	private void updateBindingForNewRowSet() {
-		boundColumnIndex = NO_COLUMN_INDEX; // In case the field is in a different position
+		columnIndex = NO_COLUMN_INDEX; // In case the field is in a different position
 
 		if (rowsModel.getRowSet() == null) {
 			getSSComponent().metadataChange();
@@ -601,17 +601,16 @@ final class SSCommon
 		}
 
 		if (!fullyBound) {
-			bind(rowsModel, boundColumnName, false);
+			bind(rowsModel, columnName, false);
 			return;
 		}
 
 		// Verify same ColumnType and nullability
 		try {
-			JDBCType typ = JDBCType.valueOf(
-					RowSetOps.getColumnType(getRowSet(), boundColumnName));
-			if (boundColumnJDBCType != typ)
-				throw new IllegalArgumentException(JDBCTypeMismatch(boundColumnJDBCType, typ));
-			boolean nulbl = RowSetOps.isNullable(getRowSet(), boundColumnName).get();
+			JDBCType typ = JDBCType.valueOf(RowSetOps.getColumnType(getRowSet(), columnName));
+			if (columnJDBCType != typ)
+				throw new IllegalArgumentException(JDBCTypeMismatch(columnJDBCType, typ));
+			boolean nulbl = RowSetOps.isNullable(getRowSet(), columnName).get();
 			if (isNullable.get() != nulbl)
 				throw new IllegalArgumentException(NullabilityMismatch(getAllowNull(), nulbl));
 		} catch (SQLException ex) {
@@ -655,7 +654,7 @@ final class SSCommon
 	 *
 	 * @return String containing the value in the bound database column
 	 */
-	String getBoundColumnText() {
+	String getColumnText() {
 		
 		// TODO Consider checking for a null RowSet. This would be the case for an unbound SSDBComboBox used for navigation.
 
@@ -679,10 +678,10 @@ final class SSCommon
 	 * Returns an Object 
 	 * representing the value in the bound database column.
 	 * <p>
-	 * Note a null is never converted into ""; use getBoundColumnText for that.
+	 * Note a null is never converted into ""; use getColumnText for that.
 	 * @return value
 	 */
-	Object getBoundColumnObject()
+	Object getColumnObject()
 	{
 		Object value = null;
 
@@ -698,35 +697,15 @@ final class SSCommon
 	}
 
 	/**
-	 * Returns an Array from the bound database column.
-	 * <p>
-	 * @return value
-	 */
-	Array getBoundColumnArray()
-	{
-		Array value = null;
-
-		try {
-			if (hasActiveRow(getSSComponent())) {
-				value = RowSetOps.getColumnArray(ssComponent);
-			}
-		} catch (SQLException se) {
-			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", se);
-		}
-
-		return value;
-	}
-
-	/**
 	 * Returns an Object of the specified type
 	 * representing the value in the bound database column.
 	 *
-	 * Note a null is never converted into ""; use getBoundColumnText for that.
+	 * Note a null is never converted into ""; use getColumnText for that.
 	 * @param <T> type to return
 	 * @param type Class of returned type
 	 * @return value
 	 */
-	<T> T getBoundColumnObject(Class<T> type)
+	<T> T getColumnObject(Class<T> type)
 	{
 		T value = null;
 
@@ -736,6 +715,26 @@ final class SSCommon
 			}
 		} catch (SQLException se) {
 			// TODO: Shouldn't an error be propogated? Related methods as well.
+			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", se);
+		}
+
+		return value;
+	}
+
+	/**
+	 * Returns an Array from the bound database column.
+	 * <p>
+	 * @return value
+	 */
+	Array getColumnArray()
+	{
+		Array value = null;
+
+		try {
+			if (hasActiveRow(getSSComponent())) {
+				value = RowSetOps.getColumnArray(ssComponent);
+			}
+		} catch (SQLException se) {
 			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", se);
 		}
 
@@ -754,7 +753,7 @@ final class SSCommon
 		// TODO: Want some checking like this, but there may be special circumstances.
 		//       For example, handling LONGVARCHAR may want stream.
 		// TODO: Need plugin support?
-		// if (ConvertType.isHandledType(getSSComponent().getBoundColumnJDBCType()))
+		// if (ConvertType.isHandledType(getSSComponent().getColumnJDBCType()))
 		// 	throw new IllegalArgumentException("Known JDBCType %s should not have columnReader");
 		this.columnReader = columnReader;
 	}
@@ -781,22 +780,22 @@ final class SSCommon
 	/**
 	 * Updates the bound database column with the specified String.
 	 *
-	 * @param boundColumnText value to write to bound database column
+	 * @param columnText value to write to bound database column
 	 * @return true if no error
 	 */
-	boolean setBoundColumnText(String boundColumnText) {
-		return setColumn(boundColumnText, (value) ->
+	boolean setColumnText(String columnText) {
+		return setColumn(columnText, (value) ->
 				RowSetOps.updateColumnText(getSSComponent(), (String)value));
 	}
 
 	/**
 	 * Updates the bound database column with the specified Object.
 	 *
-	 * @param boundColumnObject value to write to bound database column
+	 * @param columnObject value to write to bound database column
 	 * @return true if no error
 	 */
-	boolean setBoundColumnObject(Object boundColumnObject) {
-		return setColumn(boundColumnObject, (value) ->
+	boolean setColumnObject(Object columnObject) {
+		return setColumn(columnObject, (value) ->
 				RowSetOps.updateColumnObject(getSSComponent(), value));
 	}
 
@@ -805,13 +804,13 @@ final class SSCommon
 	 * <p>
 	 * Used for SSList or other component where multiple items can be selected.
 	 *
-	 * @param boundColumnArray Array to write to bound database column
+	 * @param columnArray Array to write to bound database column
 	 * @return true if no error
 	 * @throws SQLException thrown if there is a problem writing the array to the
 	 *                      RowSet
 	 */
-	boolean setBoundColumnArray(Array boundColumnArray) throws SQLException {
-		return setColumn(boundColumnArray, (value) ->
+	boolean setColumnArray(Array columnArray) throws SQLException {
+		return setColumn(columnArray, (value) ->
 				RowSetOps.updateColumnArray(getSSComponent(), (Array) value));
 	}
 
@@ -883,7 +882,7 @@ final class SSCommon
 		switch(ex) {
 		case SSSQLInternalException e -> {
 			ex_title = "SS Internal Error";
-			ex_msg = sf("%s: %s", getBoundColumnName(), e.getMessage());
+			ex_msg = sf("%s: %s", getColumnName(), e.getMessage());
 		}
 		case SSSQLConversionException e -> {
 			ex_title = "Conversion Error";
@@ -891,19 +890,19 @@ final class SSCommon
 		}
 		case SSSQLNullException _ -> {
 			ex_title = "Null Exception";
-			ex_msg = "Null values are not allowed for " + getBoundColumnName();
+			ex_msg = "Null values are not allowed for " + getColumnName();
 		}
 		case SQLException _ -> {
 			ex_title = "SQL Exception";
-			ex_msg = "SQL Exception encountered for " + getBoundColumnName();
+			ex_msg = "SQL Exception encountered for " + getColumnName();
 		}
 		case NumberFormatException _ -> {
 			ex_title = "Number Format Exception";
-			ex_msg = "Number Format Exception encountered for " + getBoundColumnName() + " converting " + value + " to a number.";
+			ex_msg = "Number Format Exception encountered for " + getColumnName() + " converting " + value + " to a number.";
 		}
 		default -> {}
 		}
-		logger.log(WARNING, getBoundColumnName() + " - " + ex_title + ".", ex);
+		logger.log(WARNING, getColumnName() + " - " + ex_title + ".", ex);
 		JOptionPane.showMessageDialog((JComponent)getSSComponent(), ex_msg,
 									  ex_title, JOptionPane.ERROR_MESSAGE);
 	}
@@ -958,26 +957,29 @@ final class SSCommon
 	 * @return returns the index of the column to which the SwingSet component is
 	 *         bound
 	 */
-	int getBoundColumnIndex() {
-		if (boundColumnIndex == NO_COLUMN_INDEX) {
+	int getColumnIndex() {
+		if (columnIndex == NO_COLUMN_INDEX) {
 			try {
-				boundColumnIndex = RowSetOps.getColumnIndex(getRowSet(), boundColumnName);
+				columnIndex = RowSetOps.getColumnIndex(getRowSet(), columnName);
 			} catch (SQLException ex) {
 				// TODO: Ex should be impossible, wrap in runtime error (see google Ex)
 				logger.log(Level.ERROR, (String) null, ex);
 			}
 		}
-		return boundColumnIndex;
+		return columnIndex;
 	}
 
 	/**
 	 * Returns the name of the database column to which the SwingSet component is
 	 * bound.
+	 * <p>
+	 * Note: In {@link DBComboBox2} if this returns null, then it's a
+	 * ComboBoxNavigator.
 	 *
-	 * @return the boundColumnName
+	 * @return the bound columnName
 	 */
-	String getBoundColumnName() {
-		return boundColumnName;
+	String getColumnName() {
+		return columnName;
 	}
 
 	/**
@@ -987,22 +989,22 @@ final class SSCommon
 	 *
 	 * @return the enum value corresponding to the data type of the bound column
 	 */
-	JDBCType getBoundColumnJDBCType() {
-		return boundColumnJDBCType;
+	JDBCType getColumnJDBCType() {
+		return columnJDBCType;
 	}
 
 	/**
 	 * Returns the bound column name in square brackets.
 	 *
-	 * @return the boundColumnName in square brackets
+	 * @return the bound columnName in square brackets
 	 */
 	String getColumnForLog() {
-		return sf("[%s:%d]", boundColumnName != null ? boundColumnName : logColumnName,
-				boundColumnIndex);
+		return sf("[%s:%d]", columnName != null ? columnName : logColumnName,
+				columnIndex);
 	}
 
 	/**
-	 * Name/text to display in log messages if boundColumnName is not set.
+	 * Name/text to display in log messages if bound columnName is not set.
 	 * @return text for log entries, null if never set
 	 */
 	String getLogColumnName() {
@@ -1010,7 +1012,7 @@ final class SSCommon
 	}
 
 	/**
-	 * Name/text to display in log messages if boundColumnName is not set.
+	 * Name/text to display in log messages if bound columnName is not set.
 	 * @param logColumnName text
 	 */
 	void setLogColumnName(String logColumnName) {
@@ -1238,10 +1240,10 @@ final class SSCommon
 		Object obj = change.value();
 		try {
 			// throw shouldn't be a problem because value fetched from undo/redo stack.
-			if (ConvertType.isHandledType(getBoundColumnJDBCType()))
-				obj = ConvertType.convertToType(obj, getBoundColumnJDBCType()); // may throw
+			if (ConvertType.isHandledType(getColumnJDBCType()))
+				obj = ConvertType.convertToType(obj, getColumnJDBCType()); // may throw
 			// NOTE: following does not generate any events
-			getRowSet().updateObject(getBoundColumnIndex(), obj); // TODO: Use RowSetOps?
+			getRowSet().updateObject(getColumnIndex(), obj); // TODO: Use RowSetOps?
 		} catch (SQLException ex) {
 			if (!change.isError())
 				throw new IllegalStateException("EXCEPTION BUT NOT ERROR");

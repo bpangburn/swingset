@@ -108,21 +108,21 @@ public class SimpleRSC implements RSC
 
 	/** {@inheritDoc} */
 	@Override
-	public int getBoundColumnIndex()
+	public int getColumnIndex()
 	{
 		return index;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public String getBoundColumnName()
+	public String getColumnName()
 	{
 		return name;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public JDBCType getBoundColumnJDBCType()
+	public JDBCType getColumnJDBCType()
 	{
 		try {
 			return RowSetOps.getJDBCColumnType(getRowSet(), index);
@@ -134,7 +134,7 @@ public class SimpleRSC implements RSC
 	/** {@inheritDoc} */
 	// TODO: SQLException better?
 	@Override
-	public String getBoundColumnText()
+	public String getColumnText()
 	{
 		String value = "";
 
@@ -156,14 +156,13 @@ public class SimpleRSC implements RSC
 	/** {@inheritDoc} */
 	// TODO: SQLException better?
 	@Override
-	public <T> T getBoundColumnObject(Class<T> clazz)
+	public <T> T getColumnObject(Class<T> clazz)
 	{
 		T value = null;
 		
 		try {
 			if (getRowSet().getRow() != 0) {
-				value = clazz.cast(RowSetOps.getColumnObject(
-						this, findJavaTypeClass(getBoundColumnJDBCType())));
+				value = clazz.cast(RowSetOps.getColumnObject(this, findJavaTypeClass(getColumnJDBCType())));
 			}
 		} catch (final SQLException ex) {
 			logger.log(ERROR, getColumnForLog() + " - SQL Exception.", ex);
@@ -174,13 +173,13 @@ public class SimpleRSC implements RSC
 	}
 
 	// @Override
-	// public Object getBoundColumnObject() throws SQLException
+	// public Object getColumnObject() throws SQLException
 	// {
 	// 	if (getColumnCount() == 0)
 	// 		return null;
 	// 	
 	// 	Object objectValue = fetchCurrentValue(this);
-	// 	return convertObjectType(objectValue, getBoundColumnJDBCType());
+	// 	return convertObjectType(objectValue, getColumnJDBCType());
 	// }
 
 

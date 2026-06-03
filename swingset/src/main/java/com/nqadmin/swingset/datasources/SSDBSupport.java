@@ -185,7 +185,7 @@ public interface SSDBSupport {
 	 */
 	static Object runDbReader(SSComponent comp) throws SQLException {
 		return comp.getColumnReader()
-				.apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp);
+				.apply(comp.getRowSet(), comp.getColumnIndex(), comp);
 	}
 
 	/**
@@ -215,7 +215,7 @@ public interface SSDBSupport {
 	private static void runDbWriter(SSComponent comp, Object value,
 			DbWriter<RowSet, Integer, SSComponent, Object> columnWriter)
 			throws SQLException {
-		columnWriter.apply(comp.getRowSet(), comp.getBoundColumnIndex(), comp, value);
+		columnWriter.apply(comp.getRowSet(), comp.getColumnIndex(), comp, value);
 	}
 
 	/**

@@ -108,18 +108,18 @@ public interface SSCollection {
 		JDBCType collectionType = jdbcType;
 		// there's also: DatabaseMetaData.getColumns() - TYPE_NAME is a column
 		ResultSetMetaData md = comp.getRowSet().getMetaData();
-		int columnTyp = md.getColumnType(comp.getBoundColumnIndex());
+		int columnTyp = md.getColumnType(comp.getColumnIndex());
 		JDBCType columnType = JDBCType.valueOf(columnTyp);
 		dbCollection = switch (columnType) {
 		case ARRAY -> {
 			// May not be any rows, so only use metadata to determine elemtype
 			// if (Utils.hasActiveRow(this)) {
-			// 	Array array = this.getBoundColumnArray();
+			// 	Array array = this.getColumnArray();
 			// 	elemtype = JDBCType.valueOf(array.getBaseType());
 			// }
 			
 			// First word of column type is element type, eg "INTEGER ARRAY".
-			String typnam = md.getColumnTypeName(comp.getBoundColumnIndex());
+			String typnam = md.getColumnTypeName(comp.getColumnIndex());
 			JDBCType elemtype = JDBCType.valueOf(typnam.split(" ")[0]);
 			if (collectionType != elemtype) {
 				String s = sf("collection type '%s' != ARRAY type '%s'", jdbcType, elemtype);

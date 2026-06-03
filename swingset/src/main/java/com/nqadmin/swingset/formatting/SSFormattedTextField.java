@@ -222,7 +222,7 @@ public class SSFormattedTextField extends JFormattedTextField
 
 			try {
 				// This avoids extra dialogs.
-				JDBCType jdbcType = getBoundColumnJDBCType();
+				JDBCType jdbcType = getColumnJDBCType();
 				Object v1 = convertToType(pce.getOldValue(), jdbcType);
 				Object v2 = convertToType(pce.getNewValue(), jdbcType);
 				// Avoid dialog if old and new are equal
@@ -246,7 +246,7 @@ public class SSFormattedTextField extends JFormattedTextField
 		boolean someError = true; // set false after successfull database update
 		if (decorate()) {
 			try {
-				dbChange(() -> setBoundColumnObject(currentValue));
+				dbChange(() -> setColumnObject(currentValue));
 				someError = false;
 			} catch (SQLException ex) {
 				logger.log(Level.ERROR, (String) null, ex);
@@ -495,7 +495,7 @@ public class SSFormattedTextField extends JFormattedTextField
 					break;
 				}
 				
-				final Object dbValue = getBoundColumnObject();
+				final Object dbValue = getColumnObject();
 
 				// If record field null then set value null, bail.
 				if (dbValue == null ) {
@@ -504,7 +504,7 @@ public class SSFormattedTextField extends JFormattedTextField
 					break;
 				}
 
-				final JDBCType jdbcType = getBoundColumnJDBCType();
+				final JDBCType jdbcType = getColumnJDBCType();
 				if (!(checkConvertToJdbcType(jdbcType, dbValue.getClass(), null)))
 					logger.log(Level.ERROR, ()->sf("%s CAN'T CONVERT %s to %s",
 							getColumnForLog(), jdbcType, dbValue.getClass().getName()));
