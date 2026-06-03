@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
@@ -50,7 +50,7 @@ import javax.sql.RowSet;
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.UndoRedo.Change;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 
 
 /**
@@ -129,7 +129,7 @@ final class UndoRow
 	private UndoCol getCol(RSC comp) throws SQLException
 	{
 		setupCols(comp.getRowSet());
-		int columnIdx = comp.getBoundColumnIndex();
+		int columnIdx = comp.getColumnIndex();
 		UndoCol col = cols[columnIdx];
 		if (col == null) {
 			col = new UndoCol(comp);
@@ -149,6 +149,14 @@ final class UndoRow
 			if (col != null)
 				col.focusChange(ev);
 		}
+	}
+
+	boolean isDirty(SSComponent comp)
+	{
+		if (cols == null)
+			return false;
+		UndoCol col = cols[comp.getColumnIndex()];
+		return col != null && col.isDirty();
 	}
 
 	/** return true if there's a column value which is not from the database */
@@ -179,8 +187,10 @@ final class UndoRow
 	 * Force the capture of the database column for the comp;
 	 * does nothing if the column is already captured.
 	 */
-	void captureInitialValue(SSComponentInterface comp) throws SQLException
+	void captureInitialValue(RSC comp) throws SQLException
 	{
+		// TODO: have a fast path check if column already captured. java.util.BitSet?
+		//       Also want fast path to the undoRow from the component
 		getCol(comp);
 	}
 
@@ -196,18 +206,18 @@ final class UndoRow
 	 * If there's nothing to do, for example UNDO but there has been
 	 * no changes, then do nothing.
 	 * 
-	 * @param comp SSComponent to adjust
+	 * @param comp rowset/col to adjust
 	 * @param cmd undo/redo
 	 * @return new value (only for logging)
 	 * @throws SQLException 
 	 */
-	Change undoRedoChange(SSComponentInterface comp, UndoRedo cmd) throws SQLException
+	Change undoRedoChange(RSC comp, UndoRedo cmd) throws SQLException
 	{
 		if (cols == null)
-			return UndoCol.NO_CHANGE;
-		UndoCol col = cols[comp.getBoundColumnIndex()];
+			return UndoRedo.NO_CHANGE;
+		UndoCol col = cols[comp.getColumnIndex()];
 		if (col == null)
-			return UndoCol.NO_CHANGE;
+			return UndoRedo.NO_CHANGE;
 		return col.findUndoRedoChange(cmd);
 	}
 

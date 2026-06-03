@@ -36,10 +36,6 @@
  *   Ernie R. Rael
  ******************************************************************************/
 
-// package-info.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * This package contains some very different kinds of model.
  * <ul>
@@ -48,7 +44,7 @@
  * </ul>
  * <h2>Database Collection Models</h2>
  * These models abstract away the storage specifics; they all 
- * implement {@link com.nqadmin.swingset.models.SSCollectionModel}.
+ * implement {@link com.nqadmin.swingset.models.SSCollection}.
  * they generally read and write to database.
  * There are subclasses that present data
  * as an array or set independent of how it might be stored in a data.

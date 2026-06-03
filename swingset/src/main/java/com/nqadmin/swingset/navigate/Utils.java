@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
@@ -55,7 +55,7 @@ import com.google.common.eventbus.SubscriberExceptionContext;
 import com.google.common.eventbus.SubscriberExceptionHandler;
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.utils.CentralLookup;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.getLogger;
@@ -122,7 +122,7 @@ public class Utils
 	 * @param source SSComponent modifying the rowset
 	 * @param value new value
 	 */
-	public static void postRowSetModified(SSComponentInterface source, Object value)
+	public static void postRowSetModified(SSComponent source, Object value)
 	{
 		// May want to extend to handling local EventBus per Frame/Panel;
 		// Use either/both source/rs to find a local eventBus.
@@ -134,7 +134,7 @@ public class Utils
 	 * @param source SSComponent modifying the rowset
 	 * @param value new value
 	 */
-	public static void postRowSetModifiedError(SSComponentInterface source, Object value)
+	public static void postRowSetModifiedError(SSComponent source, Object value)
 	{
 		RowSetModificationEvent ev = new RowSetModificationEvent(source, value, true);
 		logger.log(DEBUG, () -> ev.toString());
@@ -147,7 +147,7 @@ public class Utils
 	 * @param value new value
 	 * @param isError value is an error
 	 */
-	public static void postRowSetUndoRedo(SSComponentInterface source, Object value,
+	public static void postRowSetUndoRedo(SSComponent source, Object value,
 									boolean isError)
 	{
 		RowSetUndoRedoEvent ev = new RowSetUndoRedoEvent(source, value, isError);

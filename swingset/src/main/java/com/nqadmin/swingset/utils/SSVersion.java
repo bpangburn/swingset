@@ -35,9 +35,15 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
 import java.io.IOException;
+import java.lang.System.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -45,7 +51,6 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import java.lang.System.Logger;
 import static java.lang.System.Logger.Level.*;
 
 // TODO: could add isNull() method for 0.0.0-SNAPSHOT

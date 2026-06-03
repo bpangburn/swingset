@@ -70,10 +70,6 @@ import static com.nqadmin.swingset.datasources.RowSetOps.updateColumnObjectDirec
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
-// SSTableModel.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * SSTableModel provides an implementation of the TableModel interface. The
  * SSDataGrid uses this class for providing a grid view for a RowSet.

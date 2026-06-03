@@ -9,8 +9,11 @@ import org.openide.util.lookup.InstanceContent;
  * in a central lookup which can affect anything within
  * the application. It can be thought of as a central context
  * where any application data may be stored and watched.
- * 
- * A singleton instance is created using @see getDefault().
+ * This class has convenience method to modify the contents
+ * of the lookup. For stricter separation of reading and writing
+ * lookup content see <a href="https://bits.netbeans.org/30/javadoc/org-openide-util-lookup/org/openide/util/lookup/AbstractLookup.Content.html">lookup content</a>
+ *<p> 
+ * A singleton instance is created using {@link #getDefault()}.
  * This class is as thread safe as Lookup. Lookup appears to be safe.
  * @author Wade Chandler
  * @version 1.0
@@ -58,9 +61,9 @@ InstanceContent
      * @param instance add this
      */
     public <T> void replace(Class<T> clazz, T instance) {
-        for(T o : this.lookupAll(clazz)) {
-            remove(o);
-        }
+		lookupAll(clazz).forEach(
+				o -> remove(o)
+		);
         add(instance);
     }
     /**

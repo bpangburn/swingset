@@ -35,18 +35,19 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
 import java.io.IOException;
+import java.lang.System.Logger;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import java.lang.System.Logger;
 import static java.lang.System.Logger.Level.*;
-
-// SSProperties.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
 
 /**
  * Loads GUI default properties for SwingSet

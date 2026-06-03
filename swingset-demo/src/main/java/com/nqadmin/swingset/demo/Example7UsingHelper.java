@@ -38,21 +38,20 @@
 package com.nqadmin.swingset.demo;
 
 import java.awt.Container;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.sql.RowSet;
 import javax.swing.JMenuBar;
 import javax.swing.plaf.InternalFrameUI;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-
 import com.nqadmin.swingset.utils.SSDataGridScreenHelper;
 import com.nqadmin.swingset.utils.SSUtils;
-import javax.sql.RowSet;
 
 /**
  * This example demonstrates the use of an SSDataGrid to display a tabular view

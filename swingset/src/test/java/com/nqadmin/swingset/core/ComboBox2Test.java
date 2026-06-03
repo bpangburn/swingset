@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2025, Ernie R Rael. All rights reserved.
+ * Copyright (C) 2025-2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -33,12 +33,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.nqadmin.swingset.mock.Util;
 import com.nqadmin.swingset.models.KeyDisplayValueSwingModel;
 
 import static com.nqadmin.swingset.models.KeyDisplayValueSwingModel.asKeyDisplayValueSwingModel;
@@ -59,6 +60,7 @@ public class ComboBox2Test
 	@BeforeAll
 	public static void setUpClass()
 	{
+		Util.initLookup();
 	}
 	
 	/** x */

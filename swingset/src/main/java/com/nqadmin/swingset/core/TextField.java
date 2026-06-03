@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024-2025, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.core;
 
@@ -52,7 +52,7 @@ import javax.swing.JTextField;
 import javax.swing.text.Document;
 
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSTextSupport;
 import com.nqadmin.swingset.utils.SSTextSupport.SSDocumentListener;
 import com.nqadmin.swingset.utils.SSTextSupport.SSPlainDocument;
@@ -65,7 +65,7 @@ import static java.lang.System.Logger.Level.*;
  * TextField extends the JTextField.
  */
 @SuppressWarnings("serial")
-public class TextField extends JTextField implements SSComponentInterface
+public class TextField extends JTextField implements SSComponent
 {
 	// TODO Consider adding an InputVerifier to prevent component from
 	// losing focus; see FormattedTextField.
@@ -92,19 +92,18 @@ public class TextField extends JTextField implements SSComponentInterface
 	 * Creates a TextField instance and binds it to the specified RowSet column.
 	 *
 	 * @param rowsModel        model for a RowSet
-	 * @param boundColumnName name of the column to which this label should be bound
+	 * @param columnName name of the column to which this label should be bound
 	 */
-	public TextField(RowsModel rowsModel, String boundColumnName) {
-		this(null, rowsModel, boundColumnName);
+	public TextField(RowsModel rowsModel, String columnName) {
+		this(null, rowsModel, columnName);
 	}
 
 	/** All the constructors feed through here */
-	private TextField(String text, RowsModel rowsModel, String boundColumnName) {
+	private TextField(String text, RowsModel rowsModel, String columnName) {
 		super(text);
 		finishSSCommon();
-		if (rowsModel != null) {
-			bind(rowsModel, boundColumnName);
-		}
+		if (rowsModel != null)
+			rowsModel.bind(this, columnName);
 	}
 
 	/**
@@ -151,12 +150,12 @@ public class TextField extends JTextField implements SSComponentInterface
 			hook = new Hook(this) {
 				/**
 				 * Updates the value stored and displayed in the SwingSet
-				 * component based on getBoundColumnText()
+				 * component based on getColumnText()
 				 */
 				@Override
 				protected void updateSSComponent() {
 					
-					final String text = getBoundColumnText();
+					final String text = getColumnText();
 					logger.log(DEBUG, ()->sf("%s: Setting text field to %s.", getColumnForLog(), text));
 					setText(text);
 				}

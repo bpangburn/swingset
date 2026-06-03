@@ -35,20 +35,27 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.demo.simpval;
 
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 
 /**
  * A combined validator/decorator using the Simple Validation framework.
  */
-public class SimpValValidatorDecorator implements Decorator
+public class SimpleValValidatorDecorator implements Decorator
 {
 	private final SSTextComponentValidationItem valItem;
+	/** decorator name */
+	public static final Decorator.DecoratorStyle decoratorStyle = new Decorator.DecoratorStyle("SimpleValidatorDecorator");
 
-	public SimpValValidatorDecorator(SSTextComponentValidationItem valItem) {
+	public SimpleValValidatorDecorator(SSTextComponentValidationItem valItem) {
 		this.valItem = valItem;
 		this.validator = () -> valItem.validate();
 	}
@@ -60,7 +67,7 @@ public class SimpValValidatorDecorator implements Decorator
 	}
 
 	@Override
-	public void install(SSComponentInterface component) {
+	public void install(SSComponent component) {
 		// No listeners to install
 	}
 
@@ -78,6 +85,16 @@ public class SimpValValidatorDecorator implements Decorator
 	 */
 	public Validator getValidator() {
 		return validator;
+	}
+
+	/**
+	 * SimpleValidatorDecorator style
+	 * @return
+	 */
+	@Override
+	public Decorator.DecoratorStyle getStyle()
+	{
+		return decoratorStyle;
 	}
 	
 }

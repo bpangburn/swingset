@@ -29,7 +29,8 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
-
+import java.awt.Component;
+import java.awt.Window;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.lang.ref.WeakReference;
@@ -38,13 +39,16 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.sql.RowSet;
 import javax.sql.RowSetEvent;
 import javax.sql.RowSetListener;
 import javax.swing.Action;
 import javax.swing.ActionMap;
+import javax.swing.JOptionPane;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 
 import org.openide.util.WeakListeners;
 
@@ -57,7 +61,8 @@ import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
 import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.RowsEventSource;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.SimpleEvents;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.LookupDefaults;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
 import com.raelity.lib.eventbus.WeakEventBus;
@@ -92,8 +97,9 @@ import static java.lang.System.Logger.Level.*;
 //       Handle an "empty"/"null"/non-executable RowSet?
 //       Is there a way to tell if current command has been executed?
 //
-public class RowsModel
+public final class RowsModel
 {
+	static { LookupDefaults.init(); }
 	/** Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
 
@@ -102,18 +108,11 @@ public class RowsModel
 			= new MapMaker().weakKeys().makeMap();
 
 	// Track the component bound column names.
-	private final Map<SSComponentInterface,String> bindings
+	private final Map<SSComponent,String> bindings
 			= new MapMaker().weakKeys().makeMap();
 	
 	private NavigateState navState;
 	private final RowsActions rowsActions;
-
-	// private static void issueRowChanged(RowsModel rowsModel)
-	// {
-	// 	// TODO: create a force/virtual ACT_ROW_CHANGED
-	// 	startRowsEvent(rowsModel, ACT_REVERT_FORCE);
-	// 	finishRowsEvent(rowsModel);
-	// }
 
 	/**
 	 * Create and return a new RowsModel for the specified RowSet.
@@ -208,6 +207,17 @@ public class RowsModel
 	}
 
 	/**
+	 * This event will cause all components to update.
+	 * @param rowsModel
+	 */
+	public static void issueRowChanged(RowsModel rowsModel)
+	{
+		startRowsEvent(rowsModel, ACT_ROW_CHANGED);
+		addRowSetEvent(RowSetEventType.ROW_CHANGED, rowsModel.getRowSet());
+		finishRowsEvent(rowsModel);
+	}
+
+	/**
 	 * Get and set NavigationState. Two step process because when navState hooks into
 	 * the RowSet, it uses the RowsModel.
 	 * 
@@ -263,14 +273,36 @@ public class RowsModel
 	 * Change the RowSet associated with this model.
 	 * @param rs new RowSet for this model
 	 * @param dbNav
+	 * @return false if abort and rowSet not set/changed
 	 */
-	public void setRowSet(RowSet rs, SSDBNav dbNav) {
+	// TODO: if dbNav null, re-use current?
+	public boolean setRowSet(RowSet rs, SSDBNav dbNav) {
 		logger.log(Level.INFO, () -> sf("RowsModel %s change rowSet from %s to %s",
 				objectID(this), objectID(getRowSet()), objectID(rs)));
 
-		if (isDirty())
+		if (isDirty()) {
 			//throw new IllegalStateException("oldRS dirty"); ???
 			logger.log(INFO, "oldRS dirty");
+			// TODO: What if row set is also in a different rowsmodel?
+			//           Then don't want dialog?
+			//       Need a way to programatically disable dialog? quiet flag.
+			//       Or caller/app should check?
+			// parent dialog with enclosing Window. TODO: allow custom find parent
+			Component parent = null;
+			if (!bindings.isEmpty()) {
+				parent = (Component) bindings.keySet().iterator().next();
+				Window win = SwingUtilities.getWindowAncestor(parent);
+				parent = win != null ? win : parent;
+			}
+			int response = JOptionPane.showConfirmDialog(parent,
+					sf("Setting new RowSet discards\nuncommitted modifications\nto table \"%s\"",
+							SSUtils.tableName(getRowSet())),
+					null, JOptionPane.OK_CANCEL_OPTION);
+			// TODO: Note the rowSet's undo/redo still has the modifications.
+			//       Really discard?
+			if (response != JOptionPane.OK_OPTION)
+				return false;
+		}
 
 		if (rs != null) {
 			verifyExecuted(rs);
@@ -283,14 +315,14 @@ public class RowsModel
 
 			// Check for component binding compatibility here
 			// to avoid exception buried in event handler.
-			for (Map.Entry<SSComponentInterface, String> entry : bindings.entrySet()) {
-				SSComponentInterface comp = entry.getKey();
+			for (Map.Entry<SSComponent, String> entry : bindings.entrySet()) {
+				SSComponent comp = entry.getKey();
 				if (!comp.isFullyBound())
 					continue;
 
 				// verify same column type and nullable.
 				String colName = entry.getValue();
-				JDBCType oldType = comp.getBoundColumnJDBCType();
+				JDBCType oldType = comp.getColumnJDBCType();
 				JDBCType newType = JDBCType.NULL;
 				try {
 					newType = RowSetOps.getJDBCColumnType(rs, colName);
@@ -312,6 +344,7 @@ public class RowsModel
 
 		rowSetListener.registerTo(rs);
 		enq.postNewRowSetEvent(this, oldRowSet);
+		return true;
 	}
 
 	// TODO: is this path OK?
@@ -329,16 +362,46 @@ public class RowsModel
 	}
 
 	/**
+	 * Establish bindings.
+	 * @param binds
+	 */
+	public void bind(Map<SSComponent, String> binds) {
+		for (Map.Entry<SSComponent, String> binding : binds.entrySet()) {
+			bind(binding.getKey(), binding.getValue());
+		}
+	}
+
+	private String bindPairName(SSComponent comp, String columnName) {
+		return sf("<%s,%s>", objectID(comp), columnName);
+	}
+
+	/**
 	 * 
 	 * @param comp
 	 * @param columnName
 	 */
-	public void bind(SSComponentInterface comp, String columnName) {
-		if (bindings.containsKey(comp))
-			throw new IllegalArgumentException("Component already bound to this model");
+	// TODO: deprecate in favor of bind(Map)
+	@SuppressWarnings("deprecation")
+	public void bind(SSComponent comp, String columnName) {
+		// Check that there's no existing binding for comp or columnName.
+		for (Map.Entry<SSComponent, String> entry : bindings.entrySet()) {
+			if (Objects.equals(comp, entry.getKey())) {
+				throw new IllegalArgumentException(
+						sf("SSComponent of %s already bound in RowsModel %s of %s",
+								bindPairName(comp, columnName), objectID(this),
+								bindPairName(comp, entry.getValue())));
+			}
+			// ColumnName can be bound to multiple components
+			// if (Objects.equals(columnName, entry.getValue())) {
+			// 	throw new IllegalArgumentException(
+			// 			sf("ColumnName of %s already bound in RowsModel %s of %s",
+			// 					bindPairName(comp, columnName), objectID(this),
+			// 					bindPairName(entry.getKey(), columnName)));
+			// }
+		}
 		bindings.put(comp, columnName);
 		try {
-			comp.bind(this, columnName);
+			comp.bind(this, columnName); // Only allowed from RowsModel
 		} catch (Exception ex) {
 			bindings.remove(comp);
 			throw ex;
@@ -355,6 +418,10 @@ public class RowsModel
 
 	NavigateState getNavState() {
 		return navState;
+	}
+
+	UndoRow getUndoRow() {
+		return getNavState().undoRow;
 	}
 
 	/**
@@ -447,11 +514,19 @@ public class RowsModel
 	}
 
 	/**
+	 * Is the component in the current row of this dirty?
+	 * @param comp
+	 * @return is dirty
+	 */
+	public boolean isDirty(SSComponent comp) {
+		return getNavState() != null && getNavState().undoRow.isDirty(comp);
+	}
+
+	/**
 	 * Is the current row of this dirty?
 	 * @return is dirty
 	 */
 	public boolean isDirty() {
-		//return getNavState().undoRow.isDirty();
 		return getNavState() != null && getNavState().undoRow.isDirty();
 	}
 
@@ -570,14 +645,14 @@ public class RowsModel
 
 	/**
 	 * Invoke this when starting an Operation that manipulates a RowSet.
-	 * @param _operatorKind
+	 * @param operatorKind
 	 * @param model
 	 * @param compOrNav
 	 */
-	public static void startRowsEvent(OperatorKind _operatorKind, RowsModel model,
+	public static void startRowsEvent(OperatorKind operatorKind, RowsModel model,
 			Object compOrNav)
 	{
-		enq.startRowsEvent(_operatorKind, model, compOrNav);
+		enq.startRowsEvent(operatorKind, model, compOrNav);
 	}
 
 	/** from the RowSet event */
@@ -837,7 +912,7 @@ public class RowsModel
 	 * @param comp
 	 * @return true if the component is in an error state
 	 */
-	public boolean hasError(SSComponentInterface comp) {
+	public boolean hasError(SSComponent comp) {
 		// TODO: check if row set has component's column name?
 		// if (!bindings.containsKey(comp))
 		// 	throw new IllegalArgumentException("Component not bound in RowsModel");

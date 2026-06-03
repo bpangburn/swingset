@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2024, Ernie R Rael. All rights reserved.
+ * Copyright (C) 2024-2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,7 +31,6 @@ package com.nqadmin.swingset.formatting;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-//import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JFormattedTextField;

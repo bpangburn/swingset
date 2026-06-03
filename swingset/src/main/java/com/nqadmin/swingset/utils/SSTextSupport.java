@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2025, Ernie R Rael. All rights reserved.
+ * Copyright (C) 2025-2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,7 @@
 package com.nqadmin.swingset.utils;
 
 import java.lang.System.Logger;
+import java.sql.SQLException;
 
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -63,7 +64,7 @@ public class SSTextSupport
 	 * @return SSDocumentListener for a JTextComponent
 	 */
 	public static SSDocumentListener getSSDocumentListener(JTextComponent jtc) {
-		if (!(jtc instanceof SSComponentInterface comp))
+		if (!(jtc instanceof SSComponent comp))
 			throw new IllegalArgumentException("Not an SSComponent");
 		// TODO: assert not called before
 		return new SSTextSupport.SSDocumentListener(comp);
@@ -90,7 +91,7 @@ public class SSTextSupport
 		/** Create DocumentListener for the component.
 		 * @param comp associated component
 		 */
-		public SSPlainDocument(SSComponentInterface comp)
+		public SSPlainDocument(SSComponent comp)
 		{
 			this.ssCommon = comp.getSSCommon();
 		}
@@ -182,7 +183,7 @@ public class SSTextSupport
 		/** Create DocumentListener for the component.
 		 * @param comp associated component
 		 */
-		public SSDocumentListener(SSComponentInterface comp)
+		public SSDocumentListener(SSComponent comp)
 		{
 			this.ssCommon = comp.getSSCommon();
 		}
@@ -200,7 +201,11 @@ public class SSTextSupport
 			SwingUtilities.invokeLater(() -> {
 				if (lastNotifiedChange != lastChange) {
 					lastNotifiedChange = lastChange;
-					ssCommon.dbChange(() -> updateTextComponent());
+					try {
+						ssCommon.dbChange(() -> updateTextComponent());
+					} catch (SQLException ex) {
+						logger.log(Logger.Level.ERROR, (String) null, ex);
+					}
 				}
 			});
 		}
@@ -215,7 +220,7 @@ public class SSTextSupport
 			// ISSUE: when decorator uses NavigateState.errorComponents,
 			// as accessed through RowsModel.hasError(comp), that state may
 			// still be there, since it's updated by RowSet event,
-			// which comes from setBoundColumnText.
+			// which comes from setColumnText.
 			try {
 				ssCommon.pendingDbChange = true;
 				if (!ssCommon.decorate()) {
@@ -228,7 +233,7 @@ public class SSTextSupport
 			boolean ok = true;
 			//boolean inErrorState = ssCommon.getRowsModel().hasError(ssCommon.getSSComponent());
 			try {
-				ok = ssCommon.setBoundColumnText(text);
+				ok = ssCommon.setColumnText(text);
 			} finally {
 				if (!ok) {
 					if (ssCommon.isRestoreOnError()) {

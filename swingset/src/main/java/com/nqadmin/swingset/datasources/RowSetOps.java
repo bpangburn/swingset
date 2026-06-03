@@ -66,8 +66,7 @@ import javax.sql.rowset.spi.SyncResolver;
 import com.nqadmin.swingset.datasources.Utils.ConflictRow;
 import com.nqadmin.swingset.navigate.RowSetState;
 import com.nqadmin.swingset.navigate.UndoRedo;
-import com.nqadmin.swingset.utils.SSArray;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.google.common.collect.Sets.immutableEnumSet;
@@ -342,16 +341,16 @@ public class RowSetOps {
 	 * @param comp
 	 * @return
 	 */
-	public static Array getColumnArray(SSComponentInterface comp)
+	public static Array getColumnArray(SSComponent comp)
 	{
 		try {
 			if (getColumnCount(comp.getRowSet())==0)
 				return null;
 			return (UndoRedo.isUndoRedoEnabled(comp)
 					? (Array)UndoRedo.fetchCurrentChange(comp).value()
-					: comp.getRowSet().getArray(comp.getBoundColumnIndex()));
+					: comp.getRowSet().getArray(comp.getColumnIndex()));
 		} catch (SQLException ex) {
-			logger.log(ERROR, "SQL Exception for column " + comp.getBoundColumnName() + ".", ex);
+			logger.log(ERROR, "SQL Exception for column " + comp.getColumnName() + ".", ex);
 		}
 		return null;
 	}
@@ -369,7 +368,7 @@ public class RowSetOps {
 	{
 		return UndoRedo.isUndoRedoEnabled(comp)
 				? UndoRedo.fetchCurrentChange(comp).value()
-				: comp.getRowSet().getObject(comp.getBoundColumnIndex());
+				: comp.getRowSet().getObject(comp.getColumnIndex());
 	}
 
 	/**
@@ -385,7 +384,7 @@ public class RowSetOps {
 	public static Object getColumnObjectLegacy(RSC comp) throws SQLException
 	{
 		if(Boolean.TRUE)
-			return comp.getRowSet().getObject(comp.getBoundColumnIndex());
+			return comp.getRowSet().getObject(comp.getColumnIndex());
 		else
 			return getColumnObject2(comp);
 	}
@@ -407,8 +406,8 @@ public class RowSetOps {
 	private static Object getColumnObject2(RSC comp) throws SQLException
 	{
 		RowSet rs = comp.getRowSet();
-		int cIdx = comp.getBoundColumnIndex();
-		return switch (comp.getBoundColumnJDBCType()) {
+		int cIdx = comp.getColumnIndex();
+		return switch (comp.getColumnJDBCType()) {
 		case INTEGER, SMALLINT, TINYINT ->	rs.getInt(cIdx);
 		case BIGINT ->				rs.getLong(cIdx);
 		case REAL ->				rs.getFloat(cIdx);
@@ -421,7 +420,7 @@ public class RowSetOps {
 		case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR ->
 									rs.getString(cIdx);
 		default -> {
-			logger.log(WARNING, () -> "Unknown data type of " + comp.getBoundColumnJDBCType());
+			logger.log(WARNING, () -> "Unknown data type of " + comp.getColumnJDBCType());
 			yield rs.getObject(cIdx);
 		}
 		};
@@ -468,7 +467,7 @@ public class RowSetOps {
 	{
 		Object objectValue = UndoRedo.isUndoRedoEnabled(comp)
 				? UndoRedo.fetchCurrentChange(comp).value()
-				: comp.getRowSet().getObject(comp.getBoundColumnIndex());
+				: comp.getRowSet().getObject(comp.getColumnIndex());
 		return convertToType(objectValue, type);
 	}
 
@@ -483,7 +482,7 @@ public class RowSetOps {
 	private static <T> T getColumnObject2(RSC comp, Class<T> type)
 			throws SQLException
 	{
-		return comp.getRowSet().getObject(comp.getBoundColumnIndex() , type);
+		return comp.getRowSet().getObject(comp.getColumnIndex() , type);
 	}
 	
 	/**
@@ -495,10 +494,10 @@ public class RowSetOps {
 	 * @return text representation of data in specified column
 	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
 	 */
-	public static String getColumnText(final SSComponentInterface comp)
+	public static String getColumnText(final SSComponent comp)
 	{
 		final RowSet rowSet = comp.getRowSet();
-		final int cIdx = comp.getBoundColumnIndex();
+		final int cIdx = comp.getColumnIndex();
 		String value = null;
 
 		try {
@@ -544,7 +543,7 @@ public class RowSetOps {
 	public static String getColumnObjectText(RSC comp)
 	{
 		final RowSet _rowSet = comp.getRowSet();
-		final String _columnName = comp.getBoundColumnName();
+		final String _columnName = comp.getColumnName();
 
 		String value = null;
 		try {
@@ -555,7 +554,7 @@ public class RowSetOps {
 
 			Object objectValue = UndoRedo.isUndoRedoEnabled(comp)
 					? UndoRedo.fetchCurrentChange(comp).value()
-					: comp.getRowSet().getObject(comp.getBoundColumnIndex());
+					: comp.getRowSet().getObject(comp.getColumnIndex());
 			if (objectValue == null)
 				return null;
 
@@ -740,8 +739,8 @@ public class RowSetOps {
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	public static void updateColumnArray(final SSComponentInterface comp, final SSArray _updatedValue) throws SSSQLNullException, SQLException {
-		updateColumnArray(comp, comp.getRowSet(), _updatedValue, comp.getBoundColumnName(), comp.getAllowNull());
+	public static void updateColumnArray(final SSComponent comp, final Array _updatedValue) throws SSSQLNullException, SQLException {
+		updateColumnArray(comp, comp.getRowSet(), _updatedValue, comp.getColumnName(), comp.getAllowNull());
 	}
 
 	/**
@@ -760,7 +759,7 @@ public class RowSetOps {
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	private static void updateColumnArray(final SSComponentInterface comp, final RowSet _rowSet, final SSArray _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException
+	private static void updateColumnArray(final SSComponent comp, final RowSet _rowSet, final Array _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException
 	{
 		logger.log(DEBUG, () -> "[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
 
@@ -793,6 +792,94 @@ public class RowSetOps {
 	}
 
 	/**
+	 * Fetch the current raw value from the database, the undo/redo stack is
+	 * not referenced; use columnReader if available.
+	 * Initial capture for undo/redo uses this method.
+	 * 
+	 * @param rsc
+	 * @return
+	 * @throws SQLException
+	 */
+	public static Object getColumnDirect(RSC rsc) throws SQLException
+	{
+		Objects.requireNonNull(rsc);
+
+		if (rsc instanceof SSComponent comp) {
+			SSDBSupport.DbReader<RowSet, Integer, SSComponent, ?> columnReader = comp.getColumnReader();
+			if (columnReader != null)
+				return comp.getColumnReader()
+						.apply(comp.getRowSet(), comp.getColumnIndex(), comp);
+		}
+		
+		return rsc.getRowSet().getObject(rsc.getColumnIndex());
+	}
+
+	/**
+	 * Reads the data from the rowset's specified column
+	 * using the provided columnReader;
+	 * no object conversion.
+	 * There is no filtering, for example null conversion.
+	 * @param comp component
+	 * @return value
+	 * @throws java.sql.SQLException
+	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B-1
+	 */
+	public static Object getColumn(SSComponent comp) throws SQLException
+	{
+		return UndoRedo.isUndoRedoEnabled(comp)
+				? UndoRedo.fetchCurrentChange(comp).value()
+				: SSDBSupport.runDbReader(comp);
+	}
+
+	/**
+	 * Update the RowSet using {@code columnWriter}. ColumnWriter is
+	 * expected to do a rowSet.update*.
+	 * 
+	 * @param comp
+	 * @param value
+	 * @throws SQLException
+	 */
+	public static void updateColumn(SSComponent comp, Object value)
+			throws SQLException
+	{
+		UndoRedo.captureInitialValue(comp);
+
+		boolean did_update = false;
+		try {
+			SSDBSupport.runDbWriter(comp, value);
+			did_update = true;
+		} finally {
+			if (did_update)
+				postRowSetModified(comp, value);
+		}
+	}
+
+	// /**
+	//  * Update the RowSet using {@code columnWriter}. ColumnWriter is
+	//  * expected to do a rowSet.update*.
+	//  * 
+	//  * @param comp
+	//  * @param value
+	//  * @param columnWriter
+	//  * @throws SQLException
+	//  */
+	// public static void updateColumn(SSComponent comp, Object value,
+	// 		DbWriter<RowSet, Integer, SSComponent, Object> columnWriter)
+	// 		throws SQLException
+	// {
+	// 	UndoRedo.captureInitialValue(comp);
+
+	// 	boolean did_update = false;
+	// 	try {
+	// 		SSDBSupport.runDbWriter(comp, value, columnWriter);
+	// 		did_update = true;
+	// 	} finally {
+	// 		if (did_update)
+	// 			postRowSetModified(comp, value);
+	// 	}
+	// }
+
+	/**
 	 * Method used by SwingSet component listeners to update the underlying
 	 * RowSet.
 	 * <p>
@@ -805,7 +892,7 @@ public class RowSetOps {
 	 * @throws SSSQLNullException thrown if null is not allowed
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	public static void updateColumnObject(SSComponentInterface comp, Object updatedValue)
+	public static void updateColumnObject(SSComponent comp, Object updatedValue)
 			throws SSSQLNullException, SQLException, NumberFormatException
 	{
 		if (updatedValue instanceof String s) {
@@ -815,7 +902,7 @@ public class RowSetOps {
 			return;
 		}
 		final RowSet rowSet = comp.getRowSet();
-		final int columnIndex = comp.getBoundColumnIndex();
+		final int columnIndex = comp.getColumnIndex();
 		boolean allowNull = comp.getAllowNull();
 		logger.log(DEBUG, () -> comp.getColumnForLog() + " Update to: " + updatedValue + ". Allow null? [" + allowNull + "]");
 
@@ -834,7 +921,7 @@ public class RowSetOps {
 			}
 
 			//_rowSet.updateObject(_columnIndex, _updatedValue);
-			JDBCType jdbcType = comp.getBoundColumnJDBCType();
+			JDBCType jdbcType = comp.getColumnJDBCType();
 			// TODO: Maybe a component field that says use jdbc conversion.
 			//		 Better, checkDriverConvertToType(),
 			//		 so "obj = convertObjectTypeIfNeeded(...)"
@@ -856,7 +943,7 @@ public class RowSetOps {
 	/** DEBUG ASSIST: Use this to force "n" acceptChanges conflicts after
 	 * modifying a character column in the database.
 	 * Only works with CachedRowSet and after
-	 * {@linkplain #updateColumnText(com.nqadmin.swingset.utils.SSComponentInterface, java.lang.String)}.
+	 * {@linkplain #updateColumnText(com.nqadmin.swingset.utils.SSComponent, java.lang.String)}.
 	 */
 	public static class ForceConflict
 	{
@@ -895,11 +982,11 @@ public class RowSetOps {
 	 * @throws SQLException
 	 */
 	@SuppressWarnings("UseOfSystemOutOrSystemErr")
-	public static void checkForceConflict(SSComponentInterface comp, String updatedValue)
+	public static void checkForceConflict(SSComponent comp, String updatedValue)
 			throws SQLException
 	{
 		// Only do this for strings.
-		if (jdbcTypeToClass(comp.getBoundColumnJDBCType()) != String.class)
+		if (jdbcTypeToClass(comp.getColumnJDBCType()) != String.class)
 				return;
 
 		ForceConflict fc = defLookup(ForceConflict.class);
@@ -911,15 +998,16 @@ public class RowSetOps {
 			rs.execute();
 			rs.absolute(comp.getRowSet().getRow());
 			System.err.printf("FORCE_CONFLICT: %s\n",
-					rs.getObject(comp.getBoundColumnIndex()));
-			rs.updateString(comp.getBoundColumnIndex(), updatedValue + "_ForceConflict");
+					rs.getObject(comp.getColumnIndex()));
+			rs.updateString(comp.getColumnIndex(), updatedValue + "_ForceConflict");
 			rs.updateRow();
 		}
 	}
 
 	/**
-	 * Method used by SwingSet component listeners to update the underlying
-	 * RowSet.
+	 * The String updatedValue is converted to an object and
+	 * {@link RowSet#updateObject(int, java.lang.Object) }
+	 * or {@link RowSet#updateNull(int) } is used.
 	 * <p>
 	 * When the user changes/edits the SwingSet column this method propagates the
 	 * change to the RowSet. A separate call is required to flush/commit the change
@@ -932,13 +1020,13 @@ public class RowSetOps {
 	 * @throws SQLException  thrown if a database error is encountered
 	 * @throws NumberFormatException thrown if unable to parse a string to number format
 	 */
-	public static void updateColumnText(SSComponentInterface comp, String updatedValue)
+	public static void updateColumnText(SSComponent comp, String updatedValue)
 			throws SSSQLNullException, SQLException, NumberFormatException
 	{ 
 		// TODO: This is only for debug
 		checkForceConflict(comp, updatedValue);
 		updateColumnText(comp, comp.getRowSet(), updatedValue,
-						 comp.getBoundColumnIndex(), comp.getAllowNull());
+						 comp.getColumnIndex(), comp.getAllowNull());
 	}
 
 	/**
@@ -961,7 +1049,7 @@ public class RowSetOps {
 	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
 	 */
 	// TODO: test this and conversions
-	private static void updateColumnText(SSComponentInterface comp, RowSet
+	private static void updateColumnText(SSComponent comp, RowSet
 			rowSet, String updatedValue, int columnIndex, boolean allowNull)
 			throws SSSQLNullException, SQLException, NumberFormatException
 	{

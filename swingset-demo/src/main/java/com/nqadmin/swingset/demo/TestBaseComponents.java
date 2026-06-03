@@ -73,11 +73,12 @@ import com.nqadmin.swingset.SSList;
 import com.nqadmin.swingset.SSSlider;
 import com.nqadmin.swingset.SSTextArea;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.decorators.AlternateBorderDecorator;
 import com.nqadmin.swingset.demo.datepicker.DbDatePicker;
-import com.nqadmin.swingset.models.SSCollectionModel;
-import com.nqadmin.swingset.models.SSDbArrayModel;
+import com.nqadmin.swingset.models.SSCollection;
+import com.nqadmin.swingset.models.SSDbArray;
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -106,7 +107,7 @@ public class TestBaseComponents extends JFrame
 	// STAR means use "*" in query
 	enum Comps {
 		NAV, PK, CHECK, COMBO, ENUM_COMBO, DB_COMBO, IMAGE, LABEL,
-		LIST, SLIDER, TEXT_AREA, TEXT_FIELD, DATE_PICKER,
+		LIST, LIST2, SLIDER, TEXT_AREA, TEXT_FIELD, DATE_PICKER,
 		STAR, // This, and anything after, are not components.
 	};
 	enum CompDim {
@@ -114,7 +115,7 @@ public class TestBaseComponents extends JFrame
 		H1, H2, H3
 	}
 
-	private record Comp(String col, SSComponentInterface comp, JLabel label, CompDim dim){};
+	private record Comp(String col, SSComponent comp, JLabel label, CompDim dim){};
 	private Map<Comps, Comp> compInfo = new EnumMap<>(Comps.class);
 	private EnumSet<Comps> activeComps = EnumSet.allOf(Comps.class);
 
@@ -126,7 +127,7 @@ public class TestBaseComponents extends JFrame
 			DATE_PICKER
 
 			// H2
-			// LIST, TEXT_AREA,
+			// LIST, LIST2, TEXT_AREA,
 
 			// H3
 			// IMAGE
@@ -134,7 +135,7 @@ public class TestBaseComponents extends JFrame
 
 	private void populateComps()
 	{
-		// This list must be in the same order as the Comps enum.
+		// This list MUST be in the same order as the Comps enum.
 		List<Comp> tComps = List.of(
 				new Comp(null,              cmbSSDBComboNav,   lblSSDBComboNav,   H1),
 				new Comp("swingset_base_test_pk", txtSwingSetBaseTestPK,
@@ -146,6 +147,7 @@ public class TestBaseComponents extends JFrame
 				new Comp("ss_image",        imgSSImage,        lblSSImage,        H3),
 				new Comp("ss_label",        lblSSLabel2,       lblSSLabel,        H1),
 				new Comp("ss_list",         lstSSList,         lblSSList,         H2),
+				new Comp("ss_list2",        lstSSList2,        lblSSList2,        H2),
 				new Comp("ss_slider",       sliSSSlider,       lblSSSlider,       H1),
 				new Comp("ss_text_area",    txtSSTextArea,     lblSSTextArea,     H2),
 				new Comp("ss_text_field",   txtSSTextField,    lblSSTextField,    H1),
@@ -224,6 +226,7 @@ public class TestBaseComponents extends JFrame
 	JLabel lblSSImage = new JLabel("SSImage");
 	JLabel lblSSLabel = new JLabel("SSLabel");
 	JLabel lblSSList = new JLabel("SSList");
+	JLabel lblSSList2 = new JLabel("SSList String");
 	JLabel lblSSSlider = new JLabel("SSSlider");
 	JLabel lblSSTextArea = new JLabel("SSTextArea");
 	JLabel lblSSTextField = new JLabel("SSTextField");
@@ -240,6 +243,7 @@ public class TestBaseComponents extends JFrame
 	SSImage imgSSImage = new SSImage();
 	SSLabel lblSSLabel2 = new SSLabel();
 	final SSList lstSSList;
+	final SSList lstSSList2;
 	SSSlider sliSSSlider = new SSSlider();
 	SSTextArea txtSSTextArea = new SSTextArea();
 	SSTextField txtSSTextField = new SSTextField();
@@ -266,11 +270,11 @@ public class TestBaseComponents extends JFrame
 	 * Method to obtain proper data structure/model for SSList based on database used
 	 * @return collection model to use for lists based on underlying database
 	 */
-	private SSCollectionModel getCollectionModel() {
+	private SSCollection getCollectionModel() {
 		@SuppressWarnings("unchecked")
-		Supplier<SSCollectionModel> supl
-				= (Supplier<SSCollectionModel>) hints.get("collectionModel");
-		return supl == null ? new SSDbArrayModel(JDBCType.INTEGER) : supl.get();
+		Supplier<SSCollection> supl
+				= (Supplier<SSCollection>) hints.get("collectionModel");
+		return supl == null ? new SSDbArray(JDBCType.INTEGER) : supl.get();
 	}
 
 	/**
@@ -288,7 +292,13 @@ public class TestBaseComponents extends JFrame
 		
 		// INITIALIZE SOME DYNAMIC INFORMATION
 		hints =  _hints;
+
 		lstSSList = new SSList(getCollectionModel());
+		// lstSSList = new SSList(JDBCType.INTEGER);
+
+		// lstSSList2 = new SSList(new SSDbStringCollection(
+		// 		JDBCType.INTEGER, SSDbStringCollection.COMMA_SEP));
+		lstSSList2 = new SSList(JDBCType.INTEGER); // auto pick for String column
 		
 		populateComps();
 		//activeComps.remove(DATE_PICKER);
@@ -301,6 +311,8 @@ public class TestBaseComponents extends JFrame
 		//		// NAV, PK, CHECK, COMBO, ENUM_COMBO, DB_COMBO, IMAGE, LABEL,
 		//		// LIST, SLIDER, TEXT_AREA, TEXT_FIELD
 		//));
+
+		activeComps.remove(LIST2);
 		
 		// SET CONNECTION
 		connection = _dbConn;
@@ -369,6 +381,9 @@ public class TestBaseComponents extends JFrame
 		if (activeComps.contains(LIST)) {
 			lstSSList.setDisplayValues(Arrays.asList(listItems), Arrays.asList(listCodes));
 		}
+		if (activeComps.contains(LIST2)) {
+			lstSSList2.setDisplayValues(Arrays.asList(listItems), Arrays.asList(listCodes));
+		}
 		
 		if (activeComps.contains(DB_COMBO)) {
 			final String dbComboQuery = "SELECT * FROM part_data;";
@@ -404,9 +419,19 @@ public class TestBaseComponents extends JFrame
 		JScrollPane lstScrollPane = null;
 		if (activeComps.contains(LIST)) {
 			// NEED TO MAKE SURE LIST IS TALLER THAN THE SCROLLPANE TO SEE THE SCROLLBAR
-			lstSSList.setPreferredSize(new Dimension(MainClass.ssDimTall.width-20, MainClass.ssDimVeryTall.height));
+			lstSSList.setPreferredSize(new Dimension(MainClass.ssDimTall.width-30, MainClass.ssDimVeryTall.height));
 			lstScrollPane = new JScrollPane(lstSSList);
 			lstScrollPane.setPreferredSize(MainClass.ssDimTall);
+			lstSSList.setDecorator(new AlternateBorderDecorator(lstScrollPane, lstSSList));
+		}
+		
+		JScrollPane lstScrollPane2 = null;
+		if (activeComps.contains(LIST2)) {
+			// NEED TO MAKE SURE LIST IS TALLER THAN THE SCROLLPANE TO SEE THE SCROLLBAR
+			lstSSList2.setPreferredSize(new Dimension(MainClass.ssDimTall.width-30, MainClass.ssDimVeryTall.height));
+			lstScrollPane2 = new JScrollPane(lstSSList2);
+			lstScrollPane2.setPreferredSize(MainClass.ssDimTall);
+			lstSSList2.setDecorator(new AlternateBorderDecorator(lstScrollPane2, lstSSList2));
 		}
 		
 		// Setup the container and layout the components.
@@ -415,7 +440,7 @@ public class TestBaseComponents extends JFrame
 		final GridBagConstraints constraints = new GridBagConstraints();
 		
 		// Add the components, there's a special case with the list scroll pane.
-		buildGui_add(contentPane, constraints, lstScrollPane);
+		buildGui_add(contentPane, constraints, lstScrollPane, lstScrollPane2);
 
 		constraints.gridx = 0;
 		constraints.gridwidth = 2;
@@ -523,7 +548,7 @@ public class TestBaseComponents extends JFrame
 
 	/** Some components aren't fully initialized until well after startup,
 	 * so replace the component in the info. */
-	private void replaceComponent(Comps eComp, SSComponentInterface comp)
+	private void replaceComponent(Comps eComp, SSComponent comp)
 	{
 		Comp info = compInfo.get(eComp);
 		compInfo.put(eComp, new Comp(info.col, comp, info.label, info.dim));
@@ -588,7 +613,7 @@ public class TestBaseComponents extends JFrame
 		}
 	}
 
-	private void buildGui_add(Container contentPane, GridBagConstraints constraints, JScrollPane jspList)
+	private void buildGui_add(Container contentPane, GridBagConstraints constraints, JScrollPane jspList, JScrollPane jspList2)
 	{
 		constraints.gridx = 0;
 		constraints.gridy = 0;
@@ -597,10 +622,12 @@ public class TestBaseComponents extends JFrame
 			constraints.gridx = 0;
 			contentPane.add(comp.label, constraints);
 			constraints.gridx = 1;
-			if(comp.comp != lstSSList)
-				contentPane.add((JComponent)comp.comp, constraints);
-			else
+			if(comp.comp == lstSSList)
 				contentPane.add(jspList, constraints);
+			else if(comp.comp == lstSSList2)
+				contentPane.add(jspList2, constraints);
+			else
+				contentPane.add((JComponent)comp.comp, constraints);
 			constraints.gridy++;
 		}
 	}

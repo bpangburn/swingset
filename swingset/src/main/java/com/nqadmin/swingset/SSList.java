@@ -38,24 +38,23 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024-2025, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
 
-import com.nqadmin.swingset.core.List1;
-
 import java.sql.JDBCType;
 
-import com.nqadmin.swingset.models.SSCollectionModel;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.core.List1;
+import com.nqadmin.swingset.models.SSCollection;
+import com.nqadmin.swingset.utils.SSComponent;
 
 /**
  * See {@link List1}.
  */
 // TODO: Long or Integer?
 @SuppressWarnings("serial")
-public class SSList extends List1<Object,String> implements SSComponentInterface
+public class SSList extends List1<Object,String> implements SSComponent
 {
 	/**
 	 * Creates an object of SSList with key type of {@code JDBCType.INTEGER}.
@@ -69,7 +68,7 @@ public class SSList extends List1<Object,String> implements SSComponentInterface
 
 	/**
 	 * Creates a List1 with default
-	 * of {@link com.nqadmin.swingset.models.SSDbArrayModel}
+	 * of {@link com.nqadmin.swingset.models.SSDbArray}
 	 * of specified jdbcType.
 	 *
 	 * @param jdbcType type of key of database elements
@@ -84,7 +83,7 @@ public class SSList extends List1<Object,String> implements SSComponentInterface
 	 *
 	 * @param collectionModel model to read/write the database
 	 */
-	public SSList(SSCollectionModel collectionModel)
+	public SSList(SSCollection collectionModel)
 	{
 		super(collectionModel);
 	}

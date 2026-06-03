@@ -37,10 +37,8 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.demo;
 
-import com.nqadmin.swingset.demo.MainClass.H2Trace;
-import com.nqadmin.swingset.utils.SSUtils;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
 import java.io.PrintWriter;
+import java.lang.System.Logger;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -63,12 +61,18 @@ import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
+
 import javax.sql.DataSource;
-import java.lang.System.Logger;
-import static java.lang.System.Logger.Level.*;
+
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.jdbcx.JdbcDataSource;
+
+import com.nqadmin.swingset.demo.MainClass.H2Trace;
+import com.nqadmin.swingset.utils.SSUtils;
+
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Provides a data source to use with the demo's naming service.

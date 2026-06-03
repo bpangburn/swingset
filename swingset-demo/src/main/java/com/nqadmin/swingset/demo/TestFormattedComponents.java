@@ -201,21 +201,21 @@ public class TestFormattedComponents extends JFrame {
 		syncManager.sync();
 		
 		// SETUP BOUND COMPONENTS
-		txtSwingSetFormattedTestPK.bind(rowsModel, "swingset_formatted_test_pk");
+		rowsModel.bind(txtSwingSetFormattedTestPK, "swingset_formatted_test_pk");
 		
 		//fmtSSCuitField.bind(rowsModel, "ss_cuit_field");
-		fmtSSCurrencyField.bind(rowsModel, "ss_currency_field");
-		fmtSSCurrencyFieldNull.bind(rowsModel, "ss_currency_field_null");
-		fmtSSDateField.bind(rowsModel, "ss_date_field");
-		fmtSSDateFieldNull.bind(rowsModel, "ss_date_field_null");
-		fmtSSFormattedTextField.bind(rowsModel, "ss_formatted_text_field");
-		fmtSSIntegerField.bind(rowsModel, "ss_integer_field");
-		fmtSSIntegerFieldNull.bind(rowsModel, "ss_integer_field_null");
-		fmtSSNumericField.bind(rowsModel, "ss_numeric_field");
-		fmtSSPercentField.bind(rowsModel, "ss_percent_field");
-		fmtSSSSNField.bind(rowsModel, "ss_ssn_field");
-		fmtSSTimeField.bind(rowsModel, "ss_time_field");
-		fmtSSTimestampField.bind(rowsModel, "ss_timestamp_field");
+		rowsModel.bind(fmtSSCurrencyField, "ss_currency_field");
+		rowsModel.bind(fmtSSCurrencyFieldNull, "ss_currency_field_null");
+		rowsModel.bind(fmtSSDateField, "ss_date_field");
+		rowsModel.bind(fmtSSDateFieldNull, "ss_date_field_null");
+		rowsModel.bind(fmtSSFormattedTextField, "ss_formatted_text_field");
+		rowsModel.bind(fmtSSIntegerField, "ss_integer_field");
+		rowsModel.bind(fmtSSIntegerFieldNull, "ss_integer_field_null");
+		rowsModel.bind(fmtSSNumericField, "ss_numeric_field");
+		rowsModel.bind(fmtSSPercentField, "ss_percent_field");
+		rowsModel.bind(fmtSSSSNField, "ss_ssn_field");
+		rowsModel.bind(fmtSSTimeField, "ss_time_field");
+		rowsModel.bind(fmtSSTimestampField, "ss_timestamp_field");
 		
 		//fmtDebugField.bind(rowsModel, "");
 		//fmtDebugFieldNull.bind(rowsModel, "");

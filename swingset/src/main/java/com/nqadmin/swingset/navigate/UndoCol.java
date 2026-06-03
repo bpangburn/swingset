@@ -49,6 +49,7 @@ import java.util.List;
 import javax.swing.text.JTextComponent;
 
 import com.nqadmin.swingset.datasources.RSC;
+import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.UndoRedo.Change;
 
 import static com.nqadmin.swingset.navigate.RowSetState.isPreInsertOps;
@@ -98,8 +99,8 @@ final class UndoCol
 	}
 
 	/**
-	 * Create UndoCol; initialize undo/redo stack from SSComponent's database value;
-	 * @param comp ssComponent
+	 * Create UndoCol; initialize undo/redo stack from comp's database value;
+	 * @param comp RowSet Column
 	 */
 	UndoCol(RSC comp) throws SQLException
 	{
@@ -109,7 +110,7 @@ final class UndoCol
 	private static Object initialValue(RSC comp) throws SQLException
 	{
 		//return isPreInsertOps(comp.getRowSet())
-		//		? null : comp.getRowSet().getObject(comp.getBoundColumnIndex());
+		//		? null : comp.getRowSet().getObject(comp.getColumnIndex());
 
 		// If doing preInsertOps, just use a null for the initial value
 		// (special case text field); the real value is on the way.
@@ -119,7 +120,7 @@ final class UndoCol
 			else
 				return null;
 		} else
-			return comp.getRowSet().getObject(comp.getBoundColumnIndex());
+			return RowSetOps.getColumnDirect(comp);
 	}
 
 	/** Check if there is an undo (previous) value. */
@@ -187,13 +188,11 @@ final class UndoCol
 		return curIdx != 0;
 	}
 
-	static final Change NO_CHANGE = new Change("UNDO/REDO NONE", false);
-
 	Change findUndoRedoChange(UndoRedo cmd)
 	{
 		return switch(cmd) {
-		case UNDO -> hasPrev() ? prevValue() : NO_CHANGE;
-		case REDO -> hasNext() ? nextValue() : NO_CHANGE;
+		case UNDO -> hasPrev() ? prevValue() : UndoRedo.NO_CHANGE;
+		case REDO -> hasNext() ? nextValue() : UndoRedo.NO_CHANGE;
 		};
 	}
 

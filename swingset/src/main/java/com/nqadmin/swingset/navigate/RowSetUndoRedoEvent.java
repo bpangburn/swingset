@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2024, Ernie R Rael. All rights reserved.
+ * Copyright (C) 2024-2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,10 +32,10 @@ package com.nqadmin.swingset.navigate;
 
 import javax.sql.RowSet;
 
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.datasources.RSC;
 
 /**
- * Sent by an SSComponent when value changes from undo/redo.
+ * Sent by a component when value changes from undo/redo.
  * The contents of the undo/redo stack is unchanged; note the error.
  */
 @SuppressWarnings("serial")
@@ -52,7 +52,7 @@ public class RowSetUndoRedoEvent extends EventObjectBacktrace
 	 * @param value the value written to the rowSet
 	 * @param error true if the component value is in error
 	 */
-	public RowSetUndoRedoEvent( SSComponentInterface source, Object value,
+	public RowSetUndoRedoEvent(RSC source, Object value,
 							   boolean error)
 	{
 		super(source);
@@ -62,11 +62,11 @@ public class RowSetUndoRedoEvent extends EventObjectBacktrace
 
 	/**
 	 * Test if this event is for the specified rowSet.
-	 * @param _rowSet check against this rowSet
+	 * @param rowSet check against this rowSet
 	 * @return true if the event is for the specified rowSet
 	 */
-	public boolean matches(RowSet _rowSet) {
-		return getSource().getRowSet() == _rowSet;
+	public boolean matches(RowSet rowSet) {
+		return getSource().getRowSet() == rowSet;
 	}
 
 	/**
@@ -74,8 +74,8 @@ public class RowSetUndoRedoEvent extends EventObjectBacktrace
 	 * {@inheritDoc }
 	 */
 	@Override
-	public SSComponentInterface getSource() {
-		return (SSComponentInterface) super.getSource();
+	public RSC getSource() {
+		return (RSC) super.getSource();
 	}
 
 	/**

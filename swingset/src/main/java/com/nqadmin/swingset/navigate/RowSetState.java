@@ -306,7 +306,7 @@ public class RowSetState
 //		return getRowSetState(comp.getRowSet()).isKey(comp.getBoundColumnName());
 //	}
 	public static boolean isKey(RSC comp) {
-		return Boolean.TRUE.equals(getRowSetState(comp.getRowSet()).isKey(comp.getBoundColumnName()));
+		return getRowSetState(comp.getRowSet()).isKey(comp.getColumnName());
 	}
 
 	/**

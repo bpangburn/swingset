@@ -16,25 +16,12 @@
 package com.nqadmin.swingset.demo.simpval;
 
 import javax.swing.SwingUtilities;
-import org.netbeans.validation.api.ui.*;
-
-/*
-import java.awt.EventQueue;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
-import javax.swing.InputVerifier;
-import javax.swing.JComponent;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-*/
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
 import org.netbeans.validation.api.Problems;
 import org.netbeans.validation.api.Validator;
+import org.netbeans.validation.api.ui.*;
 import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
 
 /**

@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.core;
 
@@ -46,6 +46,7 @@ package com.nqadmin.swingset.core;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.sql.JDBCType;
+import java.sql.SQLException;
 import java.util.EnumSet;
 import java.util.EventListener;
 
@@ -54,7 +55,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.assertConvertFromJdbcType;
@@ -65,7 +66,7 @@ import static java.sql.JDBCType.*;
  * Used to link a JSlider to a numeric column in a database.
  */
 @SuppressWarnings("serial")
-public class Slider extends JSlider implements SSComponentInterface
+public class Slider extends JSlider implements SSComponent
 {
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
@@ -81,13 +82,17 @@ public class Slider extends JSlider implements SSComponentInterface
 			if (getValueIsAdjusting())
 				return;
 
-			dbChange(() -> setBoundColumnObject(getValue()));
+			try {
+				dbChange(() -> setColumnObject(getValue()));
+			} catch (SQLException ex) {
+				logger.log(Level.ERROR, (String) null, ex);
+			}
 		}
 
 	} // end protected class SliderListener implements ChangeListener, Serializable
 
 	/** Logger for component */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Empty constructor needed for deserialization. Creates a horizontal slider
@@ -123,13 +128,13 @@ public class Slider extends JSlider implements SSComponentInterface
 	 * specified RowSet column.
 	 *
 	 * @param rowsModel          datasource to be used.
-	 * @param boundColumnName name of the column to which this slider should be
+	 * @param columnName name of the column to which this slider should be
 	 *                         bound
 	 * @throws java.sql.SQLException SQLException
 	 */
-	public Slider(RowsModel rowsModel, String boundColumnName) throws java.sql.SQLException {
+	public Slider(RowsModel rowsModel, String columnName) throws java.sql.SQLException {
 		this();
-		bind(rowsModel, boundColumnName);
+		rowsModel.bind(this, columnName);
 	}
 
 	/** {@inheritDoc } */
@@ -164,12 +169,12 @@ public class Slider extends JSlider implements SSComponentInterface
 				protected void updateSSComponent()
 				{
 					try {
-						Integer n = getBoundColumnObject(Integer.class);
+						Integer n = getColumnObject(Integer.class);
 						setValue(n != null ? n : 0);
 					} catch (final NumberFormatException _nfe) {
 						// TODO: Hmm, probably should be an SQL conversion error.
 						// Output the text value
-						String columnValue = getBoundColumnText();
+						String columnValue = getColumnText();
 						logger.log(Level.ERROR, getColumnForLog() + ": Number Format Exception. Cannot update slider to " + columnValue,
 								_nfe);
 					}

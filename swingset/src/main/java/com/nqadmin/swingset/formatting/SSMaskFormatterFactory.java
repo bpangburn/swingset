@@ -38,16 +38,12 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.formatting;
 
-import java.text.ParseException;
-
-import javax.swing.JFormattedTextField.AbstractFormatter;
-import javax.swing.text.MaskFormatter;
-
 import java.lang.System.Logger;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -55,14 +51,14 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import javax.swing.JFormattedTextField;
+import javax.swing.JFormattedTextField.AbstractFormatter;
+import javax.swing.text.MaskFormatter;
 
 import com.nqadmin.swingset.datasources.RSC;
-
-import static java.lang.System.Logger.Level.*;
-
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.lang.System.Logger.Level.*;
 
 /**
  * A FormatterFactory, with formatters based on MaskFormatter, which uses
@@ -220,7 +216,7 @@ public class SSMaskFormatterFactory extends FormatterFactory
 			SSMaskFormatter mf = builder.getSSMaskFormatter();
 			setDefaultFormatter(mf);
 		} catch (ParseException ex) {
-			logger.log(ERROR, "Bad mask format: " + builder.mask);
+			logger.log(ERROR, () -> "Bad mask format: " + builder.mask);
 		}
 	}
 

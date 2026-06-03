@@ -177,11 +177,11 @@ public class Example4 extends JFrame {
 		cmbPartColorChangeOptions();
 		
 		// BIND THE COMPONENTS TO THE DATABASE COLUMNS
-		txtPartID.bind(rowsModel, "part_id");
-		txtPartName.bind(rowsModel, "part_name");
-		cmbPartColor.bind(rowsModel, "color_code");
-		txtPartWeight.bind(rowsModel, "weight");
-		txtPartCity.bind(rowsModel, "city");
+		rowsModel.bind(txtPartID, "part_id");
+		rowsModel.bind(txtPartName, "part_name");
+		rowsModel.bind(cmbPartColor, "color_code");
+		rowsModel.bind(txtPartWeight, "weight");
+		rowsModel.bind(txtPartCity, "city");
 		
 		// SETUP SYNCMANAGER, WHICH WILL TAKE CARE OF KEEPING THE COMBO NAVIGATOR AND
 		// DATA NAVIGATOR IN SYNC.

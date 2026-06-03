@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.utils;
 
@@ -50,15 +50,12 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
-// SSArray.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
- * Implementation of SQL array for SSList.
+ * Implementation of SQL array for SSList; most methods unsupported.
+ * Array data is not copied/safe.
  */
 
-public class SSArray implements Array
+public class SSJDBCArray implements Array
 {
 	// TODO May be able to eliminate. Only reference is in com.nqadmin.swingset.SSList.
 
@@ -68,79 +65,107 @@ public class SSArray implements Array
 	final private JDBCType baseType;
 
 	/**
-	 * object array containing elements of sql array
+	 * an array containing elements for an sql array
 	 */
-	private final Object[] data;
+	private Object data;
 
 	/**
-	 * Creates SSArray with the object array and data base type
-	 * @param _data     object array of SSArray
-	 * @param _baseType Array elements database type
+	 * Creates SSArray with the object array and data base type.
+	 * <em>The data is not copied</em>; the caller should not modify the array.
+	 * 
+	 * @param data     object array of SSArray
+	 * @param baseType Array elements database type
 	 */
-	public SSArray(final Object[] _data, final JDBCType _baseType) {
-		Objects.requireNonNull(_data);
-		data = _data.clone();
-		baseType = _baseType;
+	public SSJDBCArray(final Object data, final JDBCType baseType) {
+		Objects.requireNonNull(data);
+		if (!data.getClass().isArray())
+			throw new IllegalArgumentException("Must be an array");
+		this.data = data;
+		this.baseType = baseType;
 	}
 
+	/** {@inheritDoc } */
 	@Override
 	public void free() throws SQLException {
-		// do nothing
+		data = null;
 	}
 
-	/**
-	 * returns Object Array contained in SSArray
-	 */
+	/** {@inheritDoc } */
 	@Override
 	public Object getArray() throws SQLException {
 		return data;
 	}
 
+	/**
+	 * throws UnsupportedOperationException
+	 * {@inheritDoc }
+	 */
 	@Override
 	public Object getArray(final long index, final int count) throws SQLException {
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * throws UnsupportedOperationException
+	 * {@inheritDoc }
+	 */
 	@Override
 	public Object getArray(final long index, final int count, final Map<String, Class<?>> map) throws SQLException {
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * throws UnsupportedOperationException
+	 * {@inheritDoc }
+	 */
 	@Override
 	public Object getArray(final Map<String, Class<?>> map) throws SQLException {
 		throw new UnsupportedOperationException();
 	}
 
+	/** {@inheritDoc } */
 	@Override
 	public int getBaseType() throws SQLException {
 		return baseType.getVendorTypeNumber();
 	}
 
-	/**
-	 * returns the base type name of db array elements
-	 *
-	 * @return _baseTypeName data base type name
-	 */
+	/** {@inheritDoc } */
 	@Override
 	public String getBaseTypeName() throws SQLException {
 		return baseType.getName();
 	}
 
+	/**
+	 * throws UnsupportedOperationException
+	 * {@inheritDoc }
+	 */
 	@Override
 	public ResultSet getResultSet() throws SQLException {
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * throws UnsupportedOperationException
+	 * {@inheritDoc }
+	 */
 	@Override
 	public ResultSet getResultSet(final long index, final int count) throws SQLException {
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * throws UnsupportedOperationException
+	 * {@inheritDoc }
+	 */
 	@Override
 	public ResultSet getResultSet(final long index, final int count, final Map<String, Class<?>> map) throws SQLException {
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * throws UnsupportedOperationException
+	 * {@inheritDoc }
+	 */
 	@Override
 	public ResultSet getResultSet(final Map<String, Class<?>> map) throws SQLException {
 		throw new UnsupportedOperationException();
@@ -148,6 +173,7 @@ public class SSArray implements Array
 
 	/**
 	 * Returns a string value with comma separated values. e.g. "{100,200,300}"
+	 * @return 
 	 */
 	@Override
 	public String toString() {

@@ -37,10 +37,6 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
-// SSDataValue.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * The SSDataValue interface specifies methods for SSTableModel to retrieve the
  * value for primary column in JTable.

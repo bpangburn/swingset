@@ -37,13 +37,6 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.demo;
 
-import com.nqadmin.swingset.core.ComboBox2.MissingDisplayValueControl;
-import com.nqadmin.swingset.models.SSListItem;
-import com.nqadmin.swingset.models.SSListItemFormat;
-
-import static com.nqadmin.swingset.navigate.RowsAction.*;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
-
 import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
@@ -64,6 +57,12 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 
+import com.nqadmin.swingset.core.ComboBox2.MissingDisplayValueControl;
+import com.nqadmin.swingset.models.SSListItem;
+import com.nqadmin.swingset.models.SSListItemFormat;
+
+import static com.nqadmin.swingset.navigate.RowsAction.*;
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**

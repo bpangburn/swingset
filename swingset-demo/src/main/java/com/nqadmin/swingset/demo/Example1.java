@@ -42,6 +42,7 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -50,6 +51,7 @@ import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.function.Function;
 
 import javax.sql.RowSet;
@@ -66,10 +68,13 @@ import com.nqadmin.swingset.SSDBNav;
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.decorators.BorderDecorator;
+import com.nqadmin.swingset.decorators.FocusDecorator.ComponentState;
 import com.nqadmin.swingset.decorators.TextComponentValidator;
 import com.nqadmin.swingset.demo.simpval.SVUtils;
 import com.nqadmin.swingset.demo.simpval.StringValidator;
 import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.SSUtils;
 
 
@@ -108,12 +113,32 @@ public class Example1 extends JFrame {
 	SSDataNavigator navigator;
 	RowsModel rowsModel;
 
+	static boolean newBorderSet;
 	private void cleanup()
 	{
 		//connection = null;
 		//rowset = null;
 		//navigator.cleanup();
 		//navigator = null;
+
+		if (newBorderSet)
+			return;
+		newBorderSet = true;
+		// After the first time, change modified color to BLUE
+		CentralLookup.getDefault().replace(BorderDecorator.BorderDecoratorPaint.class,
+				new BorderDecorator.BorderDecoratorPaint() {
+					@Override
+					public Color getBorderColor(ComponentState state)
+					{
+						return switch(state) {
+						case CLEAN -> null;
+						case FOCUSED_CLEAN -> Color.GREEN;
+						case MODIFIED, FOCUSED_MODIFIED  -> Color.BLUE;
+						case ERROR, FOCUSED_ERROR -> Color.RED;
+						};
+					}
+					
+				});
 	}
 
 	RowSet getRowSet() {
@@ -267,10 +292,11 @@ public class Example1 extends JFrame {
 		}
 
 		// Bind the components to the RowsModel and the database columns.
-		rowsModel.bind(txtSupplierID, "supplier_id");
-		rowsModel.bind(txtSupplierName, "supplier_name");
-		rowsModel.bind(txtSupplierCity, "city");
-		rowsModel.bind(txtSupplierStatus, "status");
+		rowsModel.bind(Map.of(
+				txtSupplierID, "supplier_id",
+				txtSupplierName, "supplier_name",
+				txtSupplierCity, "city",
+				txtSupplierStatus, "status"));
 		
 		// Set label dimensions.
 		lblSupplierID.setPreferredSize(MainClass.labelDim);

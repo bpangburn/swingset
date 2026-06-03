@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2024, Ernie R Rael. All rights reserved.
+ * Copyright (C) 2024-2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -51,9 +51,9 @@ import org.junit.jupiter.api.Test;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.mock.H2;
 import com.nqadmin.swingset.mock.TestLogging;
+import com.nqadmin.swingset.mock.Util;
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.CentralLookup;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 
 import static com.nqadmin.swingset.utils.SSUtils.getLoggerName;
 import static com.nqadmin.swingset.utils.SSUtils.isJunit;
@@ -78,7 +78,7 @@ public class RowSetOpsTest
 	{
 		isJunit();	// Make sure it's set; when using invokeLater, can be missed.
 		TestLogging.load();
-		CentralLookup.getDefault().replace(SSDBSupport.class, new DefaultSSDBSupport());
+		Util.initLookup();
 	}
 	
 	/** x */
@@ -200,7 +200,7 @@ public class RowSetOpsTest
 			throws Exception
 	{
 		LOG.log(INFO, "    " + col);
-		SSComponentInterface comp = new SSTextField(g_rm, col);
+		SSComponent comp = new SSTextField(g_rm, col);
 		RowSetOps.updateColumnText(comp, sVal);
 		g_rm.commit();
 		Object co = RowSetOps.getColumnObject(comp);
@@ -303,9 +303,9 @@ public class RowSetOpsTest
 		String sDate = "2222-02-22";
 		String sTime = "12:12:12";
 		String sTimestamp = "2222-02-22 22:22:22";
-		SSComponentInterface comp1 = new SSTextField(rowsModel, "c_date");
-		SSComponentInterface comp2 = new SSTextField(rowsModel, "c_time");
-		SSComponentInterface comp3 = new SSTextField(rowsModel, "c_timestamp");
+		SSComponent comp1 = new SSTextField(rowsModel, "c_date");
+		SSComponent comp2 = new SSTextField(rowsModel, "c_time");
+		SSComponent comp3 = new SSTextField(rowsModel, "c_timestamp");
 		RowSetOps.updateColumnText(comp1, sDate);
 		RowSetOps.updateColumnText(comp2, sTime);
 		RowSetOps.updateColumnText(comp3, sTimestamp);
@@ -346,7 +346,7 @@ public class RowSetOpsTest
 	public void testUpdateColumnObject() throws Exception
 	{
 		LOG.log(INFO, "TEST: updateColumnObject");
-		SSComponentInterface comp = null;
+		SSComponent comp = null;
 		Object _updatedValue = null;
 		RowSetOps.updateColumnObject(comp, _updatedValue);
 		// TODO review the generated test code and remove the default call to fail.

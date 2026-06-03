@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 
 package com.nqadmin.swingset.decorators;
 
@@ -46,7 +51,8 @@ import java.awt.event.FocusListener;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
+import com.nqadmin.swingset.utils.SSComponent.ValidationResult;
 
 /**
  * Base class for decorators that use Focus.
@@ -54,8 +60,67 @@ import com.nqadmin.swingset.utils.SSComponentInterface;
 public abstract class FocusDecorator
 		implements Decorator, FocusListener, TextDecorator
 {
+	/** The state of a component. Used to create the proper decoration */
+	// TODO: may want to treat as bit field for: error/focus/warning/dirty
+	public enum ComponentState {
+		/** not focused, no error, not modified */
+		CLEAN,
+		/** focus gained, no error, not modified */
+		FOCUSED_CLEAN,
+		/** modified without focus */
+		MODIFIED,
+		/** modified with focus */
+		FOCUSED_MODIFIED,
+		/** error with/without focus */
+		ERROR,
+		/** error with/without focus */
+		FOCUSED_ERROR;
+
+		boolean isFocused() {
+			return this == FOCUSED_CLEAN || this == FOCUSED_MODIFIED
+					|| this == FOCUSED_ERROR;
+		}
+
+		boolean isModified() {
+			return this == MODIFIED || this == FOCUSED_MODIFIED;
+		}
+
+		boolean isError() {
+			return this == ERROR || this == FOCUSED_ERROR;
+		}
+
+		// TODO: isModified, isError
+	}
+
+	/**
+	 * Determine the state of the component.
+	 * @param valid
+	 * @return the component state
+	 */
+	public ComponentState getComponentState(ValidationResult valid) {
+		ComponentState borderState;
+		if (valid.all()) {
+			borderState = getComponent().isDirty()
+					? ComponentState.MODIFIED
+					: ComponentState.CLEAN;
+		} else
+			borderState = ComponentState.ERROR;
+		if (fcomp().isFocusOwner()) {
+			borderState = switch(borderState) {
+			case CLEAN -> ComponentState.FOCUSED_CLEAN;
+
+
+			case MODIFIED -> ComponentState.FOCUSED_MODIFIED;
+			case ERROR -> ComponentState.FOCUSED_ERROR;
+			default -> throw new IllegalStateException("Unexpected value: " + (borderState));
+			};
+		}
+
+		return borderState;
+	}
+
 	/** this component */
-	private SSComponentInterface component;
+	private SSComponent component;
 	/** current color set by decorateText() */
 	protected Color textColor;
 
@@ -73,7 +138,7 @@ public abstract class FocusDecorator
 
 	/** {@inheritDoc} */
 	@Override
-	public void install(SSComponentInterface component) {
+	public void install(SSComponent component) {
 		this.component = component;
 		fcomp().addFocusListener(this);
 	}
@@ -85,7 +150,9 @@ public abstract class FocusDecorator
 	}
 
 	/**
-	 * Based on JComponent type, determine Component that gets focus.
+	 * Return the Component that gets focus when the associated SSComponent
+	 * is focused.
+	 * 
 	 * @return focus target
 	 */
 	// TODO: fcomp() - maybe just return jc() and dynamically override
@@ -96,10 +163,8 @@ public abstract class FocusDecorator
 				: ((JComboBox)jc()).getEditor().getEditorComponent();
 	}
 
-	/** {@inheritDoc}
-	 * Put here for convenience; Signature of {@literal "enum<?>"} is so plugin authors
-	 * can override and define their own styles.
-	 * Change the color of the text according * to _style.
+	/**
+	 * Set the color of the text/foreground according to _style.
 	 */
 	@Override
 	public <E extends Enum<E>> void decorateText(E _style) {
@@ -116,16 +181,19 @@ public abstract class FocusDecorator
 	}
 
 	/**
-	 * Return the component associated with this validator
+	 * Return the SSComponent associated with this decorator.
+	 * 
 	 * @return the component
 	 */
-	public SSComponentInterface getComponent() {
+	public SSComponent getComponent() {
 		return component;
 	}
 
 	/**
-	 * Return the SSComponent as a JComponent.
-	 * @return the SSComponent
+	 * Return the JComponent that gets decorated.
+	 * It may not be the same as whats returned by {@link #getComponent() }.
+	 * 
+	 * @return the JComponent
 	 */
 	protected JComponent jc() {
 		return (JComponent) component;

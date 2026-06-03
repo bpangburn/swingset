@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2024, Ernie R Rael. All rights reserved.
+ * Copyright (C) 2024-2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,19 +30,18 @@
 package com.nqadmin.swingset.core;
 
 import java.sql.JDBCType;
-
-
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.nqadmin.swingset.mock.Util;
 import com.nqadmin.swingset.models.KeyDisplayValueSwingModel;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -61,6 +60,7 @@ public class List1Test
 	@BeforeAll
 	public static void setUpClass()
 	{
+		Util.initLookup();
 	}
 	
 	/** x */
@@ -85,7 +85,7 @@ public class List1Test
 	 * MyList
 	 */
 	@SuppressWarnings("serial")
-	class MyList extends List1<Object,String> implements SSComponentInterface
+	class MyList extends List1<Object,String> implements SSComponent
 	{
 		/** x */
 		public MyList()

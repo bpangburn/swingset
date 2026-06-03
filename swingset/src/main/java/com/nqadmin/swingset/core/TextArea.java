@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2025, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2025-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.core;
 
@@ -48,7 +48,7 @@ import java.util.EventListener;
 import javax.swing.JTextArea;
 
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSTextSupport;
 import com.nqadmin.swingset.utils.SSTextSupport.SSDocumentListener;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -60,7 +60,7 @@ import static java.lang.System.Logger.Level.*;
  * TextArea extends the JTextArea to add RowSet binding.
  */
 @SuppressWarnings("serial")
-public class TextArea extends JTextArea implements SSComponentInterface {
+public class TextArea extends JTextArea implements SSComponent {
 
 	// TODO Consider adding an InputVerifier to prevent component from losing focus.
 	//      Probably want component/system-wide option.
@@ -95,11 +95,11 @@ public class TextArea extends JTextArea implements SSComponentInterface {
 	 * Creates a multi-line text box and binds it to the specified RowSet column.
 	 *
 	 * @param rowsModel          datasource to be used.
-	 * @param boundColumnName name of the column to which this text area should be bound
+	 * @param columnName name of the column to which this text area should be bound
 	 */
-	public TextArea(RowsModel rowsModel, String boundColumnName) {
+	public TextArea(RowsModel rowsModel, String columnName) {
 		this();
-		bind(rowsModel, boundColumnName);
+		rowsModel.bind(this, columnName);
 	}
 
 	/**
@@ -129,12 +129,12 @@ public class TextArea extends JTextArea implements SSComponentInterface {
 			hook = new Hook(this) {
 				/**
 				 * Updates the value stored and displayed in the SwingSet
-				 * component based on getBoundColumnText()
+				 * component based on getColumnText()
 				 */
 				@Override
 				protected void updateSSComponent() {
 					
-					final String text = getBoundColumnText();
+					final String text = getColumnText();
 					logger.log(DEBUG, ()->sf("%s: Setting text area to %s.", getColumnForLog(), text));
 					setText(text);
 				}

@@ -66,10 +66,6 @@ import com.nqadmin.swingset.datasources.AppSSDBSupport;
 import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.navigate.RowsModel;
 
-//SSScreenHelperCommon.java
-//
-//SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Helper class for designing SwingSet Form View screens.
  */

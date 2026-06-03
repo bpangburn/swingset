@@ -59,10 +59,6 @@ import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
 import static java.lang.System.Logger.Level.*;
 
-//SSFormViewScreenHelper.java
-//
-//SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Helper class for designing SwingSet Form View screens.
  */

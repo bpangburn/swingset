@@ -48,13 +48,11 @@ import org.junit.jupiter.api.Test;
 
 import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.core.TextField;
-import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
-import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.mock.H2;
 import com.nqadmin.swingset.mock.TestLogging;
 import com.nqadmin.swingset.mock.TinyRS;
+import com.nqadmin.swingset.mock.Util;
 import com.nqadmin.swingset.navigate.EQ.BusReceiver;
-import com.nqadmin.swingset.utils.CentralLookup;
 import com.raelity.lib.eventbus.WeakEventBus;
 
 import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
@@ -79,7 +77,7 @@ public class RowsModelTest
 	{
 		isJunit();	// Make sure it's set; when using invokeLater, can be missed.
 		TestLogging.load();
-		CentralLookup.getDefault().replace(SSDBSupport.class, new DefaultSSDBSupport());
+		Util.initLookup();
 	}
 	
 	/** x */
@@ -243,6 +241,7 @@ public class RowsModelTest
 
 		RowsModel rowsModel = RowsModel.create(null, null);
 		TextField tf = new TextField();
+		TextField tf2 = new TextField();
 		DbNav _dbNav = null;
 		try {
 			_dbNav = new DbNav(tf, rowsModel);
@@ -270,7 +269,11 @@ public class RowsModelTest
 		rowsModel.bind(tf, keyCol);
 		// Try to bind tfInt again to a different column.
 		Exception exx = assertThrows(IllegalArgumentException.class, () -> rowsModel.bind(tf, cityCol));
-		assertTrue(exx.getMessage().startsWith("Component already bound to this model"), exx.getMessage());
+		assertTrue(exx.getMessage().matches("SSComponent of <.*,city> already bound.*<.*,supplier_id>"));
+		// Try to bind different text field to same column of tfInt, not an error
+		rowsModel.bind(tf2, keyCol);
+		// exx = assertThrows(IllegalArgumentException.class, () -> rowsModel.bind(tf2, keyCol));
+		// assertTrue(exx.getMessage().matches("ColumnName of <.*,supplier_id> already bound.*<.*,supplier_id>"));
 
 		// Try to bind tfInt to a different model.
 		RowsModel rowsModel2 = RowsModel.create(null, null);

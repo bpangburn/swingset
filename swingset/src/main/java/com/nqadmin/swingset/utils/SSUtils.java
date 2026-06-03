@@ -82,7 +82,7 @@ public class SSUtils {
 	/** Temporary for hiding SSCommon; used from SSDBComboBox.
 	 * @param comp component to update
 	 */
-	public static void updateSSComponent_HACK(SSComponentInterface comp) {
+	public static void updateSSComponent_HACK(SSComponent comp) {
 		comp.getSSCommon().updateSSComponent();
 	}
 
@@ -112,7 +112,7 @@ public class SSUtils {
 	 * @param comp 
 	 * @return true if the listener is added
 	 */
-	public static boolean isSSComponentListenerAddedDebug(SSComponentInterface comp) {
+	public static boolean isSSComponentListenerAddedDebug(SSComponent comp) {
 		return comp.getSSCommon().isSSComponentListenerAdded();
 	}
 
@@ -172,20 +172,20 @@ public class SSUtils {
 	 * @param _container
 	 * @return List of SScomponents
 	 */
-	public static List<SSComponentInterface> findSSComponents(Container _container)
+	public static List<SSComponent> findSSComponents(Container _container)
 	{
-		ArrayList<SSComponentInterface> l = new ArrayList<>();
+		ArrayList<SSComponent> l = new ArrayList<>();
 		findSSComponents(_container, l);
 		return l;
 	}
-	private static void findSSComponents(Container _container, List<SSComponentInterface> l)
+	private static void findSSComponents(Container _container, List<SSComponent> l)
 	{
 		//
 		// TODO: Need a special case for getViewport() or anything else ???????
 		//
 		for (Component comp : _container.getComponents()) {
 			switch (comp) {
-			case SSComponentInterface c -> l.add(c);
+			case SSComponent c -> l.add(c);
 			case Container c -> findSSComponents(c, l);
 			default -> { }
 			}
@@ -232,7 +232,7 @@ public class SSUtils {
 	 */
 	// TODO: Could have an array of primary keys, one entry per column.
 	//		 Could this be needed for joins?
-	public static void setupDefaultPrimaryKeys(SSComponentInterface comp)
+	public static void setupDefaultPrimaryKeys(SSComponent comp)
 	{
 		RowSet rs = comp.getRowSet();
 		if (rs instanceof JoinRowSet)
@@ -403,7 +403,7 @@ public class SSUtils {
 	 * @param ex error
 	 */
 	// TODO: Only used from Image.java. Does this belong in Image.java?
-	public static void reportError(Logger logger, SSComponentInterface comp, String title, Path path, Exception ex)
+	public static void reportError(Logger logger, SSComponent comp, String title, Path path, Exception ex)
 	{
 		String pathName = path != null ? path.toAbsolutePath().toString() : "";
 		logger.log(Level.ERROR, () -> sf("%s: IO Exception %s: file %s: %s",
@@ -438,9 +438,9 @@ public class SSUtils {
 	 * @param comp string for this
 	 * @return string from component
 	 */
-	public static String ssComponentToString(SSComponentInterface comp)
+	public static String ssComponentToString(SSComponent comp)
 	{
-		return sf("%s, column=%s", objectID(comp.getRowSet()), comp.getBoundColumnName());
+		return sf("%s, column=%s", objectID(comp.getRowSet()), comp.getColumnName());
 	}
 
 	/**

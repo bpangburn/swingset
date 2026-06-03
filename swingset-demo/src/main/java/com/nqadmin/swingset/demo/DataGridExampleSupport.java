@@ -37,22 +37,18 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.demo;
 
-import com.nqadmin.swingset.SSDataGrid;
-import com.nqadmin.swingset.SSDataGridHandler;
-import com.nqadmin.swingset.SSDataValue;
-import com.nqadmin.swingset.SSTableModel;
-import com.nqadmin.swingset.datasources.RowSetOps;
-import static com.nqadmin.swingset.utils.SSUtils.sf;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.lang.System.Logger;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import javax.sql.RowSet;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
@@ -61,7 +57,14 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import java.lang.System.Logger;
+
+import com.nqadmin.swingset.SSDataGrid;
+import com.nqadmin.swingset.SSDataGridHandler;
+import com.nqadmin.swingset.SSDataValue;
+import com.nqadmin.swingset.SSTableModel;
+import com.nqadmin.swingset.datasources.RowSetOps;
+
+import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**

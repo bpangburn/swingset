@@ -4,6 +4,24 @@ Names case conversion. Per dbms/platform plugin. Maybe only needed for metadata
 access. For example, H2 converts column_name to COLUMN_NAME. Currently using
 map with case insensitive key. See RowSetState TreeMap
 
+DBMS plugin for interpretation of SQL Exceptions to assist in better messages
+and/or error handling. For example, determine if error is a constraint violation
+and print the violated constraint.
+
+================================================================================
+
+setColumn()/getColumn() allow to pass in reader/writer? Consider ConsumerSQL.
+
+================================================================================
+
+Incorporate Brian TODO from April 29, "Added TODOs for possible cleanup"
+about making some methods private in DBComboBox2.
+
+================================================================================
+
+SSCollectionModel. Provide better interoperability with primitive arrays.
+But considering there might be primitive generics at some point...
+
 ================================================================================
 
 Why maintain currentRow and rowCount in navigateState? How much perf gain?
@@ -173,34 +191,12 @@ If at bottom of stack, then Redo to an error, swithes from canNavigate btns to
 only RevertChanges btn. There is a brief flash of the commit button on the way,
 minor issue to ignore for now.
 
---- backing out text component error
-validation issue interacting with database errors
-Example1 - status change "20" to "20x", conversion error.
-    SSDocumentListener.udpateTextComponent
-        does ssCommon.setBoundColumnText
-        does RowSetOps.updateColumnText
-        does convertToType("20x", INT)
-            gets exception
-    ssCommon.setBoundColumnText does
-        postRowSetModifiedError
-        and returns false
-    The SSDocumentListener
-        because setBoundColumnText fails (return false, also if thrown exception)
-        backs out the text field change;
-        but note that an error has already been posted
 
-    The nav state gets screwy. There's no error, but the component is in an error
-    state. There was "no change", because it was backed out. ^Z/^Y aren't quite
-    right.
-
-    The conversion to database type, should be part of validation.
-
+--- backing out text component error (see DONE)
     This issue may relate to the issues with pluginValidate leaving things in
     an unusual state. FIND THOSE COMMENTS...
 
     
-
-Should decorator check component error state (from navigator)...
 
 ---
 ACT_REVERT on cached row set.
@@ -568,6 +564,15 @@ This brings up a dialog, and during testing if click OK
 there is no error.
 In RowSetOps could 'catch(SQLException ex) {excount++; throw ex;}
 and a getExCount(). Maybe the counter could be in postRowSetError.
+
+For example1, status enter 2000, click commit. get dialog but no indication
+of which column is a problem. For H2 dialog says constraint error. Plugin
+to help decode error. This shows set command, what about values?
+        Exception occured while saving row.
+        "Check constraint violation: "CONSTRAINT_37: ";
+        SQL statement: UPDATE "PUBLIC"."SUPPLIER_DATA"
+            SET "SUPPLIER_ID"=? ,"SUPPLIER_NAME"=? ,"STATUS"=? ,"CITY"=?
+            WHERE "SUPPLIER_ID"=? [23513-240]"
 
 
 ============== EVENTS

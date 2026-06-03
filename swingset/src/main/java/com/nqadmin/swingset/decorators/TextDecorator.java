@@ -45,7 +45,7 @@ public interface TextDecorator
 {
 
 	/**
-	 * Modify the text to reflect the style; Commonly modifies text color.
+	 * Modify the text according to style; commonly modifies text color.
 	 * Signature of {@literal "enum<?>"} is so plugin authors can override and
 	 * define their own styles.
 	 * @param _style why the text is decorated

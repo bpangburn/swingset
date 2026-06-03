@@ -1,6 +1,6 @@
 /*
  * Portions created by Ernie Rael are
- * Copyright (C) 2024 Ernie Rael.  All Rights Reserved.
+ * Copyright (C) 2024-2026 Ernie Rael.  All Rights Reserved.
  *
  * The contents of this file are subject to the Mozilla Public
  * License Version 1.1 (the "License"); you may not use this file
@@ -18,6 +18,7 @@ package com.nqadmin.swingset.demo.datepicker;
 
 import java.lang.System.Logger;
 import java.sql.JDBCType;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.EventListener;
@@ -26,8 +27,10 @@ import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
 import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
+import com.nqadmin.swingset.decorators.AlternateBorderDecorator;
+import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.assertConvertFromJdbcType;
@@ -40,14 +43,18 @@ import static java.sql.JDBCType.DATE;
  * in the SS library.
  */
 @SuppressWarnings("serial")
-public class DbDatePicker extends DatePicker implements SSComponentInterface
+public class DbDatePicker extends DatePicker implements SSComponent
 {
 	private class DbDatePickerListener implements EventListener,DateChangeListener {
 		/** {@inheritDoc} */
 		@Override
 		public void dateChanged(final DateChangeEvent dce)
 		{
-			dbChange(() -> setBoundColumnObject(dce.getNewDate()));
+			try {
+				dbChange(() -> setColumnObject(dce.getNewDate()));
+			} catch (SQLException ex) {
+				logger.log(Logger.Level.ERROR, (String) null, ex);
+			}
 		}
 	}
 	/** System Logger for component. */
@@ -60,7 +67,11 @@ public class DbDatePicker extends DatePicker implements SSComponentInterface
 	{
 		super(initialSettings());
 
+		// @SuppressWarnings("LeakingThisInConstructor")
+		// Border b = SSUtils.createEmptyBorder(this);
+		// setBorder(b);
 		//setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+
 		finishSSCommon();
 	}
 
@@ -109,6 +120,16 @@ public class DbDatePicker extends DatePicker implements SSComponentInterface
 		}
 	}
 
+	/**
+	 * Highlight the date text field when this component gets focus.
+	 * {@inheritDoc }
+	 */
+	@Override
+	public Decorator createDefaultDecorator() {
+		// Decorator.DecoratorStyle style = def.lookup(Decorator.DecoratorStyle.class);
+		return new AlternateBorderDecorator(getComponentDateTextField());
+	}
+
 	private Hook hook;
 
 	/** {@inheritDoc } */
@@ -120,8 +141,8 @@ public class DbDatePicker extends DatePicker implements SSComponentInterface
 				@Override
 				protected void updateSSComponent()
 				{
-					logger.log(DEBUG, () -> sf("%s: getBoundColumnText() - %s",getColumnForLog(), getBoundColumnText()));
-					LocalDate value = getBoundColumnObject(LocalDate.class);
+					logger.log(DEBUG, () -> sf("%s: getBoundColumnText() - %s",getColumnForLog(), getColumnText()));
+					LocalDate value = getColumnObject(LocalDate.class);
 					setDate(value);
 				}
 				

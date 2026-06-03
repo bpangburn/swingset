@@ -35,6 +35,11 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  * ****************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 
 package com.nqadmin.swingset.decorators;
 
@@ -43,7 +48,7 @@ import java.lang.System.Logger;
 
 import javax.swing.UIManager;
 
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent.ValidationResult;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static java.lang.System.Logger.Level.*;
@@ -60,23 +65,23 @@ public class BackgroundDecorator extends FocusDecorator
 	private final Color standardBackgroundColor = getDefaultBackgroundColor();
 	private Color focusBackgroundColor = new Color(204, 255, 255); // Tealish
 	private final Color errorBackgroundColor = Color.PINK;
+	private final Color modifiedBackgroundColor = Color.YELLOW;
 
 	/** Decorate the component using current state. */
 	@Override
 	public boolean decorate() {
-		SSComponentInterface.validateResult valid = getComponent().allValidate();
+		ValidationResult valid = getComponent().allValidate();
 		logger.log(TRACE, () -> String.format("%s focus: %s, compValid %s, allValid: %s",
 				jc().getClass().getSimpleName(), fcomp().isFocusOwner(), valid.comp(), valid.all()));
 
 
+		ComponentState state = getComponentState(valid);
+		Color color = state.isError() ? errorBackgroundColor
+				: state.isModified() ? modifiedBackgroundColor
+				: state.isFocused() ? focusBackgroundColor
+				: standardBackgroundColor;
+		jc().setBackground(color);
 
-		//boolean dataValid = getComponent().getSSCommon().validate() && getComponent().isDataValid();
-		if (valid.all()) {
-			jc().setBackground(jc().isFocusOwner()
-					? focusBackgroundColor : standardBackgroundColor);
-		} else {
-			jc().setBackground(errorBackgroundColor);
-		}
 		return valid.all();
 	}
 
@@ -105,6 +110,15 @@ public class BackgroundDecorator extends FocusDecorator
 	 */
 	public void setFocusBackgroundColor(final Color _focusBackgroundColor) {
 		focusBackgroundColor = _focusBackgroundColor;
+	}
+
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public DecoratorStyle getStyle()
+	{
+		return DecoratorStyle.BACKGROUND;
 	}
     
 }

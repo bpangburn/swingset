@@ -38,19 +38,19 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
 
 import javax.sql.RowSet;
 
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.datasources.RSC;
 
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
 
 /**
- * Sent by a SSComponnent when it modifies its value using updateXxx.
+ * Sent by a component when it modifies its value using updateXxx.
  * Note, the value is not yet written to the database.
  */
 //
@@ -68,7 +68,7 @@ public class RowSetModificationEvent extends EventObjectBacktrace
 	 * @param source the component making the modification
 	 * @param value the value written to the rowSet
 	 */
-	public RowSetModificationEvent(SSComponentInterface source, Object value) {
+	public RowSetModificationEvent(RSC source, Object value) {
 		this(source, value, false);
 	}
 
@@ -78,7 +78,7 @@ public class RowSetModificationEvent extends EventObjectBacktrace
 	 * @param value the value written to the rowSet
 	 * @param error true if the component value is in error
 	 */
-	public RowSetModificationEvent(SSComponentInterface source, Object value,
+	public RowSetModificationEvent(RSC source, Object value,
 								   boolean error) {
 		super(source);
 		this.value = value;
@@ -90,8 +90,8 @@ public class RowSetModificationEvent extends EventObjectBacktrace
 	 * {@inheritDoc }
 	 */
 	@Override
-	public SSComponentInterface getSource() {
-		return (SSComponentInterface) super.getSource();
+	public RSC getSource() {
+		return (RSC) super.getSource();
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class RowSetModificationEvent extends EventObjectBacktrace
 	 */
 	public String getColumnName()
 	{
-		return getSource().getBoundColumnName();
+		return getSource().getColumnName();
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class RowSetModificationEvent extends EventObjectBacktrace
 	 */
 	public int getColumnIndex()
 	{
-		return getSource().getBoundColumnIndex();
+		return getSource().getColumnIndex();
 	}
 
 	/**

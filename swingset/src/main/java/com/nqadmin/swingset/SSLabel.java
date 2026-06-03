@@ -50,10 +50,6 @@ import com.nqadmin.swingset.navigate.RowsModel;
 
 import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 
-// SSLabel.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Used to display database values in a read-only JLabel.
  * By default, programmatic changes to the label are not propagated,
@@ -94,11 +90,11 @@ public class SSLabel extends Label
 	 * column.
 	 *
 	 * @param rowsModel          datasource to be used.
-	 * @param boundColumnName name of the column to which this label should be
+	 * @param columnName name of the column to which this label should be
 	 *                         bound
 	 */
-	public SSLabel(RowsModel rowsModel, String boundColumnName) {
-		super(rowsModel, boundColumnName);
+	public SSLabel(RowsModel rowsModel, String columnName) {
+		super(rowsModel, columnName);
 	}
 
 	/**
@@ -106,12 +102,12 @@ public class SSLabel extends Label
 	 * column.
 	 *
 	 * @param _rowSet          datasource to be used.
-	 * @param _boundColumnName name of the column to which this label should be
+	 * @param columnName name of the column to which this label should be
 	 *                         bound
 	 * @deprecated use RowsModel insted of RowSet
 	 */
 	@Deprecated
-	public SSLabel(final RowSet _rowSet, final String _boundColumnName) {
-		super(findRowsModel(_rowSet), _boundColumnName);
+	public SSLabel(final RowSet _rowSet, final String columnName) {
+		super(findRowsModel(_rowSet), columnName);
 	}
 } // end public class SSLabel extends JLabel {

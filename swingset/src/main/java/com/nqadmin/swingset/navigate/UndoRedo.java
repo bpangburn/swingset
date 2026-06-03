@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2025, Ernie R Rael. All rights reserved.
+ * Copyright (C) 2025-2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -36,7 +36,7 @@ import javax.sql.RowSet;
 import javax.swing.SwingUtilities;
 
 import com.nqadmin.swingset.datasources.RSC;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.navigate.Utils.postRowSetUndoRedo;
@@ -53,7 +53,12 @@ public enum UndoRedo
 	/** Redo command */
 	REDO;
 
+	/**
+	 * Value and error status of item on the undo/redo stack.
+	 */
 	public record Change(Object value, boolean isError){};
+
+	static final Change NO_CHANGE = new Change("UNDO/REDO NONE", false);
 
 	/** Logger for component */
 	private static final Logger logger = SSUtils.getLogger();
@@ -99,48 +104,25 @@ public enum UndoRedo
 		return isUndoRedoEnabled(comp.getRowSet());
 	}
 
-	// /**
-	//  * Check if the rowSet's cursor is on a row or on the insert row.
-	//  * @param rs rowset for this component
-	//  * @return true if cursor on a row or insert row
-	//  * @throws SQLException 
-	//  */
-	// public static boolean hasActiveRow(RowSet rs) throws SQLException
-	// {
-	// 	return rs.getRow() != 0
-	// 			|| RowSetState.isInserting(rs);
-	// }
-
-	// /**
-	//  * Check if the rowSet's cursor is on a row or on the insert row.
-	//  * @param comp rowset for this component
-	//  * @return true if cursor on a row or insert row
-	//  * @throws SQLException 
-	//  */
-	// public static boolean hasActiveRow(RSC comp) throws SQLException
-	// {
-	// 	return hasActiveRow(comp.getRowSet());
-	// }
-
 	/**
 	 * Make sure the column's undo/redo stack is initialized; the
 	 * database value (an object) is the base.
 	 * This must be used before any updates are done to the rowset.
+	 * Does nothing if base already captured.
 	 * @param comp rowset/column
 	 * @throws SQLException
 	 */
-	public static void captureInitialValue(SSComponentInterface comp)
+	public static void captureInitialValue(RSC comp)
 			throws SQLException
 	{
 		if (!isUndoRedoEnabled(comp))
 			return;
-		NavigateState navState = comp.getRowsModel().getNavState();
-		navState.undoRow.captureInitialValue(comp);
+		comp.getRowsModel().getUndoRow().captureInitialValue(comp);
 	}
 
 	/**
 	 * Return the current undo/redo value for the specified component.
-	 * @param comp ssComponent
+	 * @param comp rowset/column
 	 * @return current value
 	 * @throws SQLException
 	 */
@@ -149,8 +131,7 @@ public enum UndoRedo
 	{
 		if (!isUndoRedoEnabled(comp))
 			throw new IllegalStateException("UNDO/REDO disabled");
-		NavigateState navState = comp.getRowsModel().getNavState();
-		return navState.undoRow.fetchCurrentChange(comp);
+		return comp.getRowsModel().getUndoRow().fetchCurrentChange(comp);
 	}
 
 	/**
@@ -158,20 +139,21 @@ public enum UndoRedo
 	 * @param comp ssComponent
 	 * @param cmd undo or redo
 	 */
-	public static void undoRedo(SSComponentInterface comp, UndoRedo cmd)
+	// TODO: SSComponent vs RSC
+	public static void undoRedo(SSComponent comp, UndoRedo cmd)
 	{
 		if (!isUndoRedoEnabled(comp))
 			return;
 		logger.log(DEBUG, () -> sf("%s: %s for %s", cmd,
-				comp.getClass().getSimpleName(), comp.getBoundColumnName()));
+				comp.getClass().getSimpleName(), comp.getColumnName()));
 		try {
 			NavigateState navState = comp.getRowsModel().getNavState();
 			Change change = navState.doUndoRedo(comp, cmd);
 			// Wait until value propogates to the component.
-			if (change != UndoCol.NO_CHANGE)
+			if (change != NO_CHANGE)
 				SwingUtilities.invokeLater(() -> {
 					postRowSetUndoRedo(comp, change.value(),
-							change.isError || !comp.allValidate().all());
+							change.isError /*|| !comp.allValidate().all()*/);
 				});
 		} catch (SQLException ex) {
 			logger.log(ERROR, sf("%s:", cmd), ex);
@@ -182,14 +164,13 @@ public enum UndoRedo
 
 	/**
 	 * Make the next undo/redo change goes into a new slot.
-	 * @param comp ssComponent
+	 * @param comp rowset/col
 	 */
-	public static void newSlot(SSComponentInterface comp)
+	public static void newSlot(RSC comp)
 	{
 		if (!isUndoRedoEnabled(comp))
 			return;
-		NavigateState navState = comp.getRowsModel().getNavState();
-		navState.undoRow.focusChange(null);
+		comp.getRowsModel().getUndoRow().focusChange(null);
 	}
 
 	/**
@@ -197,12 +178,12 @@ public enum UndoRedo
 	 * @param ev
 	 * @throws SQLException
 	 */
+	// TODO: make this package visibility, go through rowsModel?
 	public static void addUndoableChange(RowSetModificationEvent ev) throws SQLException
 	{
 		if (!isUndoRedoEnabled(ev.getSource()))
 			return;
-		NavigateState navState = ev.getSource().getRowsModel().getNavState();
-		navState.undoRow.addChange(ev);
+		ev.getSource().getRowsModel().getUndoRow().addChange(ev);
 	}
 
 }

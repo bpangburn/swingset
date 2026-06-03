@@ -37,10 +37,6 @@
  ******************************************************************************/
 package com.nqadmin.swingset.models;
 
-// SSListItem.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Marker interface for items displayed in
  * SwingSet list and combobox components.

@@ -38,24 +38,25 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2025, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2025-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.core;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.sql.SQLException;
 import java.util.EventListener;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
 
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
-import static java.lang.System.Logger.Level.*;
 
 /**
  * Used to display database values in a read-only JLabel.
@@ -63,7 +64,7 @@ import static java.lang.System.Logger.Level.*;
  * except of course to set a label's value from a RowSet.
  */
 @SuppressWarnings("serial")
-public class Label extends JLabel implements SSComponentInterface
+public class Label extends JLabel implements SSComponent
 {
 	/** ugh */
 	// TODO: Come up with general way to allow selective prop change disable.
@@ -84,12 +85,16 @@ public class Label extends JLabel implements SSComponentInterface
 			if (!"text".equals(pce.getPropertyName()))
 				return;
 
-			dbChange(() -> setBoundColumnText(getText()));
+			try {
+				dbChange(() -> setColumnText(getText()));
+			} catch (SQLException ex) {
+				logger.log(Level.ERROR, (String) null, ex);
+			}
 		}
 	} // end protected class LabelListener
 
 	/** Log4j Logger for component */
-	private static Logger logger = SSUtils.getLogger();
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Empty constructor needed for deserialization. Creates a Label instance with
@@ -125,11 +130,11 @@ public class Label extends JLabel implements SSComponentInterface
 	 * column.
 	 *
 	 * @param rowsModel          datasource to be used.
-	 * @param boundColumnName name of the column to which this label should be bound
+	 * @param columnName name of the column to which this label should be bound
 	 */
-	public Label(RowsModel rowsModel, String boundColumnName) {
+	public Label(RowsModel rowsModel, String columnName) {
 		this();
-		bind(rowsModel, boundColumnName);
+		rowsModel.bind(this, columnName);
 	}
 
 	/** {@inheritDoc } */
@@ -149,12 +154,12 @@ public class Label extends JLabel implements SSComponentInterface
 			hook = new Hook(this) {
 				/**
 				 * Updates the value stored and displayed in the SwingSet
-				 * component based on getBoundColumnText()
+				 * component based on getColumnText()
 				 */
 				@Override
 				protected void updateSSComponent() {
-					final String text = getBoundColumnText();
-					logger.log(DEBUG, ()->sf("%s: Setting label to %s.", getColumnForLog(), text));
+					final String text = getColumnText();
+					logger.log(Level.DEBUG, ()->sf("%s: Setting label to %s.", getColumnForLog(), text));
 					setText(text);
 				}
 				

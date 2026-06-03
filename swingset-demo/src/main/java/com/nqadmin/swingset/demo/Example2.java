@@ -142,10 +142,10 @@ public class Example2 extends JFrame
 									 List.of(10, 20, 30));
 		
 		// BIND THE COMPONENTS TO THE DATABASE COLUMNS
-		txtSupplierID.bind(rowsModel, "supplier_id");
-		txtSupplierName.bind(rowsModel, "supplier_name");
-		txtSupplierCity.bind(rowsModel, "city");
-		cmbSupplierStatus.bind(rowsModel, "status");
+		rowsModel.bind(txtSupplierID, "supplier_id");
+		rowsModel.bind(txtSupplierName, "supplier_name");
+		rowsModel.bind(txtSupplierCity, "city");
+		rowsModel.bind(cmbSupplierStatus, "status");
 		//this.cmbSupplierStatus.setSelectedIndex(1);
 		
 		// SET LABEL DIMENSIONS

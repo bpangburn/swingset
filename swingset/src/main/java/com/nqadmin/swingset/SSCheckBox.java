@@ -49,15 +49,11 @@ import com.nqadmin.swingset.navigate.RowsModel;
 
 import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 
-// SSCheckBox.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Used to display values stored in the database as a boolean.
  * The SSCheckBox can be bound to a numeric or boolean database column. 
  * The boolean value is converted to the data base type by the
- * {@linkplain #setBoundColumnObject(java.lang.Object) } infrastructure.
+ * {@linkplain #setColumnObject(java.lang.Object) } infrastructure.
  * Currently, Dec 2024, if bound to a numeric database column, a checked
  * SSCheckBox puts a '1' to the database and an unchecked SSCheckBox puts a '0'.
  * <p>
@@ -88,10 +84,10 @@ public class SSCheckBox extends CheckBox
 	 * given RowSet.
 	 *
 	 * @param rowsModel        datasource to be used.
-	 * @param boundColumnName name of the column to which this check box should be
+	 * @param columnName name of the column to which this check box should be
 	 */
-	public SSCheckBox(RowsModel rowsModel, String boundColumnName) {
-		super(rowsModel, boundColumnName);
+	public SSCheckBox(RowsModel rowsModel, String columnName) {
+		super(rowsModel, columnName);
 	}
 	
 	/**

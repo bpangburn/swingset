@@ -42,8 +42,6 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.core;
 
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -58,47 +56,48 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.EnumSet;
 import java.util.EventListener;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
 
-import com.nqadmin.swingset.decorators.BorderDecorator;
+import com.nqadmin.swingset.decorators.AlternateBorderDecorator;
 import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 import static java.nio.file.StandardOpenOption.READ;
+import static java.sql.JDBCType.*;
 
 /**
  * Used to load, store, and display images stored in a database.
  */
 // TODO: Image make all the load/store buttons/capabilities optional.
 @SuppressWarnings("serial")
-public class Image extends JPanel implements SSComponentInterface
+public class Image extends JPanel implements SSComponent
 {
 	// TODO: try to get this initialized
 	private Path path;
 	/**
-	 * Listener(s) for the component's value used to propagate changes back to bound
-	 * database column
+	 * This listener can read a file; create an image from the file;
+	 * write the image bits to the database, display the image.
+	 * The first step puts up a FileChooser.
 	 */
 	protected class ImageListener implements ActionListener
 	{
@@ -113,48 +112,60 @@ public class Image extends JPanel implements SSComponentInterface
 			if (fc.showOpenDialog(btnUpdateImage) != JFileChooser.APPROVE_OPTION) {
 				return;
 			}
+
 			Path tPath = fc.getSelectedFile().toPath();
+			try {
+				img = createDbImageFromFile(tPath);
+			} catch (IOException ioe) {
+				SSUtils.reportError(logger, Image.this, "Error accessing image file", tPath, ioe);
+				return;
+			} catch (SQLException ex) {
+				logger.log(Level.ERROR, (String) null, ex);
+				return;
+			}
 
+			// Display the image
+			path = tPath;
+			
+			lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
+			lblImage.setIcon(img);
+			lblImage.setText("");
+		}
+
+		private ImageIcon createDbImageFromFile(Path tPath) throws SQLException, IOException
+		{
+			// Read the image into a byte array
+			ByteBuffer bb;
+			try (SeekableByteChannel rbc
+					= Files.newByteChannel(tPath, EnumSet.of(READ))) {
+				int totalLength = (int) rbc.size();
+				bb = ByteBuffer.allocate(totalLength);
+				int bytesRead = rbc.read(bb);
+				if (totalLength != bytesRead)
+					throw new IOException(sf("Image expected %d bytes, got %d",
+							totalLength, bytesRead));
+			}
+			byte[] bytes = bb.array();
+			
+			// Verify the bytes are a recognized image
+			ByteArrayInputStream bs = new ByteArrayInputStream(bytes);
+			ImageInputStream iis = ImageIO.createImageInputStream(bs);
+			if (Boolean.FALSE) getImageFormat(iis);
+			BufferedImage bimg = ImageIO.read(iis); // NOTE: usually closes iis
+			if (bimg == null) {
+				iis.close();
+				throw new IOException("Unknown image format");
+			}
+			
+			// Create icon before writing to database in case of error
+			ImageIcon imageIcon = new ImageIcon(bimg);
+			
+			// Stage the image to the database
 			dbChange(() -> {
-				try {
-					ByteBuffer bb;
-					try (SeekableByteChannel rbc
-							= Files.newByteChannel(tPath, EnumSet.of(READ))) {
-						int totalLength = (int) rbc.size();
-						bb = ByteBuffer.allocate(totalLength);
-						int bytesRead = rbc.read(bb);
-						if (totalLength != bytesRead)
-							throw new IOException(sf("Image expected %d bytes, got %d",
-									totalLength, bytesRead));
-					}
-					byte[] bytes = bb.array();
-
-					// verify the bytes are a recognized image
-					ByteArrayInputStream bs = new ByteArrayInputStream(bytes);
-					ImageInputStream iis = ImageIO.createImageInputStream(bs);
-					if (Boolean.FALSE) getImageFormat(iis);
-					BufferedImage bimg = ImageIO.read(iis); // NOTE: usually closes iis
-					if (bimg == null) {
-						iis.close();
-						throw new IOException("Unknown image format");
-					}
-
-					// create icon before writing to database in case of error
-					img = new ImageIcon(bimg);
-					
-					// TODO: remove direct RowSet access
-					getRowSet().updateBytes(getBoundColumnName(), bytes);
-					path = tPath;
-
-					lblImage.setPreferredSize(new Dimension(img.getIconWidth(), img.getIconHeight()));
-					lblImage.setIcon(img);
-					lblImage.setText("");
-				} catch (SQLException se) {
-					logger.log(Level.ERROR, getColumnForLog() + ": SQL Exception.", se);
-				} catch (IOException ioe) {
-					SSUtils.reportError(logger, Image.this, "Error accessing image file", tPath, ioe);
-				}
+				setColumn(bytes);
 			});
+
+			return imageIcon;
 		}
 	} // end private class ImageListener
 
@@ -186,6 +197,13 @@ public class Image extends JPanel implements SSComponentInterface
 	 */
 	public Image() {
 		finishSSCommon();
+
+		setColumnReader((rs, cidx, _) -> {
+			return rs.getBytes(cidx);
+		});
+		setColumnWriter((rs, cidx, _, value) -> {
+			rs.updateBytes(cidx, (byte[]) value);
+		});
 	}
 
 	/**
@@ -193,13 +211,22 @@ public class Image extends JPanel implements SSComponentInterface
 	 * rowSet.
 	 *
 	 * @param rowsModel          - RowSet from/to which data has to be read/written
-	 * @param _boundColumnName - column in the rowSet to which the component should
+	 * @param columnName - column in the rowSet to which the component should
 	 *                         be bound.
 	 */
-	public Image(RowsModel rowsModel, String _boundColumnName)
+	public Image(RowsModel rowsModel, String columnName)
 	{
 		this();
-		bind(rowsModel, _boundColumnName);
+		rowsModel.bind(this, columnName);
+	}
+
+	/** {@inheritDoc } */
+	@Override
+	public void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException
+	{
+		Set<JDBCType> allowed = Set.of(BLOB, BINARY, VARBINARY, LONGVARBINARY);
+		if (!allowed.contains(jdbcType))
+			throw new IllegalArgumentException("Image column type must be BLOB");
 	}
 
 	// TODO: Why do decorators interfere with Image?
@@ -216,41 +243,8 @@ public class Image extends JPanel implements SSComponentInterface
 	 */
 	@Override
 	public Decorator createDefaultDecorator() {
-		Decorator decorator = SSComponentInterface.super.createDefaultDecorator();
-		if (!(decorator instanceof BorderDecorator))
-			return decorator;
-
-		return new BorderDecorator() {
-			@Override
-			protected Border getBorder(BorderState state)
-			{
-				// The default border when just running the demo is
-				// the CompoundBorder: [[3,3,3,3],[2,14,2,14]].
-				Color color = getBorderColor(state);
-				if (color == null)
-					return defaultBorder;
-
-				if (jc().getBorder() instanceof CompoundBorder cb) {
-					return BorderDecorator.lineEmpty_empty(
-							cb.getOutsideBorder().getBorderInsets(jc()),
-							cb.getInsideBorder().getBorderInsets(jc()),
-							color);
-				}
-				return empty_line(jc().getInsets(), color);
-			}
-
-			@Override
-			protected JComponent jc()
-			{
-				return btnUpdateImage;
-			}
-			
-			@Override
-			protected Component fcomp()
-			{
-				return btnUpdateImage;
-			}
-		};
+		// Decorator.DecoratorStyle style = def.lookup(Decorator.DecoratorStyle.class);
+		return new AlternateBorderDecorator(btnUpdateImage);
 	}
 
 	/**
@@ -345,21 +339,15 @@ public class Image extends JPanel implements SSComponentInterface
 
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
-	 * getBoundColumnText().
+	 * getColumnText().
 	 * <p>
 	 * Call to this method should be coming from SSCommon and should already have
 	 * the Component listener removed.
 	 */
 	public void updateComponent() {
-
-		// TODO: If CachedRowSet, BLOBs don't work. As a convenience could,
-		//		 grab a connection, find the primary keys, and read the BLOB.
-
-		// TODO: Should getBoundColumnObject() be used here?
-		//		 Seems like it, it's used just about everywhere else.
-
 		try {
-			byte[] imageData = getRowSet().getRow() > 0 ? getRowSet().getBytes(getBoundColumnName()) : null;
+			byte[] imageData = (byte[]) getColumn();
+
 			if (imageData != null) {
 				logger.log(DEBUG, () -> sf("%s: Setting non-null image.", getColumnForLog()));
 				img = new ImageIcon(imageData);
@@ -376,10 +364,6 @@ public class Image extends JPanel implements SSComponentInterface
 		}
 
 		lblImage.setIcon(img);
-
-		// TODO Confirm updateUI is needed here.
-		updateUI();
-
 	}
 
 	// only here for play at this time

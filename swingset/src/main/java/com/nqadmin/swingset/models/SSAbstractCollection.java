@@ -35,13 +35,17 @@
  *   Man "Bee" Vo
  *   Ernie R. Rael
  ******************************************************************************/
+/* *****************************************************************************
+ * The conditions in the above copyright notice apply to this copyright notice.
+ * Additions and modifications made by Ernie R. Rael are
+ * copyright (C) 2026, Ernie R. Rael. All rights reserved.
+ * ****************************************************************************/
 package com.nqadmin.swingset.models;
 
+import java.lang.System.Logger;
 import java.sql.JDBCType;
 
-// SSAbstractCollectionModel.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
+import com.nqadmin.swingset.utils.SSUtils;
 
 /**
  * This is the superclass for all collection models.
@@ -49,20 +53,23 @@ import java.sql.JDBCType;
  * 
  * @since 4.0.0
  */
-public abstract class SSAbstractCollectionModel implements SSCollectionModel {
+public abstract class SSAbstractCollection implements SSCollection {
 	private final JDBCType jdbcType;
+
+	/** logger */
+	private static final Logger logger = SSUtils.getLogger();
 
 	/**
 	 * Indicate and save the type of the collection.
-	 * @param _jdbcType the collection type
+	 * @param jdbcType the collection type
 	 */
-	public SSAbstractCollectionModel(JDBCType _jdbcType) {
-		jdbcType = _jdbcType != null ? _jdbcType : JDBCType.NULL;
+	public SSAbstractCollection(JDBCType jdbcType) {
+		this.jdbcType = jdbcType != null ? jdbcType : JDBCType.NULL;
 	}
 
+	/** {@inheritDoc } */
 	@Override
 	public JDBCType getJDBCType() {
 		return jdbcType;
 	}
-
 }

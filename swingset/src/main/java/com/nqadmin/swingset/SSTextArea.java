@@ -49,10 +49,6 @@ import com.nqadmin.swingset.navigate.RowsModel;
 
 import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
 
-// SSTextArea.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * SSTextArea extends the JTextArea to add RowSet binding.
  */
@@ -80,11 +76,11 @@ public class SSTextArea extends TextArea {
 	 * Creates a multi-line text box and binds it to the specified RowSet column.
 	 *
 	 * @param rowsModel          datasource to be used.
-	 * @param boundColumnName name of the column to which this text area should be
+	 * @param columnName name of the column to which this text area should be
 	 *                         bound
 	 */
-	public SSTextArea(RowsModel rowsModel, String boundColumnName) {
-		super(rowsModel, boundColumnName);
+	public SSTextArea(RowsModel rowsModel, String columnName) {
+		super(rowsModel, columnName);
 	}
 
 	/**

@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024-2025, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.core;
 
@@ -46,6 +46,7 @@ package com.nqadmin.swingset.core;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.sql.JDBCType;
+import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,27 +65,31 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import com.google.common.reflect.TypeToken;
+import com.nqadmin.swingset.datasources.SSSQLRuntimeException;
 import com.nqadmin.swingset.models.AbstractComboBoxListSwingModel;
 import com.nqadmin.swingset.models.KeyDisplayValueSwingModel;
-import com.nqadmin.swingset.models.SSCollectionModel;
-import com.nqadmin.swingset.models.SSDbArrayModel;
+import com.nqadmin.swingset.models.SSCollection;
+import com.nqadmin.swingset.models.SSDbArray;
+import com.nqadmin.swingset.models.SSDbStringCollection;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.navigate.UndoRedo;
 import com.nqadmin.swingset.navigate.UndoRedo.Change;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.navigate.Utils;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.models.KeyDisplayValueSwingModel.asKeyDisplayValueSwingModel;
+import static com.nqadmin.swingset.models.SSCollection.convertArrayToObjectList;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
  * Provides a way to display a list of elements and map them to corresponding
- * database codes. These keys are typically provided by {@code setDisplayValues} method;
+ * database keys. These keys are typically provided by {@code setDisplayValues} method;
  * if param keys are null they default to zero to N-1.
  * The keys for the selected {@code JList} values are typically in a DB as
- * controlled by a {@link com.nqadmin.swingset.models.SSCollectionModel};
- * if not specified {@link com.nqadmin.swingset.models.SSDbArrayModel} is
+ * controlled by a {@link com.nqadmin.swingset.models.SSCollection};
+ * if not specified {@link com.nqadmin.swingset.models.SSDbArray} is
  * used by default and this model saves the selected keys in a column of
  * type {@code JDBCType.ARRAY}.
  * 
@@ -98,7 +103,7 @@ import static java.lang.System.Logger.Level.*;
  * @param <D> 
  */
 @SuppressWarnings("serial")
-public class List1<K,D> extends JList<SSListItem> implements SSComponentInterface
+public class List1<K,D> extends JList<SSListItem> implements SSComponent
 {
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
@@ -115,7 +120,11 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponentInterfac
 			if (e.getValueIsAdjusting())
 				return;
 
-			dbChange(() -> updateRowSet());
+			try {
+				dbChange(() -> updateRowSet());
+			} catch (SQLException ex) {
+				logger.log(Level.ERROR, ex.getMessage(), ex);
+			}
 		}
 	}
 
@@ -141,34 +150,60 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponentInterfac
 	/**
 	 * This model read/write the database
 	 */
-	private SSCollectionModel chosenDBModel;
+	private SSCollection dbCollection;
+	/**
+	 * Flag indicating the collection is manually set in the constructor.
+	 */
+	private boolean collectionSet = true;
 
 	/**
 	 * Creates a List1 with default
-	 * of {@link com.nqadmin.swingset.models.SSDbArrayModel}
-	 * of specified jdbcType.
+	 * {@link SSDbArray} or {@link SSDbStringCollection}
+	 * depending on RowSet's columnType. For string column type
+	 * collection, "comma(,)" is used as the elment separator.
 	 *
 	 * @param jdbcType type of key of database elements
 	 */
 	public List1(JDBCType jdbcType) {
 		// TODO: select proper model through the **DbPlugin**.
-		this(new SSDbArrayModel(jdbcType));
+		this(new SSDbArray(jdbcType));
+		collectionSet = false; // using a default collection
 	}
 
 	/**
-	 * @param chosenDBModel model to read/write the database
+	 * @param dbCollection model to read/write the database
 	 */
 	@SuppressWarnings("LeakingThisInConstructor")
-	public List1(SSCollectionModel chosenDBModel) {
-		this.chosenDBModel = chosenDBModel;
+	public List1(SSCollection dbCollection) {
+		this.dbCollection = dbCollection;
 
 		finishSSCommon();
 
-		// last line of constructor safe to access this
+		// Last line of constructor, safe to access this.
 		Model.install(this);
+	}
 
-		// uncomment this to run some tests
-		// testStuff(this);
+	/**
+	 * Check metadata to pick an {@link SSCollection}.
+	 */
+	@Override
+	public void metadataChange()
+	{
+		if (!collectionSet) {
+			try {
+				// Note: the JDBCType was specified when constructing "this"
+				dbCollection = SSCollection.getSuitableDbCollection(
+						this, dbCollection.getJDBCType());
+			} catch (IllegalArgumentException ex) {
+				logger.log(Level.ERROR, ex.getMessage(), ex);
+				throw ex;
+			} catch (SQLException ex) {
+				logger.log(Level.ERROR, ex.getMessage(), ex);
+				throw new SSSQLRuntimeException(ex);
+			} finally {
+				collectionSet = true;
+			}
+		}
 	}
 
 	/**
@@ -262,7 +297,7 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponentInterfac
 
 	/**
 	 * {@inheritDoc}
- Set up KeyDisplayValueSwingModel if parameter matches.
+	 * Set up KeyDisplayValueSwingModel if parameter matches.
 	 */
 	// TODO: Tag the models with an interface, exception if not.
 	//		 Then setListData will cause an exception.
@@ -300,9 +335,9 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponentInterfac
 	}
 
 	/**
-	 * Sets the displayValues to be displayed in the list based on
-	 * the enum class' value's toString().Generate {@literal [0-N)}
- keys, which corresponds to e.ordinal().
+	 * Sets the displayValues to be displayed in the list based on the enum
+	 * class' value's toString(). Generate {@literal [0-N)} keys, which
+	 * corresponds to e.ordinal().
 	 *
 	 * @param <T> inferred enum type
 	 * @param enumDisplayValues enum class with values to display
@@ -322,13 +357,13 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponentInterfac
 	}
 
 	/**
-	 * Sets the displayValues to be displayed in the list box along with
- their corresponding keys to database values.If {@code keys}
- is null, then zero to N-1 keys are automatically established.
+	 * Sets the displayValues to be displayed in the list box along with their
+	 * corresponding keys to database values. If {@code keys} is null, then zero
+	 * to N-1 keys are automatically established.
 	 * <p>
- If keys is null, then autogenerate the keys;
- keys type must be Integer or Long.
-	 * 
+	 * If keys is null, then autogenerate the keys; keys type must be Integer or
+	 * Long.
+	 *
 	 * @param displayValues  displayed in the list box.
 	 * @param keys null or database values that correspond to the displayValues,
 	 *             1 to 1, in the list box.
@@ -341,8 +376,9 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponentInterfac
 	/**
 	 * Set up the specified keys/displayValues.
 	 * <p>
- If _keys is null, then autogenerate the keys;
- _keys type must be Integer or Long.
+	 * If _keys is null, then autogenerate the keys; _keys type must be Integer
+	 * or Long.
+	 *
 	 * @param _displayValues
 	 * @param _keys
 	 */
@@ -441,7 +477,7 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponentInterfac
 	// TODO: quiet failure.
 	protected void updateRowSet() {
 		try {
-			chosenDBModel.writeData(this, getChosenKeys().toArray());
+			dbCollection.writeData(this, getChosenKeys().toArray());
 		} catch (final SQLException se) {
 			logger.log(Level.ERROR, () -> sf("%s: SQL Exception.", getColumnForLog()), se);
 		}
@@ -451,7 +487,7 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponentInterfac
 	@Override
 	public void undoRedoUpdateObject(UndoRedo cmd, Change change) throws SQLException
 	{
-		SSComponentInterface.super.undoRedoUpdateObject(cmd, change);
+		SSComponent.super.undoRedoUpdateObject(cmd, change);
 		// TODO: does the following seem right
 				// - If there is a selection, and none of the selection is visible
 				//   then pick something an make sure it's visible.
@@ -472,7 +508,7 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponentInterfac
 
 	/**
 	 * Updates the value stored and displayed in the SwingSet component based on
-	 * getBoundColumnText()
+	 * getColumnText()
 	 * <p>
 	 * Call to this method should be coming from SSCommon and should already have
 	 * the Component listener removed
@@ -483,15 +519,14 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponentInterfac
 			return;
 		}
 
-		Object[] array = null;
+		Object array = null;
 		//
-		// TODO: Should getBoundColumnObject() be used here?
+		// TODO: Should getColumnObject() be used here?
 		//		 Seems like it, it's used just about everywhere else.
 		//
 		try {
-			if (getRowSet().getRow() > 0) {
-				array = chosenDBModel.readData(List1.this);
-			}
+			if (Utils.hasActiveRow(this))
+				array = dbCollection.readData(List1.this);
 		} catch (final SQLException se) {
 			logger.log(Level.ERROR, () -> sf("%s: SQL Exception.", getColumnForLog()), se);
 		}
@@ -502,9 +537,15 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponentInterfac
 			return;
 		}
 
-		Object[] finalArray = array;
-		logger.log(DEBUG, () -> sf("%s: Updating component with array of %s.", getColumnForLog(), Arrays.toString(finalArray)));
-		setChosenKeys(finalArray);
+		try {
+			Object[] objArray = convertArrayToObjectList(array).toArray();
+			setChosenKeys(objArray);
+			logger.log(DEBUG, () -> sf("%s: Updating component with array of %s.",
+					getColumnForLog(), Arrays.toString(Arrays
+							.copyOfRange(objArray, 0, Math.min(5, objArray.length)))));
+		} catch (IllegalArgumentException | SQLDataException ex) {
+			logger.log(Level.ERROR, ex.getMessage(), ex);
+		}
 	}
 
 	private Hook hook;

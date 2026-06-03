@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 
 package com.nqadmin.swingset.datasources;
@@ -49,6 +49,7 @@ import java.sql.SQLException;
 import javax.sql.RowSet;
 
 import com.nqadmin.swingset.utils.CentralLookup;
+import com.nqadmin.swingset.utils.SSComponent;
 
 
 /**
@@ -66,11 +67,35 @@ public interface SSDBSupport {
 	}
 
 	/**
+	 * Like Runnable, but throws.
+	 */
+	interface RunnableSQL {
+		/**
+		 * @throws SQLException
+		 */
+		void run() throws SQLException;
+	}
+
+	/**
+	 *
+	 * @param <T>
+	 */
+	interface ConsumerSQL<T> {
+
+		/**
+		 *
+		 * @param t
+		 * @throws SQLException
+		 */
+		public void accept(T t) throws SQLException;
+	}
+
+	/**
 	 * Like Function, but only has apply method that throws SQLException.
 	 * @param <T>
 	 * @param <R>
 	 */
-	interface DbFunc<T,R> {
+	interface FuncSQL<T,R> {
 
 		/**
 		 * Run the function.
@@ -82,6 +107,118 @@ public interface SSDBSupport {
 	}
 
 	/**
+	 * Like BiFunction, but throws SQLException.
+	 * 
+	 * @param <T>
+	 * @param <U>
+	 * @param <R>
+	 */
+	interface BiFuncSQL<T,U,R> {
+
+		/**
+		 * Run the function
+		 * @param t
+		 * @param u
+		 * @return
+		 * @throws SQLException
+		 */
+		public R apply(T t, U u) throws SQLException;
+	}
+
+	/**
+	 * Three arg function taking rowSet,colIdx,comp that throws SQLException
+	 * and returns an Object.
+	 *
+	 * @param <T>
+	 * @param <U>
+	 * @param <V>
+	 * @param <R>
+	 */
+
+	interface DbReader<T,U,V,R>  {
+
+		/**
+		 * Run the function
+		 *
+		 * @param t
+		 * @param u
+		 * @param v
+		 * @return
+		 * @throws SQLException
+		 */
+
+		public R apply(T t, U u, V v) throws SQLException;
+	}
+
+	/**
+	 * Four arg function taking rowSet,colIdx,comp,value that throws SQLException
+	 * and returns an Object.
+	 *
+	 * @param <T>
+	 * @param <U>
+	 * @param <V>
+	 * @param <W>
+	 */
+	interface DbWriter<T,U,V,W>  {
+
+		/**
+		 * Run the function
+		 *
+		 * @param t
+		 * @param u
+		 * @param v
+		 * @param w
+		 * @throws SQLException
+		 */
+
+		public void apply(T t, U u, V v, W w) throws SQLException;
+	}
+
+	/**
+	 * For the typical simple cases run the columnRead to set the value.
+	 * Note that the columnWriter typically ignores the comp argument, but
+	 * there for special cases.
+	 *
+	 * @param comp
+	 * @return
+	 * @throws java.sql.SQLException
+	 */
+	static Object runDbReader(SSComponent comp) throws SQLException {
+		return comp.getColumnReader()
+				.apply(comp.getRowSet(), comp.getColumnIndex(), comp);
+	}
+
+	/**
+	 * For the typical simple cases run the columnWriter to set the value.
+	 * Note that the columnWriter typically ignores the comp argument, but
+	 * there for special cases.
+	 * 
+	 * @param comp
+	 * @param value
+	 * @throws SQLException
+	 */
+	static void runDbWriter(SSComponent comp, Object value) throws SQLException {
+		runDbWriter(comp, value, comp.getColumnWriter());
+	}
+
+	/**
+	 * For the typical simple cases run the columnWriter to set the value.
+	 * Note that the columnWriter typically ignores the comp argument, but
+	 * there for special cases.
+	 *
+	 * @param comp
+	 * @param value
+	 * @param columnWriter
+	 * @throws SQLException
+	 */
+	// TODO: any reason to make this public?
+	private static void runDbWriter(SSComponent comp, Object value,
+			DbWriter<RowSet, Integer, SSComponent, Object> columnWriter)
+			throws SQLException {
+		columnWriter.apply(comp.getRowSet(), comp.getColumnIndex(), comp, value);
+	}
+
+	/**
 	 * Run the function with a connection to the database associated
 	 * with the specified {@code RowSet}, return the result.
 	 * @param <R>
@@ -90,7 +227,7 @@ public interface SSDBSupport {
 	 * @return
 	 * @throws java.sql.SQLException
 	 */
-	<R> R runWithConnection(RowSet rs, DbFunc<Connection, R> func) throws SQLException;
+	<R> R runWithConnection(RowSet rs, FuncSQL<Connection, R> func) throws SQLException;
 
 	/**
 	 * Return a connection, that <em>should not be closed</em>, for short term use that

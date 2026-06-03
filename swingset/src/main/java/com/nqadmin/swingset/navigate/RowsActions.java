@@ -122,7 +122,7 @@ final class RowsActions
 		case ACT_ADD		-> new NavAddAction();
 		case ACT_DELETE		-> new NavDeleteAction();
 		case ACT_GOTOROW	-> new NavGotoRowAction();
-		case ACT_REVERT_FORCE -> throw new IllegalStateException();
+		default				-> throw new IllegalStateException();
 		});
 		if (rowsModel.getRowSet() == null)
 			action.setEnabled(false);

@@ -1,5 +1,5 @@
 /* *****************************************************************************
- * Copyright (C) 2024, Ernie R Rael. All rights reserved.
+ * Copyright (C) 2024-2026, Ernie R Rael. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,11 +32,13 @@ package com.nqadmin.swingset.formatting;
 
 import javax.swing.text.DefaultFormatterFactory;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.nqadmin.swingset.mock.Util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -55,6 +57,7 @@ public class NumberFieldTest
 	@BeforeAll
 	public static void setUpClass()
 	{
+		Util.initLookup();
 	}
 	
 	/** x */

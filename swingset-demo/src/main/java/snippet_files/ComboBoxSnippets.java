@@ -79,12 +79,13 @@ public class ComboBoxSnippets extends JFrame
 		// @start region=custom_key
 		SSComboBox combo = new SSComboBox();
 		List<String> options = List.of("111", "2222", "33333");
-		List<Integer> mappings = List.of(1, 5, 7 );
-		combo.setDisplayValues(options, mappings);
+		// The keys used in "my_column".
+		List<Integer> keys = List.of(1, 5, 7 );
+		combo.setDisplayValues(options, keys);
 		
 		// Next line is assuming rowsModel has been initialized
-		// and "my_column" is a column in it's rowSet.
-		combo.bind(rowsModel, "my_column");
+		// and "my_column" is a column in its rowSet.
+		rowsModel.bind(combo, "my_column");
 		// @end region=custom_key
 	}
 

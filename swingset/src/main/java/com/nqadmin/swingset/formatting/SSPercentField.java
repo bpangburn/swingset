@@ -51,10 +51,6 @@ import javax.swing.text.DefaultFormatterFactory;
 
 import static com.nqadmin.swingset.formatting.NumberField.createNumberFormat;
 
-// SSPercentField.java
-//
-// SwingSet - Open Toolkit For Making Swing Controls Database-Aware
-
 /**
  * Used to bind a SSFormattedTextField to a percentage column in a database.
  */

@@ -76,6 +76,7 @@ import javax.sql.rowset.spi.SyncFactoryException;
 import javax.sql.rowset.spi.SyncProvider;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
@@ -83,11 +84,9 @@ import javax.swing.SwingUtilities;
 
 import org.h2.tools.RunScript;
 
-import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.datasources.DefaultSSDBSupport;
 import com.nqadmin.swingset.datasources.RowSetOps.ForceConflict;
-import com.nqadmin.swingset.models.SSCollectionModel;
-import com.nqadmin.swingset.models.SSMysqlSetModel;
+import com.nqadmin.swingset.models.SSDbStringCollection;
 import com.nqadmin.swingset.navigate.Utils;
 import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -100,6 +99,8 @@ import static com.nqadmin.swingset.demo.DemoUtil.configureJavaUtilLogger;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
+
+import com.nqadmin.swingset.models.SSCollection;
 
 /**
  * A JFrame with buttons to launch each of the SwingSet example/demo screens.
@@ -224,23 +225,28 @@ public class MainClass extends JFrame
 		}
 	}
 
+	// Use a plain combobox to avoid using SS in main demo menu window
+	//private class ComboRowSetSource extends SSComboBox {
 	@SuppressWarnings("serial")
-	private class ComboRowSetSource extends SSComboBox {
+	private final class ComboRowSetSource extends JComboBox<DemoUtil.RowSetSource> {
 		Popup popup;
 
 		public ComboRowSetSource() {
-			super(ModelType.SWING);
+			//super(ModelType.SWING);
+			super(DemoUtil.RowSetSource.values());
 			setMaximumSize(new Dimension(210, 25));
-			setAllowNull(false);
+			//setAllowNull(false);
 			DemoUtil.RowSetSource rsSource = DemoUtil.getWhichRowSetDefault();
-			setDisplayValues(DemoUtil.RowSetSource.class);
-			setChosenEnum(rsSource);
+			//setDisplayValues(DemoUtil.RowSetSource.class);
+			//setChosenEnum(rsSource);
+			setSelectedItem(rsSource);
 			btnRowSetSource.setText("RowSet: " + rsSource.toString());
 		}
 
-		@Override
+		//@Override
 		public DemoUtil.RowSetSource getChosenEnum() {
-			return (DemoUtil.RowSetSource) super.getChosenEnum();
+			// return (DemoUtil.RowSetSource) super.getChosenEnum();
+			return (DemoUtil.RowSetSource) getSelectedItem();
 		}
 
 		@Override
@@ -748,7 +754,8 @@ public class MainClass extends JFrame
 		public void run() {
 			super.run();
 			globalHints.put("collectionModel",
-					(Supplier<SSCollectionModel>) () -> new SSMysqlSetModel(JDBCType.INTEGER));
+					(Supplier<SSCollection>) () ->
+							new SSDbStringCollection(JDBCType.INTEGER, SSDbStringCollection.COMMA_SEP));
 			// () -> new SSStringArrayModel(JDBCType.INTEGER));
 		}
 

@@ -38,7 +38,7 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2024, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2024-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.datasources;
 
@@ -57,10 +57,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static java.sql.JDBCType.*;
-
 import static com.nqadmin.swingset.datasources.ConvertType.Clazz.getClazz;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
+import static java.sql.JDBCType.*;
 
 // TODO: Wonder if a "X --> Y" sparse matrix filled with converters... guava table.
 // There's /junk/repo/h2database/h2/src/main/org/h2/value/Value.java with conversions.
@@ -276,6 +275,16 @@ public class ConvertType
 		};
 		default -> false;
 		};
+	}
+
+	/**
+	 * 
+	 * @param jdbcType
+	 * @return true if param type is handled conversion type.
+	 */
+	public static boolean isHandledType(JDBCType jdbcType)
+	{
+		return handledJavaTypeClass.contains(jdbcType);
 	}
 
 	/** 
@@ -553,7 +562,7 @@ public class ConvertType
 	}
 
 	/**
-	 * Copy the elements of the _objects array into into
+	 * Copy the elements of the objects array into into
 	 * an array of the correct type for the {@code JDBCType}d objects.
 	 * <p>
 	 * If an array or even a collection of the accurate type is desired,
@@ -613,7 +622,7 @@ public class ConvertType
 			return clazz;
 		}
 
-		if(!handledJavaTypeClass.contains(jdbcType))
+		if(!isHandledType(jdbcType))
 			throw new SSSQLUnhandledTypeException(jdbcType.toString());
 
 		return JdbcDataTypeConversionTables.jdbcTypeToClassStrict(jdbcType);

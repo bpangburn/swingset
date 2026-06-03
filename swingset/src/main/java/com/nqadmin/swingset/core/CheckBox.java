@@ -38,38 +38,36 @@
 /* *****************************************************************************
  * The conditions in the above copyright notice apply to this copyright notice.
  * Additions and modifications made by Ernie R. Rael are
- * copyright (C) 2025, Ernie R. Rael. All rights reserved.
+ * copyright (C) 2025-2026, Ernie R. Rael. All rights reserved.
  * ****************************************************************************/
 package com.nqadmin.swingset.core;
 
-import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.sql.JDBCType;
+import java.sql.SQLException;
 import java.util.EnumSet;
 import java.util.EventListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
 
 import com.nqadmin.swingset.decorators.BorderDecorator;
 import com.nqadmin.swingset.navigate.RowsModel;
-import com.nqadmin.swingset.utils.SSComponentInterface;
+import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.assertConvertFromJdbcType;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
-import static java.lang.System.Logger.Level.*;
 import static java.sql.JDBCType.*;
 
 /**
  * Used to display values stored in the database as a boolean.
  * The CheckBox can be bound to a numeric or boolean database column. 
  * The boolean value is converted to the data base type by the
- * {@linkplain #setBoundColumnObject(java.lang.Object) } infrastructure.
+ * {@link #setColumnObject(java.lang.Object)} infrastructure.
  * Currently, Dec 2024, if bound to a numeric database column, a checked
  * CheckBox puts a '1' to the database and an unchecked CheckBox puts a '0'.
  * <p>
@@ -77,7 +75,7 @@ import static java.sql.JDBCType.*;
  * values returned for the checked and unchecked CheckBox states.
  */
 @SuppressWarnings("serial")
-public class CheckBox extends JCheckBox implements SSComponentInterface
+public class CheckBox extends JCheckBox implements SSComponent
 {
 	/**
 	 * Listener(s) for the component's value used to propagate changes back to bound
@@ -89,7 +87,11 @@ public class CheckBox extends JCheckBox implements SSComponentInterface
 		@Override
 		public void itemStateChanged(final ItemEvent ie)
 		{
-			dbChange(() -> setBoundColumnObject(isSelected()));
+			try {
+				dbChange(() -> setColumnObject(isSelected()));
+			} catch (SQLException ex) {
+				logger.log(Level.ERROR, (String) null, ex);
+			}
 		}
 	}
 
@@ -108,12 +110,12 @@ public class CheckBox extends JCheckBox implements SSComponentInterface
 	 * given RowSet.
 	 *
 	 * @param rowsModel        model for a rowSet
-	 * @param boundColumnName name of the column to which this check box should be
+	 * @param columnName name of the column to which this check box should be
 	 *                         bound
 	 */
-	public CheckBox(RowsModel rowsModel, final String boundColumnName) {
+	public CheckBox(RowsModel rowsModel, final String columnName) {
 		this(null);
-		bind(rowsModel, boundColumnName);
+		rowsModel.bind(this, columnName);
 	}
 
 	/**
@@ -123,31 +125,14 @@ public class CheckBox extends JCheckBox implements SSComponentInterface
 	 */
 	public CheckBox(final String _text) {
 		super(_text);
-		logger.log(DEBUG, () -> sf("original border: %s",
+		logger.log(Level.DEBUG, () -> sf("original border: %s",
 				BorderDecorator.asString(getBorder(), this)));
 		// JCheckBox disables painting the borders.
 		// Replace the JCheckBox border with an empty border.
-		Border b = getBorder();
-		if (b instanceof CompoundBorder cb) {
-			Insets oInsets = toInsets(cb.getOutsideBorder());
-			Insets iInsets = toInsets(cb.getInsideBorder());
-			b = BorderFactory.createCompoundBorder(
-					BorderFactory.createEmptyBorder(
-							oInsets.top, oInsets.left, oInsets.bottom, oInsets.right),
-					BorderFactory.createEmptyBorder(
-							iInsets.top, iInsets.left, iInsets.bottom, iInsets.right));
-		} else {
-			Insets i = getInsets();
-			b = BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right);
-		}
+		Border b = BorderDecorator.createEmptyBorder(this);
 		setBorder(b);
 		setBorderPainted(true);
 		finishSSCommon();
-	}
-
-	private Insets toInsets(Border b)
-	{
-		return b.getBorderInsets(this);
 	}
 
 	/** {@inheritDoc } */
@@ -175,14 +160,14 @@ public class CheckBox extends JCheckBox implements SSComponentInterface
 			hook = new Hook(this) {
 				/**
 				 * Updates the value stored and displayed in the SwingSet component
-				 * based on getBoundColumnText()
+				 * based on getColumnText()
 				 */
 				@Override
 				protected void updateSSComponent()
 				{
-					logger.log(DEBUG, () -> sf("%s: getBoundColumnText() - %s",getColumnForLog(), getBoundColumnText()));
+					logger.log(Level.DEBUG, () -> sf("%s: getColumnText() - %s",getColumnForLog(), getColumnText()));
 					
-					Boolean value = getBoundColumnObject(Boolean.class);
+					Boolean value = getColumnObject(Boolean.class);
 					setSelected(value == null ? false : value);
 				}
 				
