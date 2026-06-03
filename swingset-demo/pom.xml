@@ -1,122 +1,132 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="https://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://maven.apache.org/POM/4.0.0
-                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>com.nqadmin.swingset</groupId>
-		<artifactId>swingset-parent</artifactId>
-		<version>4.0.13</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
+  <parent>
+    <groupId>com.nqadmin.swingset</groupId>
+    <artifactId>swingset-parent</artifactId>
+    <version>4.0.13</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
-	<!-- Keep your existing demo coordinates -->
-	<groupId>com.nqadmin.swingset.demo</groupId>
-	<artifactId>swingset-demo</artifactId>
-	<packaging>jar</packaging>
+  <groupId>com.nqadmin.swingset.demo</groupId>
+  <artifactId>swingset-demo</artifactId>
+  <packaging>jar</packaging>
 
-	<name>swingset-demo</name>
-	<description>Demo for SwingSet</description>
-	<url>https://github.com/bpangburn/swingset</url>
+  <name>swingset-demo</name>
+  <description>Demo for SwingSet</description>
+  <url>https://github.com/bpangburn/swingset</url>
 
-	<properties>
-		<!-- Never publish demo artifacts to Maven Central -->
-		<maven.deploy.skip>true</maven.deploy.skip>
-	</properties>
+  <properties>
+    <!-- Never publish demo artifacts to Maven Central -->
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
 
-	<licenses>
-		<license>
-			<name>BSD 3-Clause</name>
-			<url>https://spdx.org/licenses/BSD-3-Clause.html</url>
-		</license>
-	</licenses>
+  <licenses>
+    <license>
+      <name>BSD 3-Clause</name>
+      <url>https://spdx.org/licenses/BSD-3-Clause.html</url>
+    </license>
+  </licenses>
 
-	<developers>
-		<developer>
-			<name>Prasanth R. Pasala</name>
-			<email>swingset@pangburngroup.com</email>
-			<organization>The Pangburn Group, Inc.</organization>
-			<organizationUrl>https://pangburngroup.com</organizationUrl>
-		</developer>
-		<developer>
-			<name>Brian E. Pangburn</name>
-			<email>brian@pangburngroup.com</email>
-			<organization>The Pangburn Group, Inc.</organization>
-			<organizationUrl>https://pangburngroup.com</organizationUrl>
-		</developer>
-	</developers>
+  <developers>
+    <developer>
+      <name>Prasanth R. Pasala</name>
+      <email>swingset@pangburngroup.com</email>
+      <organization>The Pangburn Group, Inc.</organization>
+      <organizationUrl>https://pangburngroup.com</organizationUrl>
+    </developer>
+    <developer>
+      <name>Brian E. Pangburn</name>
+      <email>brian@pangburngroup.com</email>
+      <organization>The Pangburn Group, Inc.</organization>
+      <organizationUrl>https://pangburngroup.com</organizationUrl>
+    </developer>
+  </developers>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.nqadmin.swingset</groupId>
-			<artifactId>swingset</artifactId>
-		</dependency>
+  <dependencies>
 
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>com.nqadmin.swingset</groupId>
+      <artifactId>swingset</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-api</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-core</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>gnu.getopt</groupId>
-			<artifactId>java-getopt</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>com.raelity</groupId>
-			<artifactId>raelity-lib</artifactId>
-		</dependency>
-	</dependencies>
+    <dependency>
+      <groupId>gnu.getopt</groupId>
+      <artifactId>java-getopt</artifactId>
+    </dependency>
 
-	<build>
-		<plugins>
+    <dependency>
+      <groupId>com.raelity</groupId>
+      <artifactId>raelity-lib</artifactId>
+    </dependency>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-			</plugin>
+  </dependencies>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<archive>
-								<manifest>
-									<mainClass>
-										com.nqadmin.swingset.demo.MainClass</mainClass>
-								</manifest>
-								<manifestEntries>
-									<Multi-Release>true</Multi-Release>
-								</manifestEntries>
-							</archive>
-							<descriptorRefs>
-								<descriptorRef>jar-with-dependencies</descriptorRef>
-							</descriptorRefs>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+  <build>
+    <plugins>
 
-		</plugins>
-	</build>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+
+      <!-- Extra explicit protection against accidentally deploying the demo module -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>demo-fat-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <archive>
+                <manifest>
+                  <mainClass>com.nqadmin.swingset.demo.MainClass</mainClass>
+                </manifest>
+                <manifestEntries>
+                  <Multi-Release>true</Multi-Release>
+                </manifestEntries>
+              </archive>
+              <descriptorRefs>
+                <descriptorRef>jar-with-dependencies</descriptorRef>
+              </descriptorRefs>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
 
 </project>

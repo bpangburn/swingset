@@ -1,368 +1,390 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="https://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://maven.apache.org/POM/4.0.0
-                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.nqadmin.swingset</groupId>
-	<artifactId>swingset-parent</artifactId>
-	<version>4.0.13</version>
-	<packaging>pom</packaging>
+  <groupId>com.nqadmin.swingset</groupId>
+  <artifactId>swingset-parent</artifactId>
+  <version>4.0.13</version>
+  <packaging>pom</packaging>
 
-	<name>swingset-parent</name>
-	<url>https://github.com/bpangburn/swingset</url>
+  <name>swingset-parent</name>
+  <url>https://github.com/bpangburn/swingset</url>
 
-	<scm>
-		<url>https://github.com/bpangburn/swingset</url>
-		<connection>scm:git:git@github.com:bpangburn/swingset.git</connection>
-		<developerConnection>scm:git:git@github.com:bpangburn/swingset.git</developerConnection>
-		<tag>HEAD</tag>
-	</scm>
+  <scm>
+    <url>https://github.com/bpangburn/swingset</url>
+    <connection>scm:git:git@github.com:bpangburn/swingset.git</connection>
+    <developerConnection>scm:git:git@github.com:bpangburn/swingset.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
 
-	<issueManagement>
-		<system>GitHub</system>
-		<url>https://github.com/bpangburn/swingset/issues</url>
-	</issueManagement>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/bpangburn/swingset/issues</url>
+  </issueManagement>
 
-	<modules>
-		<module>swingset</module>
-		<module>swingset-demo</module>
-	</modules>
+  <modules>
+    <module>swingset</module>
+    <module>swingset-demo</module>
+  </modules>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<!-- Toolchain -->
-		<version.maven>3.9.6</version.maven>
-		<maven.compiler.release>8</maven.compiler.release>
+    <!-- Toolchain -->
+    <version.maven>3.9.16</version.maven>
+    <maven.compiler.release>8</maven.compiler.release>
 
-		<!-- Dependencies -->
-		<version.glazedlists>1.11.1203</version.glazedlists>
-		<version.log4j-api>2.25.3</version.log4j-api>
-		<version.log4j-core>2.25.3</version.log4j-core>
-		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
-		<version.h2>2.4.240</version.h2>
-		<version.java-getopt>1.0.13</version.java-getopt>
-		<version.raelity-lib>1.2.0</version.raelity-lib>
-		<version.junit-jupiter>5.14.1</version.junit-jupiter>
+    <!-- Dependencies -->
+    <version.glazedlists>1.11.1203</version.glazedlists>
+    <version.log4j>2.26.0</version.log4j>
+    <version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
+    <version.h2>2.4.240</version.h2>
+    <version.java-getopt>1.0.13</version.java-getopt>
+    <version.raelity-lib>1.2.0</version.raelity-lib>
+    <version.junit-jupiter>5.14.1</version.junit-jupiter>
 
-		<!-- Plugins -->
-		<version.versions-maven-plugin>2.20.1</version.versions-maven-plugin>
-		<version.maven-enforcer-plugin>3.6.2</version.maven-enforcer-plugin>
-		<version.maven-clean-plugin>3.5.0</version.maven-clean-plugin>
-		<version.maven-resources-plugin>3.4.0</version.maven-resources-plugin>
-		<version.maven-compiler-plugin>3.14.1</version.maven-compiler-plugin>
-		<version.maven-surefire-plugin>3.5.4</version.maven-surefire-plugin>
-		<version.maven-failsafe-plugin>3.5.4</version.maven-failsafe-plugin>
-		<version.maven-jar-plugin>3.5.0</version.maven-jar-plugin>
-		<version.maven-source-plugin>3.4.0</version.maven-source-plugin>
-		<version.maven-javadoc-plugin>3.12.0</version.maven-javadoc-plugin>
-		<version.maven-install-plugin>3.1.4</version.maven-install-plugin>
-		<version.maven-deploy-plugin>3.1.4</version.maven-deploy-plugin>
-		<version.maven-site-plugin>4.0.0-M16</version.maven-site-plugin>
-		<version.maven-gpg-plugin>3.2.8</version.maven-gpg-plugin>
-		<version.maven-assembly-plugin>3.8.0</version.maven-assembly-plugin>
+    <!-- Plugins -->
+    <version.versions-maven-plugin>2.20.1</version.versions-maven-plugin>
+    <version.maven-enforcer-plugin>3.6.3</version.maven-enforcer-plugin>
+    <version.maven-clean-plugin>3.5.0</version.maven-clean-plugin>
+    <version.maven-resources-plugin>3.5.0</version.maven-resources-plugin>
+    <version.maven-compiler-plugin>3.14.1</version.maven-compiler-plugin>
+    <version.maven-surefire-plugin>3.5.6</version.maven-surefire-plugin>
+    <version.maven-failsafe-plugin>3.5.6</version.maven-failsafe-plugin>
+    <version.maven-jar-plugin>3.5.0</version.maven-jar-plugin>
+    <version.maven-source-plugin>3.4.0</version.maven-source-plugin>
+    <version.maven-javadoc-plugin>3.12.0</version.maven-javadoc-plugin>
+    <version.maven-install-plugin>3.1.4</version.maven-install-plugin>
+    <version.maven-deploy-plugin>3.1.4</version.maven-deploy-plugin>
+    <version.maven-gpg-plugin>3.2.8</version.maven-gpg-plugin>
+    <version.maven-assembly-plugin>3.8.0</version.maven-assembly-plugin>
 
-		<!-- Security -->
-		<version.dependency-check-maven>12.1.9</version.dependency-check-maven>
+    <!-- Security -->
+    <version.dependency-check-maven>12.1.9</version.dependency-check-maven>
 
-		<!-- Sonatype Central Publishing -->
-		<version.central-publishing-maven-plugin>0.9.0</version.central-publishing-maven-plugin>
-	</properties>
+    <!-- Sonatype Central Publishing -->
+    <version.central-publishing-maven-plugin>0.10.0</version.central-publishing-maven-plugin>
+  </properties>
 
-	<dependencyManagement>
-		<dependencies>
-			<!-- Internal -->
-			<dependency>
-				<groupId>com.nqadmin.swingset</groupId>
-				<artifactId>swingset</artifactId>
-				<version>${project.version}</version>
-			</dependency>
+  <dependencyManagement>
+    <dependencies>
 
-			<!-- Shared deps -->
-			<dependency>
-				<groupId>com.raelity.3rdparty.com.glazedlists</groupId>
-				<artifactId>glazedlists</artifactId>
-				<version>${version.glazedlists}</version>
-			</dependency>
+      <!-- Internal -->
+      <dependency>
+        <groupId>com.nqadmin.swingset</groupId>
+        <artifactId>swingset</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>org.apache.logging.log4j</groupId>
-				<artifactId>log4j-api</artifactId>
-				<version>${version.log4j-api}</version>
-			</dependency>
+      <!-- Shared deps -->
+      <dependency>
+        <groupId>com.raelity.3rdparty.com.glazedlists</groupId>
+        <artifactId>glazedlists</artifactId>
+        <version>${version.glazedlists}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>org.apache.logging.log4j</groupId>
-				<artifactId>log4j-core</artifactId>
-				<version>${version.log4j-core}</version>
-			</dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-api</artifactId>
+        <version>${version.log4j}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>com.nqadmin.rowset</groupId>
-				<artifactId>jdbcrowsetimpl</artifactId>
-				<version>${version.jdbcrowsetimpl}</version>
-			</dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>${version.log4j}</version>
+      </dependency>
 
-			<!-- Demo-only deps -->
-			<dependency>
-				<groupId>com.h2database</groupId>
-				<artifactId>h2</artifactId>
-				<version>${version.h2}</version>
-			</dependency>
+      <dependency>
+        <groupId>com.nqadmin.rowset</groupId>
+        <artifactId>jdbcrowsetimpl</artifactId>
+        <version>${version.jdbcrowsetimpl}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>gnu.getopt</groupId>
-				<artifactId>java-getopt</artifactId>
-				<version>${version.java-getopt}</version>
-			</dependency>
+      <!-- Demo-only deps -->
+      <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <version>${version.h2}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>com.raelity</groupId>
-				<artifactId>raelity-lib</artifactId>
-				<version>${version.raelity-lib}</version>
-			</dependency>
+      <dependency>
+        <groupId>gnu.getopt</groupId>
+        <artifactId>java-getopt</artifactId>
+        <version>${version.java-getopt}</version>
+      </dependency>
 
-			<!-- Tests -->
-			<dependency>
-				<groupId>org.junit.jupiter</groupId>
-				<artifactId>junit-jupiter</artifactId>
-				<version>${version.junit-jupiter}</version>
-				<scope>test</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+      <dependency>
+        <groupId>com.raelity</groupId>
+        <artifactId>raelity-lib</artifactId>
+        <version>${version.raelity-lib}</version>
+      </dependency>
 
-	<build>
-		<pluginManagement>
-			<plugins>
+      <!-- Tests -->
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>${version.junit-jupiter}</version>
+        <scope>test</scope>
+      </dependency>
 
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>versions-maven-plugin</artifactId>
-					<version>${version.versions-maven-plugin}</version>
-				</plugin>
+    </dependencies>
+  </dependencyManagement>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-clean-plugin</artifactId>
-					<version>${version.maven-clean-plugin}</version>
-				</plugin>
+  <build>
+    <pluginManagement>
+      <plugins>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-resources-plugin</artifactId>
-					<version>${version.maven-resources-plugin}</version>
-				</plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>versions-maven-plugin</artifactId>
+          <version>${version.versions-maven-plugin}</version>
+        </plugin>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>${version.maven-compiler-plugin}</version>
-					<configuration>
-						<release>${maven.compiler.release}</release>
-					</configuration>
-				</plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>${version.maven-clean-plugin}</version>
+        </plugin>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<version>${version.maven-surefire-plugin}</version>
-				</plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>${version.maven-resources-plugin}</version>
+        </plugin>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>${version.maven-failsafe-plugin}</version>
-				</plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${version.maven-compiler-plugin}</version>
+          <configuration>
+            <release>${maven.compiler.release}</release>
+          </configuration>
+        </plugin>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-jar-plugin</artifactId>
-					<version>${version.maven-jar-plugin}</version>
-				</plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${version.maven-surefire-plugin}</version>
+        </plugin>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-source-plugin</artifactId>
-					<version>${version.maven-source-plugin}</version>
-				</plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${version.maven-failsafe-plugin}</version>
+        </plugin>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>${version.maven-javadoc-plugin}</version>
-				</plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${version.maven-jar-plugin}</version>
+        </plugin>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-install-plugin</artifactId>
-					<version>${version.maven-install-plugin}</version>
-				</plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${version.maven-source-plugin}</version>
+        </plugin>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-deploy-plugin</artifactId>
-					<version>${version.maven-deploy-plugin}</version>
-				</plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${version.maven-javadoc-plugin}</version>
+        </plugin>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-site-plugin</artifactId>
-					<version>${version.maven-site-plugin}</version>
-				</plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>${version.maven-install-plugin}</version>
+        </plugin>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-gpg-plugin</artifactId>
-					<version>${version.maven-gpg-plugin}</version>
-				</plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>${version.maven-deploy-plugin}</version>
+        </plugin>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-assembly-plugin</artifactId>
-					<version>${version.maven-assembly-plugin}</version>
-				</plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>${version.maven-gpg-plugin}</version>
+        </plugin>
 
-				<!-- OWASP (managed; executed only in -Psecurity-scan) -->
-				<plugin>
-					<groupId>org.owasp</groupId>
-					<artifactId>dependency-check-maven</artifactId>
-					<version>${version.dependency-check-maven}</version>
-					<configuration>
-						<nvdApiServerId>nvd</nvdApiServerId>
-						<ossIndexServerId>ossindex</ossIndexServerId>
-					</configuration>
-				</plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>${version.maven-assembly-plugin}</version>
+        </plugin>
 
-				<!-- Central Publishing (managed; executed only in -Prelease) -->
-				<plugin>
-					<groupId>org.sonatype.central</groupId>
-					<artifactId>central-publishing-maven-plugin</artifactId>
-					<version>${version.central-publishing-maven-plugin}</version>
-					<extensions>true</extensions>
-					<configuration>
-						<publishingServerId>central</publishingServerId>
-						<autoPublish>true</autoPublish>
-					</configuration>
-				</plugin>
+        <!-- OWASP (managed; executed only in -Psecurity-scan) -->
+        <plugin>
+          <groupId>org.owasp</groupId>
+          <artifactId>dependency-check-maven</artifactId>
+          <version>${version.dependency-check-maven}</version>
+          <configuration>
+            <nvdApiServerId>nvd</nvdApiServerId>
+            <ossIndexServerId>ossindex</ossIndexServerId>
+          </configuration>
+        </plugin>
 
-			</plugins>
-		</pluginManagement>
+        <!-- Central Publishing (managed; executed only in -Prelease) -->
+        <plugin>
+          <groupId>org.sonatype.central</groupId>
+          <artifactId>central-publishing-maven-plugin</artifactId>
+          <version>${version.central-publishing-maven-plugin}</version>
+          <extensions>true</extensions>
+          <configuration>
+            <publishingServerId>central</publishingServerId>
 
-		<!-- Always-on enforcer -->
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>${version.maven-enforcer-plugin}</version>
-				<executions>
-					<execution>
-						<id>enforce-versions</id>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<configuration>
-							<rules>
-								<requireMavenVersion>
-									<version>[${version.maven},)</version>
-								</requireMavenVersion>
-								<requireJavaVersion>
-									<version>[1.8,)</version>
-								</requireJavaVersion>
-							</rules>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+            <!--
+              Release-safe first-publish guidance:
 
-	<profiles>
+              For the first deployment after switching to the Sonatype Central Portal
+              / central-publishing-maven-plugin, consider temporarily setting:
 
-		<profile>
-			<id>security-scan</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.owasp</groupId>
-						<artifactId>dependency-check-maven</artifactId>
-						<executions>
-							<execution>
-								<id>owasp-check</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>check</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
+                  <autoPublish>false</autoPublish>
 
-		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
+              Then run from the parent project directory:
 
-					<!-- Attach sources -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
+                  mvn -Prelease clean deploy
 
-					<!-- Attach javadocs -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>attach-javadocs</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
+              After the upload completes, verify in the Sonatype Central Portal that
+              the deployment bundle contains:
+                - com.nqadmin.swingset:swingset-parent
+                - com.nqadmin.swingset:swingset
+                - NOT com.nqadmin.swingset.demo:swingset-demo
 
-					<!-- Sign -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
+              Once confirmed, either manually publish from the Central Portal or
+              change this back to:
 
-					<!-- Publish via Central Portal -->
-					<plugin>
-						<groupId>org.sonatype.central</groupId>
-						<artifactId>central-publishing-maven-plugin</artifactId>
-					</plugin>
+                  <autoPublish>true</autoPublish>
 
-				</plugins>
-			</build>
-		</profile>
+              The demo module should remain excluded because its POM sets
+              maven.deploy.skip=true and also explicitly configures
+              maven-deploy-plugin <skip>true</skip>.
+            -->
+            <autoPublish>true</autoPublish>
+          </configuration>
+        </plugin>
 
-	</profiles>
+      </plugins>
+    </pluginManagement>
+
+    <!-- Always-on enforcer -->
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>${version.maven-enforcer-plugin}</version>
+        <executions>
+          <execution>
+            <id>enforce-versions</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>[${version.maven},)</version>
+                </requireMavenVersion>
+                <requireJavaVersion>
+                  <version>[1.8,)</version>
+                </requireJavaVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+
+    <profile>
+      <id>security-scan</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.owasp</groupId>
+            <artifactId>dependency-check-maven</artifactId>
+            <executions>
+              <execution>
+                <id>owasp-check</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>check</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+
+          <!-- Attach sources for Maven Central publication -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- Attach javadocs for Maven Central publication -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- Sign artifacts for Maven Central publication -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- Publish through Sonatype Central Portal -->
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+          </plugin>
+
+        </plugins>
+      </build>
+    </profile>
+
+  </profiles>
 
 </project>
