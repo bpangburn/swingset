@@ -1,232 +1,284 @@
-# ReadMe file for the SwingSet DEMO
+# SwingSet Demo
 
-## LICENSE
+The `swingset-demo` module contains runnable sample applications for the SwingSet library.
 
-Copyright (C) 2003-2026, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
-All rights reserved.
+The demo shows how SwingSet components can be used to build database-aware Java Swing screens. By default, it uses an in-memory H2 database populated with sample supplier-and-parts data based on the database described in C. J. Date's classic database textbook, *An Introduction to Database Systems*.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+For the core library documentation, see [`../swingset/README.md`](../swingset/README.md).
 
-1. Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
+## Requirements
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+- Java 8 or later.
+- Maven 3.9.6 or later is recommended for building from source.
 
-3. Neither the name of the copyright holder nor the names of its contributors
-   may be used to endorse or promote products derived from this software
-   without specific prior written permission.
+## Running the executable demo JAR
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-POSSIBILITY OF SUCH DAMAGE.
+Beginning with SwingSet 3.0.0, the demo module can produce an executable JAR with dependencies.
 
-Contributors:
-  Prasanth R. Pasala
-  Brian E. Pangburn
-  Diego Gil
-  Man "Bee" Vo
-  Ernie R. Rael
+After downloading or building the demo JAR, run:
 
-## 3rd PARTY LICENSES
+```bash
+java -jar swingset-demo-x.y.z-jar-with-dependencies.jar
+```
 
-This software contains unmodified binary redistributions for
-H2 database engine (http://www.h2database.com/),
-which is dual licensed and available under the MPL 2.0
-(Mozilla Public License) or under the EPL 1.0 (Eclipse Public License).
-An original copy of the license agreement can be found at:
-http://www.h2database.com/html/license.html
+Replace `x.y.z` with the SwingSet version number.
 
-This software contains unmodified binary redistributions for
-Glazed Lists List Transformation toolkit (http://glazedlists.com)
-which is dual licensed and available under the MPL 2.0
-(Mozilla Public License)
-or under the LGPL 2.1 (GNU Lesser General Public License).
+The demo uses an in-memory H2 database by default, so no external database server is required for normal demo usage.
 
-## DESCRIPTION
+## Building from source
 
-SwingSet is an open source Java toolkit containing data-aware replacements for many of the standard Java Swing components.
+Clone the repository and build from the repository root:
 
-This file contains sample/demo SwingSet source code and Java class files.
+```bash
+git clone https://github.com/bpangburn/swingset.git
+cd swingset
+mvn clean package
+```
 
-The sample/demo programs provided with SwingSet utilize the h2 database, which is run in memory.
+To build only the demo module from the repository root:
 
-The sample database is based on the suppliers-and-parts database referenced in the classic database textbook, "An Introduction to Database Systems," by C. J. Date.
+```bash
+mvn clean package -pl swingset-demo -am
+```
 
-For questions regarding SwingSet, send an email to:
-swingset#NO-SPAM#@pangburngroup.com
+To build from inside the demo module directory:
 
-## EXECUTION
+```bash
+cd swingset-demo
+mvn clean package
+```
 
-The SwingSet samples/demo requires Java 1.8 or later.
+For release-style local builds that attach source and Javadoc artifacts, use the release profile:
 
-  1. Beginning with SwingSet 3.0.0. we're providing an executable jar with all dependencies.
-  2. Download/save swingset-demo-x.y.z-jar-with-dependencies.jar to a local folder
-  3. Type: `java -jar swingset-demo-x.y.z-jar-with-dependencies.jar`
-  		
-The swingset-demo uses an in-memory H2 database by default, but can be run using other databases with some effort.
+```bash
+mvn clean package -Prelease
+```
 
-See "USING ALTERNATE DATABASE SERVERS" at the end of this document for more information.
+The executable demo JAR is written to:
 
-Note that the default screen for placement of the demo can be specified using the environment variable: `JAVA_PREFERRED_SCREEN`.
-For example, in a dual monitor Linux environment, you can type `export JAVA_PREFERRED_SCREEN=1` prior to running the demo, and the SwingSet demo will appear on the right screen (presuming the left monitor is the default). 
-If the environment variable is not present or out of bound, the default is used.
+```text
+swingset-demo/target/
+```
 
-## COMPILATION
+Run it with:
 
-The SwingSet samples/demo requires Java 1.8 or later.
+```bash
+cd swingset-demo/target
+java -jar swingset-demo-x.y.z-jar-with-dependencies.jar
+```
 
-Git/Maven:
-  `git clone https://github.com/bpangburn/swingset.git`
+## Multi-monitor placement
 
-  After cloning, you can use an IDE, e.g. Eclipse or NetBeans, to compile/run.
-  Or you can use mvn directly and then run as shown here. Note that compiled
-  jar files will be in the ./target subdirectory.
-  
-  SwingSet Library:
-    `cd ./swingset/swingset/`
-    `mvn clean package -Prelease`
-    
-  SwingSet Demo:
-    `cd ./swingset/swingset-demo/`
-    `mvn clean package -Prelease`
-    `cd target`
-    `java -jar swingset-demo-X.Y.Z-jar-with-dependencies.jar`
+The default screen for the demo can be specified with the `JAVA_PREFERRED_SCREEN` environment variable.
 
-## CLASS DESCRIPTIONS
+For example, on a dual-monitor Linux system:
 
-### MainClass
+```bash
+export JAVA_PREFERRED_SCREEN=1
+java -jar swingset-demo-x.y.z-jar-with-dependencies.jar
+```
 
-A JFrame with buttons to launch each of the SwingSet example/demo screens.
+If the environment variable is not present or is out of bounds, the default screen is used.
 
-### Example1
+## Demo screens
 
-This example displays data from the supplier_data table. SSTextFields are used to display supplier id, name, city, and status.
+### `MainClass`
 
-Record navigation is handled with a SSDataNavigator.
+Main demo launcher. Opens a `JFrame` with buttons for each SwingSet example/demo screen.
 
-### Example2
+### `Example1`
 
-This example displays data from the supplier_data table. SSTextFields are used to display supplier id, name, and city. SSComboBox is used to display status.
+Displays data from the `supplier_data` table.
 
-Record navigation is handled with a SSDataNavigator.
+Demonstrates:
 
-### Example3
+- `SSTextField` for supplier ID, name, city, and status.
+- `SSDataNavigator` for record navigation.
 
-This example displays data from the supplier_part_data table. SSTextFields are used to display supplier-part id and quantity. SSDBComboBoxes are used to display supplier name and part name based on queries against the supplier_data and part_data tables.
+### `Example2`
 
-Record navigation is handled with a SSDataNavigator.
+Displays data from the `supplier_data` table.
 
-### Example4
+Demonstrates:
 
-This example displays data from the part_data table. SSTextFields are used to display part id, name, weight, and city. SSComboBox is used to display color.
+- `SSTextField` for supplier ID, name, and city.
+- `SSComboBox` for status values.
+- `SSDataNavigator` for record navigation.
 
-Record navigation can be handled with a SSDataNavigator or with a SSDBComboBox.
+### `Example3`
 
-Since the navigation can take place by multiple methods, the navigation controls have to be synchronized. This is accomplished with the SSSyncManager.
+Displays data from the `supplier_part_data` table.
 
-### Example4 Advanced
+Demonstrates:
 
-Extension of Example4, showing:
-1. Custom handling of a missing Option (Red) in the Color SSComboBox.
-2. Use of InputMap/ActionMap for custom key and extra button handling with F3-F11 mnemonics corresponding to the buttons on Navigator.
-3. Use of InputMap/ActionMap to add "extra" First and Last record navigation buttons at the bottom of the screen.
+- `SSTextField` for supplier-part ID and quantity.
+- `SSDBComboBox` for displaying supplier name and part name from lookup queries against `supplier_data` and `part_data`.
+- `SSDataNavigator` for record navigation.
 
-### Example4 Using Helper
+### `Example4`
 
-Same as Example4, but built by extending the SSFormViewScreenHelper helper class to organize construction.
+Displays data from the `part_data` table.
 
-### Example5
+Demonstrates:
 
-This example demonstrates the use of an SSDataGrid to display a tabular view of the part_data table.
+- `SSTextField` for part ID, name, weight, and city.
+- `SSComboBox` for color.
+- Record navigation using either `SSDataNavigator` or `SSDBComboBox`.
+- `SSSyncManager` for synchronizing navigation controls when more than one navigation mechanism is available.
 
-For an editable table, users can delete rows by selecting the row to be deleted and pressing Ctrl-X. By default, a confirmation message is displayed before deletion.
+### `Example4Advanced`
 
-### Example6
+Extends `Example4`.
 
-This example is similar to Example5, demonstrating the use of an SSDataGrid to display a tabular view of the part_data table. It adds a ComboRenderer for the color column.
+Demonstrates:
 
-### Example7
+- Custom handling of a missing option, such as `Red`, in the color `SSComboBox`.
+- `InputMap` and `ActionMap` usage for custom key handling.
+- Extra button handling with `F3` through `F11` mnemonics corresponding to navigator buttons.
+- Additional first-record and last-record navigation buttons at the bottom of the screen.
 
-This example demonstrates the use of an SSDataGrid to display a tabular view of the supplier_part_data table.
+### `Example4UsingHelper`
 
-It adds a ComboRenderer with a lookup to the supplier_data table for the supplier name, and adds a DateRenderer for the ship date column.
+Same general demonstration as `Example4`, but implemented by extending `SSFormViewScreenHelper`.
 
-### Example7 Using Helper
+### `Example5`
 
-Same as Example7, but built by extending the SSDataGridScreenHelper helper class to organize construction.
+Displays a tabular view of the `part_data` table.
 
-### Test Base Components
+Demonstrates:
 
-This example demonstrates all of the Base SwingSet Components except for the SSDataGrid.
+- `SSDataGrid` for table/grid display.
+- Editable table behavior.
+- Row deletion using `Ctrl-X`.
+- Default delete confirmation behavior.
 
-There is a separate example screen to demonstrate the Formatted SwingSet Components.
+### `Example6`
 
-### Test Formatted Components
+Similar to `Example5`, but adds a combo-box renderer for the color column.
 
-This example demonstrates all of the Formatted SwingSet Components.
+Demonstrates:
 
-There is a separate example screen to demonstrate the Base SwingSet Components.
+- `SSDataGrid`.
+- Custom column rendering with `ComboRenderer`.
 
-## USING ALTERNATE DATABASE SERVERS
+### `Example7`
 
-swingset-demo can work with user supplied connection properties and sql scripts to initialize a database that is then used for the demo. Look at the help with
+Displays a tabular view of the `supplier_part_data` table.
 
-    java -jar swingset-demo-x.y.z-jar-with-dependencies.jar -h
+Demonstrates:
 
-The connection properties is standard java format for a properties file.
-Here is an example of a database connection property file used with mysql
+- `SSDataGrid`.
+- `ComboRenderer` with a lookup to `supplier_data` for displaying supplier names.
+- `DateRenderer` for the ship-date column.
 
-    # This is a standard java properties file
+### `Example7UsingHelper`
 
-    DB_DRIVER_CLASS = com.mysql.cj.jdbc.Driver
-    DB_URL = jdbc:mysql://localhost/swingset_demo_suppliers_and_parts
-    user = some_user
-    password = some_password
-    serverTimezone = UTC
+Same general demonstration as `Example7`, but implemented by extending `SSDataGridScreenHelper`.
 
-The properties "DB_DRIVER_CLASS" and "DB_URL" are used internally with
-    Class.forName(driver_class)
-    DriverManager.getConnection(url, props)
+### Base component test screen
 
-You can run the demo, without re-compiling, if you provide java the dbms server class jar on the command line. Before running the demo, create the database swingset_demo_suppliers_and_parts.  The sql scripts to initialize the MySQL database tables are included in swingset-demo
+Demonstrates the base SwingSet components except for `SSDataGrid`.
 
-    java -cp mysql-connector-java-8.0.21.jar:swingset-demo-x.y.z-jar-with-dependencies.jar \
-        com.nqadmin.swingset.demo.MainClass -v -p property_file mysql
+### Formatted component test screen
 
-Note that if you use the '-cp' option, you can not use the '-jar' option and so you tell java the main class to run.
+Demonstrates formatted SwingSet components, such as fields intended for formatted values.
 
-You can extract the MySQL script. The following command:
+## Using alternate database servers
 
-    java -jar swingset-demo-x.y.z-jar-with-dependencies.jar -d mysql
+The demo uses an in-memory H2 database by default. It can also work with user-supplied connection properties and SQL scripts to initialize another database.
 
-puts the following files into the current directory.
+Show command-line help with:
 
-    dump.mysql.swingset-demo-app.sql
-    dump.mysql.swingset-demo-components.sql
+```bash
+java -jar swingset-demo-x.y.z-jar-with-dependencies.jar -h
+```
 
-These files can be edited as needed for a different database. If the files are edited and saved under the names
+### Connection properties
 
-    swingset-demo-app.sql
-    swingset-demo-components.sql
+Connection properties use the standard Java properties-file format.
 
-You can use them as in this example
+Example MySQL properties file:
 
-    java -cp some_db_driver.jar:swingset-demo-x.y.z-jar-with-dependencies.jar \
-        com.nqadmin.swingset.demo.MainClass -v \
-        -p property_file \
-        -s swingset-demo-app.sql -s swingset-demo-components.sql
+```properties
+# This is a standard Java properties file.
+DB_DRIVER_CLASS = com.mysql.cj.jdbc.Driver
+DB_URL = jdbc:mysql://localhost/swingset_demo_suppliers_and_parts
+user = some_user
+password = some_password
+serverTimezone = UTC
+```
 
-The user supplied connection properties and sql scripts initialize the database and then the demo is started.
+The `DB_DRIVER_CLASS` and `DB_URL` properties are used internally with:
 
-There are other options...
+```java
+Class.forName(driverClass);
+DriverManager.getConnection(url, props);
+```
+
+Before running the demo against MySQL, create the target database. For example:
+
+```text
+swingset_demo_suppliers_and_parts
+```
+
+The SQL scripts to initialize the MySQL database tables are included in the demo module.
+
+### Running with an external database driver
+
+To run with an external database driver, place the database driver JAR on the classpath. Do not use `-jar` when using `-cp`; specify the main class directly.
+
+Example:
+
+```bash
+java -cp mysql-connector-java-8.0.21.jar:swingset-demo-x.y.z-jar-with-dependencies.jar \
+    com.nqadmin.swingset.demo.MainClass -v -p property_file mysql
+```
+
+### Extracting database scripts
+
+To extract the included MySQL scripts:
+
+```bash
+java -jar swingset-demo-x.y.z-jar-with-dependencies.jar -d mysql
+```
+
+This writes files similar to the following into the current directory:
+
+```text
+dump.mysql.swingset-demo-app.sql
+dump.mysql.swingset-demo-components.sql
+```
+
+These files can be edited as needed for another database. If edited, save them under these names:
+
+```text
+swingset-demo-app.sql
+swingset-demo-components.sql
+```
+
+Then run the demo with the custom scripts:
+
+```bash
+java -cp some_db_driver.jar:swingset-demo-x.y.z-jar-with-dependencies.jar \
+    com.nqadmin.swingset.demo.MainClass -v \
+    -p property_file \
+    -s swingset-demo-app.sql \
+    -s swingset-demo-components.sql
+```
+
+The supplied connection properties and SQL scripts initialize the database before the demo starts.
+
+## Third-party libraries
+
+The demo uses third-party libraries, including:
+
+- H2 Database Engine, which is dual licensed under the Mozilla Public License 2.0 or the Eclipse Public License 1.0.
+- Glazed Lists, which is dual licensed under the Mozilla Public License 2.0 or the GNU Lesser General Public License 2.1.
+
+Review the applicable third-party licenses before redistributing the demo or bundled dependencies.
+
+## License
+
+SwingSet is distributed under the BSD 3-Clause License. See [`../LICENSE.md`](../LICENSE.md).
+
+For questions regarding SwingSet, send an email to `swingset#NO-SPAM#@pangburngroup.com`.
