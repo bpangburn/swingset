@@ -441,7 +441,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 *
 	 * @param displayColumnName column name whose values have to be displayed.
 	 */
-	public void setDisplayColumnName(final String displayColumnName) {
+	private void setDisplayColumnName(final String displayColumnName) {
 		final String oldValue = this.displayColumnName;
 		this.displayColumnName = displayColumnName;
 		firePropertyChange("displayColumnName", oldValue, this.displayColumnName);
@@ -453,7 +453,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 *
 	 * @param primaryKeyColumnName name of the PK value to query for the bound column keys
 	 */
-	public void setPrimaryKeyColumnName(final String primaryKeyColumnName) {
+	private void setPrimaryKeyColumnName(final String primaryKeyColumnName) {
 		final String oldValue = this.primaryKeyColumnName;
 		this.primaryKeyColumnName = primaryKeyColumnName;
 		firePropertyChange("primaryKeyColumnName", oldValue, this.primaryKeyColumnName);
@@ -512,6 +512,7 @@ public class DBComboBox2<K,D,D2> extends ComboBox2<K,D,D2>
 	 *
 	 * @param separator separator to be used.
 	 */
+	// TODO: 2026-04-29_BP: Make this private? Used in SSFormViewScreenHelper. Maybe set in a Constructor?
 	public void setSeparator(final String separator) {
 		final String oldValue = getListItemFormat().getSeparator();
 		getListItemFormat().setSeparator(separator);

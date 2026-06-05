@@ -248,6 +248,47 @@ public class ConvertTypeTest
 	}
 
 	/**
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	@SuppressWarnings("ThrowableResultIgnored")
+	public void testConvertBoolean() throws Exception
+	{
+		System.out.println("convertBoolean");
+		@SuppressWarnings("unused")
+		Object rv;
+
+		assertEquals(true, convertToType(true, JDBCType.BIT));
+		assertEquals(true, convertToType(Byte.MAX_VALUE, JDBCType.BOOLEAN));
+		assertEquals(true, convertToType(Short.MAX_VALUE, JDBCType.BIT));
+		assertEquals(true, convertToType(Integer.MAX_VALUE, JDBCType.BOOLEAN));
+		assertEquals(true, convertToType(Long.MAX_VALUE, JDBCType.BIT));
+		assertEquals(true, convertToType(BigDecimal.valueOf(Long.MAX_VALUE), JDBCType.BIT));
+		assertThrows(SSSQLConversionException.class,
+				() -> convertToType(Double.MAX_VALUE, JDBCType.BIT));
+
+		assertEquals(false, convertToType(false, JDBCType.BIT));
+		assertEquals(false, convertToType((short)0, JDBCType.BIT));
+
+		assertEquals(1, rv = convertToType(true, JDBCType.TINYINT));
+		assertEquals(Integer.class, rv.getClass());
+		assertEquals(1, rv = convertToType(true, JDBCType.SMALLINT));
+		assertEquals(Integer.class, rv.getClass());
+		assertEquals(1, rv = convertToType(true, JDBCType.INTEGER));
+		assertEquals(Integer.class, rv.getClass());
+		assertEquals(BigDecimal.ONE, rv = convertToType(true, JDBCType.NUMERIC));
+		assertEquals(BigDecimal.class, rv.getClass());
+
+		assertEquals(0, convertToType(false, JDBCType.SMALLINT));
+		assertEquals(BigDecimal.ZERO, convertToType(false, JDBCType.NUMERIC));
+
+		// Why is floating point OK? Should this be an excep[tion?
+		assertEquals(1.0F, convertToType(true, JDBCType.REAL));
+	}
+	//EnumSet.of(BIT, BOOLEAN, INTEGER, SMALLINT, TINYINT));
+
+	/**
 	 * Test of convertObjectType method, of class ConvertType.
 	 * @throws java.lang.Exception
 	 */

@@ -805,7 +805,7 @@ public interface SSComponent extends RSC
 		boolean baseValid = baseValidate();
 		boolean compValid = baseValid && componentValidate();
 		boolean otherValid = compValid;
-		if (compValid && !getSSCommon().pendingDbChange) {
+		if (compValid && !getSSCommon().skipValidateHasError) {
 			RowsModel rowsModel = getRowsModel();
 			if (rowsModel != null && rowsModel.getRowSet() != null)
 				otherValid = !rowsModel.hasError(this);

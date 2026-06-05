@@ -284,7 +284,7 @@ final class SSCommon
 	private final boolean restoreOnError = false; // easiest/safest?
 	private boolean dialogOnError = false;
 
-	boolean pendingDbChange;
+	boolean skipValidateHasError;
 
 	//
 	// isNullable is cached state of metadata.
@@ -1224,6 +1224,7 @@ final class SSCommon
 	/**
 	 * Use the specified argument, which comes from an undo or redo command,
 	 * to set the components value.
+	 * Goes directly to RowSet, does <em>not</em> go through RowSetOps.
 	 * Whether the command was undo or redo generally doesn't matter.
 	 * @param cmd undo or redo
 	 * @param value the new value

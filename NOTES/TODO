@@ -14,8 +14,17 @@ setColumn()/getColumn() allow to pass in reader/writer? Consider ConsumerSQL.
 
 ================================================================================
 
-Incorporate Brian TODO from April 29, "Added TODOs for possible cleanup"
-about making some methods private in DBComboBox2.
+Inconsistently used: SSCommon.isRestoreOnError()
+
+================================================================================
+
+DBComboBox2 - firePropertyChange, needed? Ifso use eventbus. setSeparator()
+
+================================================================================
+
+RSC vs SSComponent - work undo/redo into RSC methods
+Or maybe something between RSC and SSComponent. NOTE
+that RSC is read only
 
 ================================================================================
 

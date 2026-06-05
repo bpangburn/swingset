@@ -48,6 +48,7 @@ import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
@@ -104,11 +105,10 @@ import static java.lang.System.Logger.Level.*;
 @SuppressWarnings("serial")
 public class TestBaseComponents extends JFrame
 {
-	// STAR means use "*" in query
 	enum Comps {
 		NAV, PK, CHECK, COMBO, ENUM_COMBO, DB_COMBO, IMAGE, LABEL,
-		LIST, LIST2, SLIDER, TEXT_AREA, TEXT_FIELD, DATE_PICKER,
-		STAR, // This, and anything after, are not components.
+		LIST, LIST2, SLIDER, TEXT_AREA, TEXT_FIELD, TEXT_FIELD_B,
+		DATE_PICKER,
 	};
 	enum CompDim {
 		//NORMAL, TALL, VERY_TALL
@@ -123,7 +123,8 @@ public class TestBaseComponents extends JFrame
 	private EnumSet<Comps> keepMinHeight = EnumSet.of(
 			// H1
 			// Commnet out the next line to get original test behavior
-			NAV, PK, CHECK, COMBO, ENUM_COMBO, DB_COMBO, LABEL, SLIDER, TEXT_FIELD,
+			NAV, PK, CHECK, COMBO, ENUM_COMBO, DB_COMBO, LABEL, SLIDER,
+			TEXT_FIELD, TEXT_FIELD_B,
 			DATE_PICKER
 
 			// H2
@@ -151,12 +152,11 @@ public class TestBaseComponents extends JFrame
 				new Comp("ss_slider",       sliSSSlider,       lblSSSlider,       H1),
 				new Comp("ss_text_area",    txtSSTextArea,     lblSSTextArea,     H2),
 				new Comp("ss_text_field",   txtSSTextField,    lblSSTextField,    H1),
+				new Comp("ss_text_field",   txtSSTextFieldB,   lblSSTextFieldB,   H1),
 				new Comp("ss_date_field_null",dpDatePicker,    lblDatePicker,     H1)
 		);
 
 		for (Comps comp : Comps.values()) {
-			if (comp == STAR)
-				break;
 			compInfo.put(comp, tComps.get(comp.ordinal()));
 		}
 	}
@@ -230,6 +230,7 @@ public class TestBaseComponents extends JFrame
 	JLabel lblSSSlider = new JLabel("SSSlider");
 	JLabel lblSSTextArea = new JLabel("SSTextArea");
 	JLabel lblSSTextField = new JLabel("SSTextField");
+	JLabel lblSSTextFieldB = new JLabel("SSTextFieldB");
 	JLabel lblDatePicker = new JLabel("DbDatePicker");
 	
 	/**
@@ -247,6 +248,7 @@ public class TestBaseComponents extends JFrame
 	SSSlider sliSSSlider = new SSSlider();
 	SSTextArea txtSSTextArea = new SSTextArea();
 	SSTextField txtSSTextField = new SSTextField();
+	SSTextField txtSSTextFieldB = new SSTextField();
 	DbDatePicker dpDatePicker = new DbDatePicker();
 
 	/**
@@ -306,7 +308,7 @@ public class TestBaseComponents extends JFrame
 		//activeComps.removeAll(EnumSet.of(CHECK, LABEL));
 		//activeComps.clear();
 		//activeComps.addAll(EnumSet.of(
-		//		STAR, PK, LABEL, LIST, TEXT_FIELD
+		//		PK, LABEL, LIST, TEXT_FIELD
 		//		//NAV, LABEL, TEXT_FIELD
 		//		// NAV, PK, CHECK, COMBO, ENUM_COMBO, DB_COMBO, IMAGE, LABEL,
 		//		// LIST, SLIDER, TEXT_AREA, TEXT_FIELD
@@ -376,7 +378,6 @@ public class TestBaseComponents extends JFrame
 		}
 		
 		// NOTE following enum has [0,N) mapping, but DB is [1,N]
-		//      Fortunately test DB doesn't have a "7" in ss_list array
 		//lstSSList.setDisplayValues(ListEnum.class);
 		if (activeComps.contains(LIST)) {
 			lstSSList.setDisplayValues(Arrays.asList(listItems), Arrays.asList(listCodes));
@@ -556,28 +557,26 @@ public class TestBaseComponents extends JFrame
 
 	private String getColumnsSQL()
 	{
-		if (activeComps.contains(STAR))
-			return "*";
-		List<String> l = getActiveCompInfo().stream()
+		String s = getActiveCompInfo().stream()
 				.filter((comp) -> comp.col != null)
-				.filter((comp) -> comp.comp != cmbEnumSSComboBox) // skip dup column
-				.map((comp) -> comp.col).collect(Collectors.toList());
-		return String.join(", ", l);
+				.map((comp) -> comp.col)
+				.distinct()
+				.collect(Collectors.joining(", "));
+		return s;
 	}
 
-	/** For enabled components, return list of records. */
-	private List<Comps> getActiveComps()
+	/** For enabled components, return list of descriptive records. */
+	private Collection<Comps> getActiveComps()
 	{
-		return activeComps.stream()
-				.filter((eComp) -> eComp != STAR)
-				.collect(Collectors.toList());
+		return activeComps;
 	}
 
 	/** For enabled components, return list of records. */
 	private List<Comp> getActiveCompInfo()
 	{
 		return getActiveComps().stream()
-				.map((eComp) -> compInfo.get(eComp)).collect(Collectors.toList());
+				.map((eComp) -> compInfo.get(eComp))
+				.toList();
 	}
 
 	private void buildGui_bind()

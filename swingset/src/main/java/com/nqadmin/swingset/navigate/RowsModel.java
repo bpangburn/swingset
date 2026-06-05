@@ -275,6 +275,7 @@ public final class RowsModel
 	 * @param dbNav
 	 * @return false if abort and rowSet not set/changed
 	 */
+	// TODO: need programatic disable dialog if discarding uncommited changes? quiet flag.
 	// TODO: if dbNav null, re-use current?
 	public boolean setRowSet(RowSet rs, SSDBNav dbNav) {
 		logger.log(Level.INFO, () -> sf("RowsModel %s change rowSet from %s to %s",

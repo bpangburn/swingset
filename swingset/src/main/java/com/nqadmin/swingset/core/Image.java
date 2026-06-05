@@ -226,7 +226,7 @@ public class Image extends JPanel implements SSComponent
 	{
 		Set<JDBCType> allowed = Set.of(BLOB, BINARY, VARBINARY, LONGVARBINARY);
 		if (!allowed.contains(jdbcType))
-			throw new IllegalArgumentException("Image column type must be BLOB");
+			throw new IllegalArgumentException(sf("Image column type must be one of %s", allowed));
 	}
 
 	// TODO: Why do decorators interfere with Image?
