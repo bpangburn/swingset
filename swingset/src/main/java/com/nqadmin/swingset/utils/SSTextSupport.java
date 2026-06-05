@@ -222,13 +222,13 @@ public class SSTextSupport
 			// still be there, since it's updated by RowSet event,
 			// which comes from setColumnText.
 			try {
-				ssCommon.pendingDbChange = true;
+				ssCommon.skipValidateHasError = true;
 				if (!ssCommon.decorate()) {
 					postRowSetModifiedError(ssCommon.getSSComponent(), text);
 					return;
 				}
 			} finally {
-				ssCommon.pendingDbChange = false;
+				ssCommon.skipValidateHasError = false;
 			}
 			boolean ok = true;
 			//boolean inErrorState = ssCommon.getRowsModel().hasError(ssCommon.getSSComponent());

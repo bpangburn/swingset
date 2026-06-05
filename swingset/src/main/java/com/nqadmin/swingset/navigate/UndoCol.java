@@ -181,6 +181,30 @@ final class UndoCol
 
 		changes.set(curIdx, newChange);
 		NavigateState.getLogger().log(DEBUG, () -> sf("UNDO/REDO change: %s - %s", me.getColumnName(), changes));
+		removeDuplicateChange(curIdx);
+	}
+
+	/**
+	 * If the change at {@code idx} is equal to previous change then
+	 * remove it; adjust curIdx as needed.
+	 * 
+	 * @return true if a change was removed.
+	 */
+	boolean removeDuplicateChange(int idx) {
+		if (idx == 0 || idx >= changes.size())
+			return false;
+
+		// Can probably assert curIdx == changes.size() - 1
+		//if (curIdx != changes.size() - 1) throw new IllegalStateException();
+		if (changes.get(idx).equals(changes.get(idx - 1))) {
+			NavigateState.getLogger().log(DEBUG,
+					() -> sf("UNDO/REDO removeDuplicateChange: %d - %s", idx, changes));
+			changes.remove(idx);
+			if (idx <= curIdx) { curIdx--; }
+			needNewSlot = true;
+			return true;
+		}
+		return false;
 	}
 
 	boolean isDirty()
@@ -212,6 +236,7 @@ final class UndoCol
 	 */
 	void focusChange(FocusChangeEvent ev)
 	{
+		removeDuplicateChange(curIdx);
 		needNewSlot = true;
 	}
 

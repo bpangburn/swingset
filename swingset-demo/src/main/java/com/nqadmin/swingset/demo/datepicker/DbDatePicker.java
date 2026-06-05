@@ -20,7 +20,6 @@ import java.lang.System.Logger;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.EnumSet;
 import java.util.EventListener;
 
 import com.github.lgooddatepicker.components.DatePicker;
@@ -33,7 +32,6 @@ import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
-import static com.nqadmin.swingset.datasources.ConvertType.assertConvertFromJdbcType;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.DEBUG;
 import static java.sql.JDBCType.DATE;
@@ -106,7 +104,8 @@ public class DbDatePicker extends DatePicker implements SSComponent
 	@Override
 	public void checkColumnType(JDBCType jdbcType) throws IllegalArgumentException
 	{
-		assertConvertFromJdbcType(jdbcType, LocalDate.class, EnumSet.of(DATE));
+		if (jdbcType != DATE)
+			throw new IllegalArgumentException(sf("Date Picker column type must be DATE"));
 	}
 	
 	/** {@inheritDoc } */
