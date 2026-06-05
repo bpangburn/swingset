@@ -43,15 +43,11 @@
 package com.nqadmin.swingset.datasources;
 
 import java.lang.System.Logger;
-import java.math.BigDecimal;
 import java.sql.Array;
-import java.sql.Date;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -337,258 +333,6 @@ public class RowSetOps {
 	}
 
 	/**
-	 *
-	 * @param comp
-	 * @return
-	 */
-	public static Array getColumnArray(SSComponent comp)
-	{
-		try {
-			if (getColumnCount(comp.getRowSet())==0)
-				return null;
-			return (UndoRedo.isUndoRedoEnabled(comp)
-					? (Array)UndoRedo.fetchCurrentChange(comp).value()
-					: comp.getRowSet().getArray(comp.getColumnIndex()));
-		} catch (SQLException ex) {
-			logger.log(ERROR, "SQL Exception for column " + comp.getColumnName() + ".", ex);
-		}
-		return null;
-	}
-
-	/**
-	 * Returns the Object from the rowset's specified column;
-	 * no object conversion.
-	 * There is no filtering, for example null conversion.
-	 * @param comp component
-	 * @return value
-	 * @throws java.sql.SQLException
-	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B-1
-	 */
-	public static Object getColumnObject(RSC comp) throws SQLException
-	{
-		return UndoRedo.isUndoRedoEnabled(comp)
-				? UndoRedo.fetchCurrentChange(comp).value()
-				: comp.getRowSet().getObject(comp.getColumnIndex());
-	}
-
-	/**
-	 * Returns the Object from the rowset's specified column;
-	 * no object conversion.
-	 * There is no filtering, for example null conversion.
-	 * @param comp component
-	 * @return value
-	 * @throws java.sql.SQLException
-	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B-1
-	 */
-	//TODO: rename this to "getColumnObjectDirect"? only used with grid
-	public static Object getColumnObjectLegacy(RSC comp) throws SQLException
-	{
-		if(Boolean.TRUE)
-			return comp.getRowSet().getObject(comp.getColumnIndex());
-		else
-			return getColumnObject2(comp);
-	}
-
-	//
-	// This switch code is the original from SSDataGrid/SSTableModel,
-	// amended to include additional column types and to meet JDBC spec.
-	// Doing "rowset.getObject(_column)" should produce the same result,
-	// possibly since JDBC 2. This is here as a fallback/just-in-case,
-	// given the great divergence in JDBC drivers and database.
-	// 
-	// If it turns out that there is some need for flipping, maybe for
-	// different environments, then it's a question of how?
-	//
-	// Explore what things should be flippable and at what granularity.
-	// Should you be able to specify handling per column type?
-	// What switch to flip, in a property file, pluggable, ...
-	//
-	private static Object getColumnObject2(RSC comp) throws SQLException
-	{
-		RowSet rs = comp.getRowSet();
-		int cIdx = comp.getColumnIndex();
-		return switch (comp.getColumnJDBCType()) {
-		case INTEGER, SMALLINT, TINYINT ->	rs.getInt(cIdx);
-		case BIGINT ->				rs.getLong(cIdx);
-		case REAL ->				rs.getFloat(cIdx);
-		case DOUBLE, FLOAT ->		rs.getDouble(cIdx);
-		case NUMERIC, DECIMAL ->	rs.getBigDecimal(cIdx);
-		case BOOLEAN, BIT ->		rs.getBoolean(cIdx);
-		case DATE ->				rs.getDate(cIdx);
-		case TIME ->				rs.getTime(cIdx);
-		case TIMESTAMP ->			rs.getTimestamp(cIdx);
-		case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR ->
-									rs.getString(cIdx);
-		default -> {
-			logger.log(WARNING, () -> "Unknown data type of " + comp.getColumnJDBCType());
-			yield rs.getObject(cIdx);
-		}
-		};
-	}
-
-	//
-	// TODO: revisit these ColumnObject methods
-	//
-	/**
-	 * Returns an Object of the specified type
-	 * representing the value in the component's bound database column.
-	 * This may involve a conversion.
-	 * <p>
-	 * Note that if a String type is specified, a null is not automatically
-	 * turned into "" use getColumnText for that.
-	 * @param <T> type to return
-	 * @param comp component
-	 * @param type Class of returned type
-	 * @return object
-	 * @throws java.sql.SQLException
-	 */
-	public static <T> T getColumnObject(RSC comp, Class<T> type) throws SQLException
-	{
-		// If there are no columns, return null.
-		if (getColumnCount(comp.getRowSet()) == 0)
-			return null;
-
-		if(Boolean.TRUE)
-			return getColumnObject1(comp, type); // undo/redo,convert
-		else
-			return getColumnObject2(comp, type); // getObject direct
-	}
-
-	/**
-	 * Returns an Object of the specified type
-	 * representing the value in the component's bound database column.
-	 * @param <T> type to return
-	 * @param comp component
-	 * @param type Class of returned type
-	 * @return value
-	 */
-	private static <T> T getColumnObject1(RSC comp, Class<T> type)
-			throws SQLException
-	{
-		Object objectValue = UndoRedo.isUndoRedoEnabled(comp)
-				? UndoRedo.fetchCurrentChange(comp).value()
-				: comp.getRowSet().getObject(comp.getColumnIndex());
-		return convertToType(objectValue, type);
-	}
-
-	/**
-	 * Returns an Object of the specified type
-	 * representing the value in the component's bound database column.
-	 * @param <T> type to return
-	 * @param comp component
-	 * @param type Class of returned type
-	 * @return value
-	 */
-	private static <T> T getColumnObject2(RSC comp, Class<T> type)
-			throws SQLException
-	{
-		return comp.getRowSet().getObject(comp.getColumnIndex() , type);
-	}
-	
-	/**
-	 * Method used by RowSet listeners to get the new text when the RowSet
-	 * events are triggered.
-	 *
-	 * @param comp this components rowset/column text
-	 *
-	 * @return text representation of data in specified column
-	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
-	 */
-	public static String getColumnText(final SSComponent comp)
-	{
-		final RowSet rowSet = comp.getRowSet();
-		final int cIdx = comp.getColumnIndex();
-		String value = null;
-
-		try {
-			// If the column is null, return null.
-			if ((getColumnCount(rowSet)==0) || (rowSet.getObject(cIdx) == null)) {
-				return null;
-			}
-
-			final JDBCType jdbcType = getJDBCType(getColumnType(rowSet, cIdx));
-
-			// Based on the column data type convert column's value to a String.
-			value = switch (jdbcType) {
-			case INTEGER, SMALLINT, TINYINT -> String.valueOf(rowSet.getInt(cIdx));
-			case BIGINT -> String.valueOf(rowSet.getLong(cIdx));
-			case REAL -> String.valueOf(rowSet.getFloat(cIdx));
-			case DOUBLE, FLOAT -> String.valueOf(rowSet.getDouble(cIdx));
-			case NUMERIC, DECIMAL -> String.valueOf(rowSet.getBigDecimal(cIdx));
-			case BIT, BOOLEAN -> String.valueOf(rowSet.getBoolean(cIdx));
-			case DATE, TIME, TIMESTAMP -> DateTime.getDateTimeText(comp);
-			case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR -> {
-				String str = rowSet.getString(cIdx);
-				yield str == null ? "" : str;
-			}
-			default -> {
-				// TODO: SSSQLExceptionUnhandledType
-				logger.log(ERROR, () -> sf("Unsupported data type of %s for column %d.",
-						jdbcType.getName(), cIdx));
-				yield null;
-			}
-			}; // end switch
-		} catch (final SQLException se) {
-			logger.log(ERROR, "SQL Exception for column " + cIdx + ".", se);
-		}
-		return value;
-
-	} // end protected String getColumnText(RowSet rs, String _columnName) {
-
-	/**
-	 * Get the column text from the current undo/redo value.
-	 * @param comp this components rowset/column text
-	 * @return
-	 */
-	public static String getColumnObjectText(RSC comp)
-	{
-		final RowSet _rowSet = comp.getRowSet();
-		final String _columnName = comp.getColumnName();
-
-		String value = null;
-		try {
-			// IF THE COLUMN IS NULL SO RETURN NULL
-			if (getColumnCount(_rowSet)==0) {
-				return null;
-			}
-
-			Object objectValue = UndoRedo.isUndoRedoEnabled(comp)
-					? UndoRedo.fetchCurrentChange(comp).value()
-					: comp.getRowSet().getObject(comp.getColumnIndex());
-			if (objectValue == null)
-				return null;
-
-			if (objectValue instanceof String s)
-				return s;
-
-			final JDBCType jdbcType = getJDBCType(getColumnType(_rowSet, _columnName));
-
-			switch (jdbcType) {
-			case INTEGER, SMALLINT, TINYINT, BIGINT, REAL, DOUBLE, FLOAT,
-					NUMERIC, DECIMAL, BIT, BOOLEAN,
-					// the CHAR... cases already handled, but...
-					CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR ->
-				value = objectValue.toString();
-			case DATE, TIME, TIMESTAMP ->
-				value = DateTime.getDateTimeText(objectValue, comp);
-			default -> // TODO: SSSQLExceptionUnhandledType
-				logger.log(ERROR, () -> "Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
-			} // end switch
-			//
-			// TODO: Convert this to use java.time.LocalDate, LocalTime,
-			//		 or LocalDateTime as needed.
-			//
-			
-
-		} catch (final SQLException se) {
-			logger.log(ERROR, "SQL Exception for column " + _columnName + ".", se);
-		}
-
-		return value;
-
-	} // end protected String getColumnText(RowSet rs, String _columnName) {
-
-	/**
 	 * Retrieves an integer corresponding to the designated column's type based on
 	 * the column index (starting from 1)
 	 *
@@ -727,71 +471,6 @@ public class RowSetOps {
 	);
 
 	/**
-	 * Method used by SwingSet component listeners to update the underlying
-	 * RowSet.
-	 * <p>
-	 * When the user changes/edits the SwingSet column this method propagates the
-	 * change to the RowSet. A separate call is required to flush/commit the change
-	 * to the database.
-	 *
-	 * @param comp The SSComponent doing the update
-	 * @param _updatedValue Array
-	 * @throws SSSQLNullException thrown if null is not allowed
-	 * @throws SQLException  thrown if a database error is encountered
-	 */
-	public static void updateColumnArray(final SSComponent comp, final Array _updatedValue) throws SSSQLNullException, SQLException {
-		updateColumnArray(comp, comp.getRowSet(), _updatedValue, comp.getColumnName(), comp.getAllowNull());
-	}
-
-	/**
-	 * Method used by SwingSet component listeners to update the underlying
-	 * RowSet.
-	 * <p>
-	 * When the user changes/edits the SwingSet column this method propagates the
-	 * change to the RowSet. A separate call is required to flush/commit the change
-	 * to the database.
-	 *
-	 * @param comp The SSComponent doing the update
-	 * @param _rowSet RowSet on which to operate
-	 * @param _updatedValue Array
-	 * @param _columnName   name of the database column
-	 * @param _allowNull 	indicates if Component and underlying column can contain null values
-	 * @throws SSSQLNullException thrown if null is not allowed
-	 * @throws SQLException  thrown if a database error is encountered
-	 */
-	private static void updateColumnArray(final SSComponent comp, final RowSet _rowSet, final Array _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException
-	{
-		logger.log(DEBUG, () -> "[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
-
-		UndoRedo.captureInitialValue(comp); // undo/redo
-
-		// On insert row, write null if updatedValue is null, and do not perform other checks. 
-		boolean did_update = false;
-		try {
-			if (_updatedValue == null && RowSetState.isInserting(_rowSet)) {
-				_rowSet.updateNull(_columnName);
-				did_update = true;
-				return;
-			}
-			
-			if (_updatedValue == null) {
-				if (_allowNull) {
-					_rowSet.updateNull(_columnName);
-					did_update = true;
-					return;
-				} else
-					throw new SSSQLNullException("NULL not allowed for this field.");
-			}
-			
-			_rowSet.updateArray(_columnName, _updatedValue);
-			did_update = true;
-		} finally {
-			if (did_update)
-				postRowSetModified(comp, _updatedValue);
-		}
-	}
-
-	/**
 	 * Fetch the current raw value from the database, the undo/redo stack is
 	 * not referenced; use columnReader if available.
 	 * Initial capture for undo/redo uses this method.
@@ -814,6 +493,148 @@ public class RowSetOps {
 		return rsc.getRowSet().getObject(rsc.getColumnIndex());
 	}
 
+	///////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////
+	//
+	// getColumn methods, fetch data from the current row.
+	//
+
+	/**
+	 * Get the column text from the current undo/redo value.
+	 * @param comp this components rowset/column text
+	 * @return
+	 */
+	public static String getColumnObjectText(RSC comp)
+	{
+		final RowSet _rowSet = comp.getRowSet();
+		final String _columnName = comp.getColumnName();
+
+		String value = null;
+		try {
+			// IF THE COLUMN IS NULL SO RETURN NULL
+			if (getColumnCount(_rowSet)==0) {
+				return null;
+			}
+
+			Object objectValue = UndoRedo.isUndoRedoEnabled(comp)
+					? UndoRedo.fetchCurrentChange(comp).value()
+					: comp.getRowSet().getObject(comp.getColumnIndex());
+			if (objectValue == null)
+				return null;
+
+			if (objectValue instanceof String s)
+				return s;
+
+			final JDBCType jdbcType = getJDBCType(getColumnType(_rowSet, _columnName));
+
+			switch (jdbcType) {
+			case INTEGER, SMALLINT, TINYINT, BIGINT, REAL, DOUBLE, FLOAT,
+					NUMERIC, DECIMAL, BIT, BOOLEAN,
+					// the CHAR... cases already handled, but...
+					CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR ->
+				value = objectValue.toString();
+			case DATE, TIME, TIMESTAMP ->
+				value = DateTime.getDateTimeText(objectValue, comp);
+			default -> // TODO: SSSQLExceptionUnhandledType
+				logger.log(ERROR, () -> "Unsupported data type of " + jdbcType.getName() + " for column " + _columnName + ".");
+			} // end switch
+			//
+			// TODO: Convert this to use java.time.LocalDate, LocalTime,
+			//		 or LocalDateTime as needed.
+			//
+			
+
+		} catch (final SQLException se) {
+			logger.log(ERROR, "SQL Exception for column " + _columnName + ".", se);
+		}
+
+		return value;
+
+	} // end protected String getColumnObjectText(RowSet rs, String _columnName) {
+
+	/**
+	 * Returns the Object from the rowset's specified column;
+	 * no object conversion.
+	 * There is no filtering, for example null conversion.
+	 * @param comp component
+	 * @return value
+	 * @throws java.sql.SQLException
+	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B-1
+	 */
+	public static Object getColumnObject(RSC comp) throws SQLException
+	{
+		return UndoRedo.isUndoRedoEnabled(comp)
+				? UndoRedo.fetchCurrentChange(comp).value()
+				: comp.getRowSet().getObject(comp.getColumnIndex());
+	}
+
+	//
+	// TODO: revisit these ColumnObject methods
+	//
+	/**
+	 * Returns an Object of the specified type
+	 * representing the value in the component's bound database column.
+	 * This may involve a conversion.
+	 * <p>
+	 * Note that if a String type is specified, a null is not automatically
+	 * turned into "" use getColumnObjectText for that.
+	 * @param <T> type to return
+	 * @param comp component
+	 * @param type Class of returned type
+	 * @return object
+	 * @throws java.sql.SQLException
+	 */
+	public static <T> T getColumnObject(RSC comp, Class<T> type) throws SQLException
+	{
+		// If there are no columns, return null.
+		if (getColumnCount(comp.getRowSet()) == 0)
+			return null;
+
+		if(Boolean.TRUE) {
+			//return getColumnObject1(comp, type); // undo/redo,convert
+			Object objectValue = getColumnObject(comp);
+			return convertToType(objectValue, type);
+		} else
+			return RowSetOps_NOT_USED.getColumnObject2(comp, type); // getObject direct
+	}
+
+	// /**
+	//  * Returns an Object of the specified type
+	//  * representing the value in the component's bound database column.
+	//  * @param <T> type to return
+	//  * @param comp component
+	//  * @param type Class of returned type
+	//  * @return value
+	//  */
+	// private static <T> T getColumnObject1(RSC comp, Class<T> type)
+	// 		throws SQLException
+	// {
+	// 	Object objectValue = getColumnObject(comp);
+	// 	// Object objectValue = UndoRedo.isUndoRedoEnabled(comp)
+	// 	// 		? UndoRedo.fetchCurrentChange(comp).value()
+	// 	// 		: comp.getRowSet().getObject(comp.getColumnIndex());
+	// 	return convertToType(objectValue, type);
+	// }
+
+	/**
+	 *
+	 * @param comp
+	 * @return
+	 */
+	public static Array getColumnArray(SSComponent comp)
+	{
+		try {
+			if (getColumnCount(comp.getRowSet())==0)
+				return null;
+			return (UndoRedo.isUndoRedoEnabled(comp)
+					? (Array)UndoRedo.fetchCurrentChange(comp).value()
+					: comp.getRowSet().getArray(comp.getColumnIndex()));
+		} catch (SQLException ex) {
+			logger.log(ERROR, "SQL Exception for column " + comp.getColumnName() + ".", ex);
+		}
+		return null;
+	}
+
 	/**
 	 * Reads the data from the rowset's specified column
 	 * using the provided columnReader;
@@ -831,116 +652,14 @@ public class RowSetOps {
 				: SSDBSupport.runDbReader(comp);
 	}
 
-	/**
-	 * Update the RowSet using {@code columnWriter}. ColumnWriter is
-	 * expected to do a rowSet.update*.
-	 * 
-	 * @param comp
-	 * @param value
-	 * @throws SQLException
-	 */
-	public static void updateColumn(SSComponent comp, Object value)
-			throws SQLException
-	{
-		UndoRedo.captureInitialValue(comp);
-
-		boolean did_update = false;
-		try {
-			SSDBSupport.runDbWriter(comp, value);
-			did_update = true;
-		} finally {
-			if (did_update)
-				postRowSetModified(comp, value);
-		}
-	}
-
-	// /**
-	//  * Update the RowSet using {@code columnWriter}. ColumnWriter is
-	//  * expected to do a rowSet.update*.
-	//  * 
-	//  * @param comp
-	//  * @param value
-	//  * @param columnWriter
-	//  * @throws SQLException
-	//  */
-	// public static void updateColumn(SSComponent comp, Object value,
-	// 		DbWriter<RowSet, Integer, SSComponent, Object> columnWriter)
-	// 		throws SQLException
-	// {
-	// 	UndoRedo.captureInitialValue(comp);
-
-	// 	boolean did_update = false;
-	// 	try {
-	// 		SSDBSupport.runDbWriter(comp, value, columnWriter);
-	// 		did_update = true;
-	// 	} finally {
-	// 		if (did_update)
-	// 			postRowSetModified(comp, value);
-	// 	}
-	// }
+	///////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////
+	//
+	// update methods, will post Modified if did update
+	//
 
 	/**
-	 * Method used by SwingSet component listeners to update the underlying
-	 * RowSet.
-	 * <p>
-	 * When the user changes/edits the SwingSet column this method propagates the
-	 * change to the RowSet. A separate call is required to flush/commit the change
-	 * to the database.
-	 *
-	 * @param comp The SSComponent doing the update
-	 * @param updatedValue value to write to underlying RowSet column
-	 * @throws SSSQLNullException thrown if null is not allowed
-	 * @throws SQLException  thrown if a database error is encountered
-	 */
-	public static void updateColumnObject(SSComponent comp, Object updatedValue)
-			throws SSSQLNullException, SQLException, NumberFormatException
-	{
-		if (updatedValue instanceof String s) {
-			// This method doesn't have all the string checks,
-			// use updateColumnText if String Object.
-			updateColumnText(comp, s);
-			return;
-		}
-		final RowSet rowSet = comp.getRowSet();
-		final int columnIndex = comp.getColumnIndex();
-		boolean allowNull = comp.getAllowNull();
-		logger.log(DEBUG, () -> comp.getColumnForLog() + " Update to: " + updatedValue + ". Allow null? [" + allowNull + "]");
-
-		UndoRedo.captureInitialValue(comp); // undo/redo
-
-		boolean did_update = false;
-		try {
-			// On insert row, write null and do not perform other checks.
-			if (updatedValue == null) {
-				if (RowSetState.isInserting(rowSet) || allowNull) {
-					rowSet.updateNull(columnIndex);
-					did_update = true;
-					return;
-				} else
-					throw new SSSQLNullException("NULL not allowed for this field.");
-			}
-
-			//_rowSet.updateObject(_columnIndex, _updatedValue);
-			JDBCType jdbcType = comp.getColumnJDBCType();
-			// TODO: Maybe a component field that says use jdbc conversion.
-			//		 Better, checkDriverConvertToType(),
-			//		 so "obj = convertObjectTypeIfNeeded(...)"
-			// TODO: Why isn't updateObject(index, object, type) used anywhere?
-			//		 Could always catch SQLFeatureNotSupportedException and do
-			//		 manual conversions as a last resort.
-			// TODO: It's weird that updateObject(idx,obj,type) javadoc says
-			//		 "type to be sent to the database". Does that mean the specified
-			//		 conversions for setObject kick in at that point?
-			Object obj = convertToType(updatedValue, jdbcType);
-			updateColumnObjectDirect(rowSet, columnIndex, obj, jdbcType);
-			did_update = true;
-		} finally {
-			if (did_update)
-				postRowSetModified(comp, updatedValue);
-		}
-	}
-
-	/** DEBUG ASSIST: Use this to force "n" acceptChanges conflicts after
+	 * DEBUG ASSIST: Use this to force "n" acceptChanges conflicts after
 	 * modifying a character column in the database.
 	 * Only works with CachedRowSet and after
 	 * {@linkplain #updateColumnText(com.nqadmin.swingset.utils.SSComponent, java.lang.String)}.
@@ -1143,11 +862,182 @@ public class RowSetOps {
 		} finally {
 			if (did_update) // component is not in error
 				postRowSetModified(comp, dbValue);
-
 		}
-
 	} // end protected void updateColumnText(String _updatedValue, String _columnName)
 
+	/**
+	 * Method used by SwingSet component listeners to update the underlying
+	 * RowSet.
+	 * <p>
+	 * When the user changes/edits the SwingSet column this method propagates the
+	 * change to the RowSet. A separate call is required to flush/commit the change
+	 * to the database.
+	 *
+	 * @param comp The SSComponent doing the update
+	 * @param updatedValue value to write to underlying RowSet column
+	 * @throws SSSQLNullException thrown if null is not allowed
+	 * @throws SQLException  thrown if a database error is encountered
+	 */
+	public static void updateColumnObject(SSComponent comp, Object updatedValue)
+			throws SSSQLNullException, SQLException, NumberFormatException
+	{
+		if (updatedValue instanceof String s) {
+			// This method doesn't have all the string checks,
+			// use updateColumnText if String Object.
+			updateColumnText(comp, s);
+			return;
+		}
+		final RowSet rowSet = comp.getRowSet();
+		final int columnIndex = comp.getColumnIndex();
+		boolean allowNull = comp.getAllowNull();
+		logger.log(DEBUG, () -> comp.getColumnForLog() + " Update to: " + updatedValue + ". Allow null? [" + allowNull + "]");
+
+		UndoRedo.captureInitialValue(comp); // undo/redo
+
+		boolean did_update = false;
+		try {
+			// On insert row, write null and do not perform other checks.
+			if (updatedValue == null) {
+				if (RowSetState.isInserting(rowSet) || allowNull) {
+					rowSet.updateNull(columnIndex);
+					did_update = true;
+					return;
+				} else
+					throw new SSSQLNullException("NULL not allowed for this field.");
+			}
+
+			//_rowSet.updateObject(_columnIndex, _updatedValue);
+			JDBCType jdbcType = comp.getColumnJDBCType();
+			// TODO: Maybe a component field that says use jdbc conversion.
+			//		 Better, checkDriverConvertToType(),
+			//		 so "obj = convertObjectTypeIfNeeded(...)"
+			// TODO: Why isn't updateObject(index, object, type) used anywhere?
+			//		 Could always catch SQLFeatureNotSupportedException and do
+			//		 manual conversions as a last resort.
+			// TODO: It's weird that updateObject(idx,obj,type) javadoc says
+			//		 "type to be sent to the database". Does that mean the specified
+			//		 conversions for setObject kick in at that point?
+			Object obj = convertToType(updatedValue, jdbcType);
+			updateColumnObjectDirect(rowSet, columnIndex, obj, jdbcType);
+			did_update = true;
+		} finally {
+			if (did_update)
+				postRowSetModified(comp, updatedValue);
+		}
+	}
+
+	/**
+	 * Method used by SwingSet component listeners to update the underlying
+	 * RowSet.
+	 * <p>
+	 * When the user changes/edits the SwingSet column this method propagates the
+	 * change to the RowSet. A separate call is required to flush/commit the change
+	 * to the database.
+	 *
+	 * @param comp The SSComponent doing the update
+	 * @param _updatedValue Array
+	 * @throws SSSQLNullException thrown if null is not allowed
+	 * @throws SQLException  thrown if a database error is encountered
+	 */
+	public static void updateColumnArray(final SSComponent comp, final Array _updatedValue) throws SSSQLNullException, SQLException {
+		updateColumnArray(comp, comp.getRowSet(), _updatedValue, comp.getColumnName(), comp.getAllowNull());
+	}
+
+	/**
+	 * Method used by SwingSet component listeners to update the underlying
+	 * RowSet.
+	 * <p>
+	 * When the user changes/edits the SwingSet column this method propagates the
+	 * change to the RowSet. A separate call is required to flush/commit the change
+	 * to the database.
+	 *
+	 * @param comp The SSComponent doing the update
+	 * @param _rowSet RowSet on which to operate
+	 * @param _updatedValue Array
+	 * @param _columnName   name of the database column
+	 * @param _allowNull 	indicates if Component and underlying column can contain null values
+	 * @throws SSSQLNullException thrown if null is not allowed
+	 * @throws SQLException  thrown if a database error is encountered
+	 */
+	private static void updateColumnArray(final SSComponent comp, final RowSet _rowSet, final Array _updatedValue, final String _columnName, final boolean _allowNull) throws SSSQLNullException, SQLException
+	{
+		logger.log(DEBUG, () -> "[" + _columnName + "]. Update to: " + _updatedValue + ". Allow null? [" + _allowNull + "]");
+
+		UndoRedo.captureInitialValue(comp); // undo/redo
+
+		// On insert row, write null if updatedValue is null, and do not perform other checks. 
+		boolean did_update = false;
+		try {
+			if (_updatedValue == null && RowSetState.isInserting(_rowSet)) {
+				_rowSet.updateNull(_columnName);
+				did_update = true;
+				return;
+			}
+			
+			if (_updatedValue == null) {
+				if (_allowNull) {
+					_rowSet.updateNull(_columnName);
+					did_update = true;
+					return;
+				} else
+					throw new SSSQLNullException("NULL not allowed for this field.");
+			}
+			
+			_rowSet.updateArray(_columnName, _updatedValue);
+			did_update = true;
+		} finally {
+			if (did_update)
+				postRowSetModified(comp, _updatedValue);
+		}
+	}
+
+	/**
+	 * Update the RowSet using {@code columnWriter}. ColumnWriter is
+	 * expected to do a rowSet.update*.
+	 * 
+	 * @param comp
+	 * @param value
+	 * @throws SQLException
+	 */
+	public static void updateColumn(SSComponent comp, Object value)
+			throws SQLException
+	{
+		UndoRedo.captureInitialValue(comp);
+
+		boolean did_update = false;
+		try {
+			SSDBSupport.runDbWriter(comp, value);
+			did_update = true;
+		} finally {
+			if (did_update)
+				postRowSetModified(comp, value);
+		}
+	}
+
+	///////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////
+	//
+	// grid stuff
+	//
+
+	/**
+	 * Returns the Object from the rowset's specified column;
+	 * no object conversion.
+	 * There is no filtering, for example null conversion.
+	 * @param comp component
+	 * @return value
+	 * @throws java.sql.SQLException
+	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B-1
+	 */
+	public static Object getColumnObjectDirect(RSC comp) throws SQLException
+	{
+		if(Boolean.TRUE)
+			return comp.getRowSet().getObject(comp.getColumnIndex());
+		else
+			return RowSetOps_NOT_USED.getColumnObject2(comp);
+	}
+
+	// 2024/01/08
 	// FOLLOWING ONLY USED FROM SSTableModel (AT LEAST FOR NOW)
 
 	/**
@@ -1165,11 +1055,11 @@ public class RowSetOps {
 	 * @param type NOT USED, the jdbc driver does the conversion
 	 * @throws SQLException  thrown if a database error is encountered
 	 */
-	public static void updateColumnObjectDirect(RowSet _rowSet, int _columnIndex, Object _value, JDBCType type) throws SQLException {
+	private static void updateColumnObjectDirect(RowSet _rowSet, int _columnIndex, Object _value, JDBCType type) throws SQLException {
 		if (Boolean.TRUE)
-			updateColumnObject1(_rowSet, _columnIndex, _value);
+			_rowSet.updateObject(_columnIndex, _value);
 		else
-			updateColumnObject2(_rowSet, _columnIndex, _value, type);
+			RowSetOps_NOT_USED.updateColumnObject2(_rowSet, _columnIndex, _value, type);
 	}
 
 	/**
@@ -1188,77 +1078,8 @@ public class RowSetOps {
 	 */
 	public static void updateColumnObjectDirect(RowSet _rowSet, int _columnIndex, Object _value) throws SQLException {
 		if (Boolean.TRUE)
-			updateColumnObject1(_rowSet, _columnIndex, _value);
+			_rowSet.updateObject(_columnIndex, _value);
 		else
-			updateColumnObject2(_rowSet, _columnIndex, _value, getJDBCColumnType(_rowSet, _columnIndex));
+			RowSetOps_NOT_USED.updateColumnObject2(_rowSet, _columnIndex, _value, getJDBCColumnType(_rowSet, _columnIndex));
 	}
-
-	/**
-	 * Update the Grid's RowSet at the specified column index with the given Object value.
-	 * RowSet. Operate on the current row.
-	 * <p>
-	 * When the user changes/edits the SSDataGrid cell this method propagates the
-	 * change to the RowSet. A separate call is required to flush/commit the change
-	 * to the database.
-	 *
-	 * @param _rowSet RowSet on which to operate
-	 * @param _value string to be type-converted as needed and updated in
-	 *                      underlying RowSet column
-	 * @param _columnIndex   index of the database column
-	 * @throws SQLException  thrown if a database error is encountered
-	 */
-	public static void updateColumnObject1(RowSet _rowSet, int _columnIndex, Object _value) throws SQLException {
-		_rowSet.updateObject(_columnIndex, _value);
-	}
-
-	//
-	// Following is available as a fallback if there is an issue.
-	//
-
-	/**
-	 * Update the Grid's RowSet at the specified column index with the given Object value.
-	 * RowSet. Operate on the current row.
-	 * <p>
-	 * When the user changes/edits the SSDataGrid cell this method propagates the
-	 * change to the RowSet. A separate call is required to flush/commit the change
-	 * to the database.
-	 *
-	 * @param _rowSet RowSet on which to operate
-	 * @param _value string to be type-converted as needed and updated in
-	 *                      underlying RowSet column
-	 * @param _columnIndex   index of the database column
-	 * @param type The JDBCType of the column
-	 * @throws SQLException  thrown if a database error is encountered
-	 * @see <a href="https://download.oracle.com/otn-pub/jcp/jdbc-4_3-mrel3-eval-spec/jdbc4.3-fr-spec.pdf">JDBC 4.3 Specification</a> Appendix B
-	 */
-	public static void updateColumnObject2(RowSet _rowSet, int _columnIndex, Object _value, JDBCType type) throws SQLException {
-		switch (type) {
-		case INTEGER, SMALLINT, TINYINT
-				-> _rowSet.updateInt(_columnIndex, ((Integer) _value));
-		case BIGINT
-				-> _rowSet.updateLong(_columnIndex, ((Long) _value));
-		case REAL
-				-> _rowSet.updateFloat(_columnIndex, ((Float) _value));
-		case FLOAT, DOUBLE
-				-> _rowSet.updateDouble(_columnIndex, ((Double) _value));
-		case DECIMAL, NUMERIC
-				-> _rowSet.updateBigDecimal(_columnIndex, ((BigDecimal) _value));
-		case BOOLEAN, BIT
-				-> _rowSet.updateBoolean(_columnIndex, ((Boolean) _value));
-		case DATE
-				-> _rowSet.updateDate(_columnIndex, (Date) _value);
-		case TIME
-				-> _rowSet.updateTime(_columnIndex, (Time) _value);
-		case TIMESTAMP
-				-> _rowSet.updateTimestamp(_columnIndex, (Timestamp) _value);
-		case CHAR, VARCHAR, LONGVARCHAR, NCHAR, NVARCHAR, LONGNVARCHAR
-				-> _rowSet.updateString(_columnIndex, (String) _value);
-		default
-				//
-				// TODO: SSSQLExceptionUnhandledType
-				//
-				-> logger.log(ERROR, () -> "Unknown data type of " + type);
-		}
-	}
-
 }

@@ -334,7 +334,7 @@ public class SSTableModel extends AbstractTableModel {
 
 			// Column numbers in ssrowset start from 1 where as column numbering
 			// for jtable start from 0.
-			value = RowSetOps.getColumnObjectLegacy(RSC.get(rowsModel, _column + 1));
+			value = RowSetOps.getColumnObjectDirect(RSC.get(rowsModel, _column + 1));
 		} catch (final SQLException se) {
 			logger.log(ERROR, "SQL Exception while retrieving value.",  se);
 			if (component != null) {
@@ -755,7 +755,7 @@ public class SSTableModel extends AbstractTableModel {
 				return;
 			}
 			
-			updateColumnObjectDirect(rowset, _column + 1, valueCopy, type);
+			updateColumnObjectDirect(rowset, _column + 1, valueCopy);
 
 			RowSetOps.updateRow(rowset);
 
