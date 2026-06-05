@@ -6,6 +6,29 @@ This file is the maintainer changelog for user-visible SwingSet changes. Depende
 Maven, and plugin version changes beginning with SwingSet 4.0.11 are tracked separately
 in [`CHANGELOG-POMS.md`](CHANGELOG-POMS.md).
 
+
+## SwingSet 4.0.13 — Pending release / 4.0.13-SNAPSHOT
+
+1. SwingSet 4.0.13 is primarily a release-preparation, dependency, build-tool, and
+   documentation maintenance release. See [`CHANGELOG-POMS.md`](CHANGELOG-POMS.md) for
+   dependency, Maven, and plugin version updates.
+2. Added [`CHANGELOG-AI.md`](CHANGELOG-AI.md), an AI-assisted supplemental changelog
+   summarizing the project history from the early CVS-converted releases through the
+   current 4.0.x line.
+3. Converted the maintainer changelog from `CHANGELOG.txt` to `CHANGELOG.md`.
+4. Converted the POM/dependency changelog from `CHANGELOG-POMS.txt` to
+   `CHANGELOG-POMS.md`.
+5. Converted the FAQ from `FAQ.txt` to `FAQ.md` and updated FAQ wording, links, and
+   formatting.
+6. Added a top-level [`LICENSE.md`](../LICENSE.md) and removed duplicated module-level
+   license text files.
+7. Updated the top-level README and module README files for clearer Maven build,
+   repository-structure, demo, and component documentation.
+8. Removed the top-level `FOLDERS.txt` file after moving the useful repository-layout
+   information into the top-level README.
+9. Updated copyright years and license references in README documentation.
+10. Updated Maven project versions from `4.0.12` to `4.0.13`.
+
 ## SwingSet 4.0.12 — Released 2023-12-16
 
 1. SwingSet 4.0.12 is an update for dependencies and plugins. See

@@ -24,7 +24,7 @@ could affect compatibility, public API, behavior, or dependency policy.
 ## Scope
 
 - Start: `arelease` / `02e8413fae1105a2d691a86d4925f70434e9f984`
-- End: `swingset-4.0.12` / `c836643a72cf3a2eb880d7b3db6d204c39138ac1`
+- End: `4.0.13-SNAPSHOT` branch, based on comparison from `swingset-4.0.12`
 - Repository: `https://github.com/bpangburn/swingset`
 
 ## Notes on interpretation
@@ -35,7 +35,7 @@ entries below are intentionally conservative and describe broad project evolutio
 than claiming every change was newly introduced in a particular semantic-release sense.
 
 For the 4.x series, the changelog reflects both the published release notes and additional
-details found by reviewing compare/patch output between tags.
+details found by reviewing compare/patch output between tags. The 4.0.13 entry is based on the `4.0.13-SNAPSHOT` branch and should be finalized when the release tag is created.
 
 ---
 
@@ -59,6 +59,50 @@ Long-term project themes include:
 ---
 
 # Release history, newest first
+
+
+## SwingSet 4.0.13 — Pending release / 4.0.13-SNAPSHOT
+
+Tag/commit: pending. Reviewed from the `4.0.13-SNAPSHOT` branch compared with `swingset-4.0.12`.
+
+Release-preparation, dependency, build-tool, and documentation maintenance release.
+
+Patch-derived details:
+
+- Updated Maven project versions from `4.0.12` to `4.0.13`.
+- Updated Maven and plugin version properties across the parent, library, and demo modules.
+- Split Log4j version properties into separate `log4j-api` and `log4j-core` properties
+  and updated both to the same 2.25.x line.
+- Updated the demo H2 dependency to the 2.4.x line.
+- Updated OWASP dependency-check and other Maven build plugins.
+- Added `CHANGELOG-AI.md` as a supplemental AI-assisted project-history changelog.
+- Converted `CHANGELOG.txt` to `CHANGELOG.md` and `CHANGELOG-POMS.txt` to
+  `CHANGELOG-POMS.md`.
+- Converted `FAQ.txt` to `FAQ.md`, reorganizing the FAQ with Markdown headings, code
+  blocks, updated links, and clearer migration/database notes.
+- Added a top-level `LICENSE.md` and removed duplicated module-level license text files.
+- Reworked the top-level README and module README files for clearer repository,
+  build, demo, and component documentation.
+- Removed `FOLDERS.txt` after moving the useful repository-layout/Eclipse project
+  information into the top-level README.
+- Updated copyright years and license references in documentation.
+
+Human-friendly summary:
+
+- Mostly a maintenance and release-prep update rather than a new SwingSet component
+  feature release.
+- Modernizes dependencies and Maven plugin versions.
+- Cleans up documentation structure by moving old text files to Markdown and removing
+  duplicated/outdated files.
+- Adds an AI-generated historical changelog intended to supplement the maintainer
+  changelog.
+
+Likely user impact:
+
+- Maven consumers should generally only need to update to version `4.0.13` once released.
+- Developers working from source should use the Markdown docs going forward.
+- Users should consult `CHANGELOG-POMS.md` for dependency/plugin details and
+  `CHANGELOG-AI.md` for broader historical context.
 
 ## SwingSet 4.0.12 — December 16, 2023
 
@@ -592,6 +636,7 @@ behavioral and API-adjacent changes:
 - 4.0.10: data-grid helper and `SSCellEditing` migration path.
 - 4.0.11: advanced demo, parent-aware grid helper fixes, and list/combo formatting fallback.
 - 4.0.12: dependency/plugin/doc maintenance.
+- 4.0.13: dependency/plugin updates, Markdown documentation conversion, AI changelog, and release-prep cleanup.
 
 ---
 
