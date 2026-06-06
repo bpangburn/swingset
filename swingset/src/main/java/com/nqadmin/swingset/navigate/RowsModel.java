@@ -910,6 +910,17 @@ public final class RowsModel
 	}
 
 	/**
+	 * Adjust the components error state. Used when there are multiple
+	 * components for the same column.
+	 * This execution path doesn't feel right.
+	 * @param comp
+	 * @param isError
+	 */
+	public void adjustErrorState(SSComponent comp, boolean isError) {
+		getNavState().adjustErrorComponentState(comp, isError);
+	}
+
+	/**
 	 * @param comp
 	 * @return true if the component is in an error state
 	 */

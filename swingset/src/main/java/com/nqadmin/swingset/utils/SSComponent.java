@@ -61,7 +61,7 @@ import com.nqadmin.swingset.decorators.Decorator;
 import com.nqadmin.swingset.decorators.Validator;
 import com.nqadmin.swingset.formatting.SSFormat;
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
-import com.nqadmin.swingset.navigate.RowSetModificationEvent;
+import com.nqadmin.swingset.navigate.ColumnChangeStartEvent;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.navigate.UndoRedo;
 import com.nqadmin.swingset.navigate.UndoRedo.Change;
@@ -720,7 +720,7 @@ public interface SSComponent extends RSC
 	 * @param ev modification event
 	 * @throws java.sql.SQLException
 	 */
-	default void addUndoableChange(RowSetModificationEvent ev) throws SQLException {
+	default void addUndoableChange(ColumnChangeStartEvent ev) throws SQLException {
 		getSSCommon().addUndoableChange(ev);
 	}
 

@@ -53,6 +53,7 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -75,6 +76,7 @@ import com.nqadmin.swingset.SSSlider;
 import com.nqadmin.swingset.SSTextArea;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.decorators.AlternateBorderDecorator;
+import com.nqadmin.swingset.decorators.TextComponentValidator;
 import com.nqadmin.swingset.demo.datepicker.DbDatePicker;
 import com.nqadmin.swingset.models.SSCollection;
 import com.nqadmin.swingset.models.SSDbArray;
@@ -315,6 +317,7 @@ public class TestBaseComponents extends JFrame
 		//));
 
 		activeComps.remove(LIST2);
+		//activeComps.remove(TEXT_FIELD_B);
 		
 		// SET CONNECTION
 		connection = _dbConn;
@@ -399,6 +402,15 @@ public class TestBaseComponents extends JFrame
 		// SSComponents are setup, save info that may have changed.
 		replaceComponent(NAV, cmbSSDBComboNav);
 		replaceComponent(DB_COMBO, cmbSSDBComboBox);
+
+		// validators for text fields
+		Function<String, Boolean> validator = (str) -> str == null || !str.matches("(?i).*oops.{0,2}$");
+		if (activeComps.contains(TEXT_FIELD)) {
+			txtSSTextField.setValidator(TextComponentValidator.create(validator));
+		}
+		if (activeComps.contains(TEXT_FIELD_B)) {
+			txtSSTextFieldB.setValidator(TextComponentValidator.create(validator));
+		}
 		
 		// Bind the components to their database columns.
 		buildGui_bind();

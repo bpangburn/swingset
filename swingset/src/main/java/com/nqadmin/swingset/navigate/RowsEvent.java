@@ -48,7 +48,7 @@ import static java.lang.System.Logger.Level.*;
  * An Event object that bundles events generated through  one or more operations
  * on a {@link javax.sql.RowSet}.
  * The event can originate from a {@link RowsAction}, from an
- * {@link RSC}/SSComponent, or
+ * {@link RSC}/{@link com.nqadmin.swingset.utils.SSComponent}, or
  * from something else, use {@link #getKindOperator} to determine the kind;
  * and use {@link #getOperComponent()} or {@link #getOperAct()} for
  * the specific operator.
@@ -147,6 +147,15 @@ public class RowsEvent extends EventObjectBacktrace implements RowsModelEvent
 	@SuppressWarnings("NonPublicExported")
 	public final RowsEventSource getSource() {
 		return (RowsEventSource) source;
+	}
+
+	/**
+	 * Test if this event is for the specified rowSet.
+	 * @param rowSet check against this rowSet
+	 * @return true if the event is for the specified rowSet
+	 */
+	public boolean matches(RowSet rowSet) {
+		return getSource().rowSet() == rowSet;
 	}
 
 	/**

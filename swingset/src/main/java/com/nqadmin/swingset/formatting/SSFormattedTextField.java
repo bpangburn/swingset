@@ -76,9 +76,9 @@ import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.checkConvertToJdbcType;
 import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
-import static com.nqadmin.swingset.navigate.Utils.postRowSetModifiedError;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
+import static com.nqadmin.swingset.navigate.Utils.postColumnChangeStartError;
 
 // TODO: Review state transitions (where it can happen).
 //		 Make sure to decorate at these points.
@@ -253,7 +253,7 @@ public class SSFormattedTextField extends JFormattedTextField
 			}
 		}
 		if (someError)
-			postRowSetModifiedError(ftf, currentValue);
+			postColumnChangeStartError(ftf, currentValue);
 	}
 	
 	/**
@@ -348,7 +348,7 @@ public class SSFormattedTextField extends JFormattedTextField
 				private void modified() {
 					if (ftf == null)
 						return;
-					Utils.postRowSetModified(ftf, ftf.getText());
+					Utils.postColumnChangeStart(ftf, ftf.getText());
 				}
 			};
 		}

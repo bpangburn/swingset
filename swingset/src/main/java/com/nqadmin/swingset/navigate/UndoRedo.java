@@ -39,9 +39,9 @@ import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
-import static com.nqadmin.swingset.navigate.Utils.postRowSetUndoRedo;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
+import static com.nqadmin.swingset.navigate.Utils.postColumnUndoRedo;
 
 /**
  * UndoRedo static commands.
@@ -152,7 +152,7 @@ public enum UndoRedo
 			// Wait until value propogates to the component.
 			if (change != NO_CHANGE)
 				SwingUtilities.invokeLater(() -> {
-					postRowSetUndoRedo(comp, change.value(),
+					postColumnUndoRedo(comp, change.value(),
 							change.isError /*|| !comp.allValidate().all()*/);
 				});
 		} catch (SQLException ex) {
@@ -179,7 +179,7 @@ public enum UndoRedo
 	 * @throws SQLException
 	 */
 	// TODO: make this package visibility, go through rowsModel?
-	public static void addUndoableChange(RowSetModificationEvent ev) throws SQLException
+	public static void addUndoableChange(ColumnChangeStartEvent ev) throws SQLException
 	{
 		if (!isUndoRedoEnabled(ev.getSource()))
 			return;

@@ -72,7 +72,7 @@ import com.nqadmin.swingset.models.GlazedListsKeyDisplayValueInfo;
 import com.nqadmin.swingset.models.KeyDisplayValueSwingModel;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.models.SSListItemFormat;
-import com.nqadmin.swingset.navigate.RowSetModificationEvent;
+import com.nqadmin.swingset.navigate.ColumnChangeStartEvent;
 import com.nqadmin.swingset.navigate.UndoRedo;
 import com.nqadmin.swingset.navigate.UndoRedo.Change;
 import com.nqadmin.swingset.utils.SSComponent;
@@ -330,7 +330,7 @@ public abstract class ComboBox2<K,D,D2>
 
 	/** {@inheritDoc } */
 	@Override
-	public void addUndoableChange(RowSetModificationEvent ev) throws SQLException
+	public void addUndoableChange(ColumnChangeStartEvent ev) throws SQLException
 	{
 		SSComponent.super.addUndoableChange(ev);
 		UndoRedo.newSlot(this);

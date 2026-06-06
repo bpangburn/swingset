@@ -47,7 +47,7 @@ import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
 import com.nqadmin.swingset.navigate.RowsModel.EnqueueRowsModelEvent;
 import com.nqadmin.swingset.utils.SSUtils;
 
-import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingChanges;
+import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingCachedRowSetChanges;
 import static com.nqadmin.swingset.navigate.RowsModel.getEventBus;
 import static com.nqadmin.swingset.navigate.RowsModel.post;
 import static com.nqadmin.swingset.utils.SSUtils.isJunit;
@@ -260,7 +260,7 @@ public class RowsModelEventHandling
 		public void addRowSetEvent(RowSetEventType rsEventType, RowSet rs) {
 			verifyEDT();
 			Objects.requireNonNull(rs);
-			if (isAcceptingChanges(rs)) // only possible if CachedRowSet
+			if (isAcceptingCachedRowSetChanges(rs))
 				return;
 			logger.log(DEBUG, () -> sf(
 					"####### rs %s evType %s", objectID(rs), rsEventType));

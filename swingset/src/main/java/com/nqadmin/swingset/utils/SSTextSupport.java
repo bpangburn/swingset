@@ -42,8 +42,8 @@ import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainDocument;
 
-import static com.nqadmin.swingset.navigate.Utils.postRowSetModifiedError;
 import static java.lang.System.Logger.Level.*;
+import static com.nqadmin.swingset.navigate.Utils.postColumnChangeStartError;
 
 /**
  * Support classes used with SSComponents that extend JTextComponent.
@@ -224,7 +224,7 @@ public class SSTextSupport
 			try {
 				ssCommon.skipValidateHasError = true;
 				if (!ssCommon.decorate()) {
-					postRowSetModifiedError(ssCommon.getSSComponent(), text);
+					postColumnChangeStartError(ssCommon.getSSComponent(), text);
 					return;
 				}
 			} finally {

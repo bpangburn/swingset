@@ -71,10 +71,10 @@ import static com.nqadmin.swingset.datasources.ConvertType.findJavaTypeClass;
 import static com.nqadmin.swingset.datasources.ConvertType.getJDBCType;
 import static com.nqadmin.swingset.datasources.DateTime.getSQLDateTimeObject;
 import static com.nqadmin.swingset.datasources.JdbcDataTypeConversionTables.jdbcTypeToClass;
-import static com.nqadmin.swingset.navigate.Utils.postRowSetModified;
 import static com.nqadmin.swingset.utils.CentralLookup.defLookup;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
+import static com.nqadmin.swingset.navigate.Utils.postColumnChangeStart;
 
 /**
  * Utility class for working with {@link RowSet}s and {@link ResultSet}s.
@@ -103,7 +103,7 @@ public class RowSetOps {
 			logger.log(DEBUG, "using CachedRowSet");
 			_resultSet.moveToCurrentRow();
 			try {
-				RowSetState.acceptChanges(crs, null);
+				RowSetState.acceptCachedRowSetChanges(crs, null);
 			} catch (SyncProviderException ex) {
 				//
 				// TODO: test CRS undoInsert after accept changes
@@ -164,7 +164,7 @@ public class RowSetOps {
 		for (; tryCount <= maxTry; ++tryCount) {
 			logger.log(DEBUG, sf("CachedRowSet.acceptChanges: try %d", tryCount));
 			try {
-				RowSetState.acceptChanges(crs, null);
+				RowSetState.acceptCachedRowSetChanges(crs, null);
 				ResetRowPosition.doit(_resultSet, currentRow, true);
 				break;
 			} catch (SyncProviderException ex) {
@@ -248,7 +248,7 @@ public class RowSetOps {
 		if (_resultSet instanceof CachedRowSet crs) {
 			logger.log(DEBUG, "using CachedRowSet");
 			try {
-				RowSetState.acceptChanges(crs, null);
+				RowSetState.acceptCachedRowSetChanges(crs, null);
 			} catch (SyncProviderException ex) {
 				crs.undoDelete();
 				throw ex;
@@ -861,7 +861,7 @@ public class RowSetOps {
 			did_update = true;
 		} finally {
 			if (did_update) // component is not in error
-				postRowSetModified(comp, dbValue);
+				postColumnChangeStart(comp, dbValue);
 		}
 	} // end protected void updateColumnText(String _updatedValue, String _columnName)
 
@@ -922,7 +922,7 @@ public class RowSetOps {
 			did_update = true;
 		} finally {
 			if (did_update)
-				postRowSetModified(comp, updatedValue);
+				postColumnChangeStart(comp, updatedValue);
 		}
 	}
 
@@ -987,7 +987,7 @@ public class RowSetOps {
 			did_update = true;
 		} finally {
 			if (did_update)
-				postRowSetModified(comp, _updatedValue);
+				postColumnChangeStart(comp, _updatedValue);
 		}
 	}
 
@@ -1010,7 +1010,7 @@ public class RowSetOps {
 			did_update = true;
 		} finally {
 			if (did_update)
-				postRowSetModified(comp, value);
+				postColumnChangeStart(comp, value);
 		}
 	}
 

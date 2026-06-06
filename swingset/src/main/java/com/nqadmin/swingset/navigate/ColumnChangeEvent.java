@@ -42,7 +42,6 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
-
 import javax.sql.RowSet;
 
 import com.nqadmin.swingset.datasources.RSC;
@@ -50,15 +49,13 @@ import com.nqadmin.swingset.datasources.RSC;
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
 
 /**
- * Sent by a component when it modifies its value using updateXxx.
- * Note, the value is not yet written to the database.
+ * abstract base of ColumnChangeStartEvent
+ * and ColumnChangeDoneEvent; they bracket from RowSetOps component change
+ * to undo/redo stack stable. ColumnChangeDoneEvent is also broadcast
+ * at end of undo/redo action.
  */
-//
-// Maybe the base of Nav stuff should be RowSetEvent.
-// Subclasses could have type, eg ERROR; type could event be enumSet.
-// 
 @SuppressWarnings("serial")
-public class RowSetModificationEvent extends EventObjectBacktrace
+abstract class ColumnChangeEvent extends EventObjectBacktrace implements ChangeEventData
 {
 	final private Object value;
 	final private boolean error;
@@ -67,22 +64,18 @@ public class RowSetModificationEvent extends EventObjectBacktrace
 	 * Create a modification event.
 	 * @param source the component making the modification
 	 * @param value the value written to the rowSet
-	 */
-	public RowSetModificationEvent(RSC source, Object value) {
-		this(source, value, false);
-	}
-
-	/**
-	 * Create a modification event.
-	 * @param source the component making the modification
-	 * @param value the value written to the rowSet
 	 * @param error true if the component value is in error
 	 */
-	public RowSetModificationEvent(RSC source, Object value,
+	public ColumnChangeEvent(RSC source, Object value,
 								   boolean error) {
 		super(source);
 		this.value = value;
 		this.error = error;
+	}
+
+	public ColumnChangeEvent(ChangeEventData ev)
+	{
+		this(ev.getRSC(), ev.getValue(), ev.isError());
 	}
 
 	/**
@@ -92,6 +85,14 @@ public class RowSetModificationEvent extends EventObjectBacktrace
 	@Override
 	public RSC getSource() {
 		return (RSC) super.getSource();
+	}
+
+	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public RSC getRSC() {
+		return getSource();
 	}
 
 	/**
@@ -125,6 +126,7 @@ public class RowSetModificationEvent extends EventObjectBacktrace
 	 * Value written to rowSet.
 	 * @return value
 	 */
+	@Override
 	public Object getValue()
 	{
 		return value;
@@ -134,6 +136,7 @@ public class RowSetModificationEvent extends EventObjectBacktrace
 	 * Test if this event's component's value is in error.
 	 * @return true if in error.
 	 */
+	@Override
 	public boolean isError() {
 		return error;
 	}
@@ -144,7 +147,7 @@ public class RowSetModificationEvent extends EventObjectBacktrace
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("RowSetModificationEvent{")
+		sb.append(getClass().getSimpleName()).append("{")
 				.append("source=").append(objectID(getSource()))
 				.append(',')
 				.append("rowSet=").append(objectID(getSource().getRowSet()))
@@ -157,5 +160,4 @@ public class RowSetModificationEvent extends EventObjectBacktrace
 				.append('}');
 		return sb.toString();
 	}
-	
 }

@@ -28,8 +28,12 @@ that RSC is read only
 
 ================================================================================
 
-SSCollectionModel. Provide better interoperability with primitive arrays.
-But considering there might be primitive generics at some point...
+Validator is connected to SSComponent; but it really should be connected
+to some RowSet column. Consider two components for same column but with
+different validation criteria.
+
+Related. Could mark SSComponent read only, so all input goes through
+only one spot.
 
 ================================================================================
 

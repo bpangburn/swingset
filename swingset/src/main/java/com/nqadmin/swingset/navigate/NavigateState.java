@@ -238,7 +238,7 @@ final class NavigateState
 	 * Listener(s) for the underlying RowSet used to update the bound SwingSet
 	 * component. When working with a {@linkplain javax.sql.rowset.CachedRowSet} there are
 	 * extra steps involved which require the listener to ignore some events, see
-	 * {@link RowSetState#acceptChanges(javax.sql.rowset.CachedRowSet, java.lang.Runnable) }.
+	 * {@link RowSetState#acceptCachedRowSetChanges(javax.sql.rowset.CachedRowSet, java.lang.Runnable) }.
 	 */
 
 	class BusReceiver {
@@ -297,7 +297,7 @@ final class NavigateState
 		// Following are typically from RowSetOps.
 
 		@WeakSubscribe
-		public void handleRowDataChanged(RowSetModificationEvent ev)
+		public void handleColumnChangeStart(ColumnChangeStartEvent ev)
 		{
 			if (!ev.matches(getRowSet()))
 				return;
@@ -305,48 +305,30 @@ final class NavigateState
 			// Our RowSet's row has changed
 			try {
 				// TODO what about ev.getSource == null ?
-				// TODO: SSComp vs RSC
 				((SSComponent)ev.getSource()).addUndoableChange(ev);
 				// TODO: don't do the rest of this stuff if exception?
 			} catch (SQLException ex) {
 				logger.log(ERROR, "Undo/redo exception", ex);
 			}
-			int sz = errorComponents.size();
-			if(ev.isError())
-				errorComponents.add(ev.getSource());
-			else
-				errorComponents.remove(ev.getSource());
-			if (sz != errorComponents.size())
-				errorComponentsChanged(ev.getSource());
-			
+
+			adjustErrorComponentState(ev.getRSC(), ev.isError());
 			logger.log(TRACE, () -> ev.toString());
 			setRowModified();
 			updateActionState();
+			Utils.postColumnChangeDone(ev);
 		}
 
 		@WeakSubscribe
-		public void handleRowUndoRedo(RowSetUndoRedoEvent ev)
+		public void handleColumnUndoRedo(ColumnUndoRedoEvent ev)
 		{
 			if (!ev.matches(getRowSet()))
 				return;
 
 			// Our RowSet's row had an undo/redo.
-			int sz = errorComponents.size();
-			if(ev.isError())
-				errorComponents.add(ev.getSource());
-			else
-				errorComponents.remove(ev.getSource());
-			if (sz != errorComponents.size())
-				errorComponentsChanged(ev.getSource());
+			adjustErrorComponentState(ev.getRSC(), ev.isError());
 			logger.log(TRACE, () -> ev.toString());
 			updateActionState();
-		}
-
-		private void errorComponentsChanged(RSC rsc) {
-			if (rsc instanceof SSComponent comp)
-				comp.decorate();
-			else
-				throw new IllegalStateException();
+			Utils.postColumnChangeDone(ev);
 		}
 
 		@WeakSubscribe
@@ -361,7 +343,24 @@ final class NavigateState
 		busReceiver = new BusReceiver();
 		WeakEventBus.register(busReceiver, getGlobalEventBus());
 	}
-
+	
+	/** return true if number of components in error changed. */
+	boolean adjustErrorComponentState(RSC rsc, boolean isError) {
+		int sz = errorComponents.size();
+		if(isError)
+			errorComponents.add(rsc);
+		else
+			errorComponents.remove(rsc);
+		if (sz != errorComponents.size()) {
+			if (rsc instanceof SSComponent comp)
+				comp.decorate();
+			else
+				throw new IllegalStateException("Not SSComponent");
+			return true;
+		}
+		return false;
+	}
+	
 	
 	// TODO: Also have Set<SSComponentInterface> modifiedComponents.
 	//		 Paint modified/OK fields with identifying color, e.g. yellow.

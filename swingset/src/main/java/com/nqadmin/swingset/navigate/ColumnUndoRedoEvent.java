@@ -39,7 +39,7 @@ import com.nqadmin.swingset.datasources.RSC;
  * The contents of the undo/redo stack is unchanged; note the error.
  */
 @SuppressWarnings("serial")
-public class RowSetUndoRedoEvent extends EventObjectBacktrace
+public class ColumnUndoRedoEvent extends EventObjectBacktrace implements ChangeEventData
 {
 	final private Object value;
 	final private boolean error;
@@ -52,7 +52,7 @@ public class RowSetUndoRedoEvent extends EventObjectBacktrace
 	 * @param value the value written to the rowSet
 	 * @param error true if the component value is in error
 	 */
-	public RowSetUndoRedoEvent(RSC source, Object value,
+	public ColumnUndoRedoEvent(RSC source, Object value,
 							   boolean error)
 	{
 		super(source);
@@ -70,7 +70,6 @@ public class RowSetUndoRedoEvent extends EventObjectBacktrace
 	}
 
 	/**
-	 *
 	 * {@inheritDoc }
 	 */
 	@Override
@@ -79,9 +78,18 @@ public class RowSetUndoRedoEvent extends EventObjectBacktrace
 	}
 
 	/**
+	 * {@inheritDoc }
+	 */
+	@Override
+	public RSC getRSC() {
+		return getSource();
+	}
+
+	/**
 	 * Value written to rowSet.
 	 * @return value
 	 */
+	@Override
 	public Object getValue()
 	{
 		return value;
@@ -91,6 +99,7 @@ public class RowSetUndoRedoEvent extends EventObjectBacktrace
 	 * Test if this event's component's value is in error.
 	 * @return true if in error.
 	 */
+	@Override
 	public boolean isError() {
 		return error;
 	}

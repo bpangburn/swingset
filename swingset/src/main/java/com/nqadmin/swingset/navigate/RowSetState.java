@@ -74,7 +74,7 @@ import static com.nqadmin.swingset.utils.SSUtils.sf;
 public class RowSetState
 {
 	private boolean inserting;
-	private boolean acceptingChanges;
+	private boolean acceptingCachedRowSetChanges;
 	private boolean preInsertOps;
 	//private NavigateState navigateState;
 	private final WeakReference<RowSet> rsRef;
@@ -142,8 +142,8 @@ public class RowSetState
 	 * a {@linkplain CachedRowSet} doing {@linkplain CachedRowSet#acceptChanges}.
 	 * @return true if executing acceptingChanges
 	 */
-	private boolean isAcceptingChanges() {
-		return acceptingChanges;
+	private boolean isAcceptingCachedRowSetChanges() {
+		return acceptingCachedRowSetChanges;
 	}
 
 	/**
@@ -308,9 +308,9 @@ public class RowSetState
 	 * @param _crs modify state for this.
 	 * @param flag state set to this.
 	 */
-	private static void setAcceptingChanges(CachedRowSet _crs, boolean flag) {
+	private static void setAcceptingCachedRowSetChanges(CachedRowSet _crs, boolean flag) {
 		if (_crs != null) {
-			getRowSetState(_crs).acceptingChanges = flag;
+			getRowSetState(_crs).acceptingCachedRowSetChanges = flag;
 		}
 	}
 
@@ -320,20 +320,20 @@ public class RowSetState
 	 * @param rs check this rowset
 	 * @return true if executing acceptingChanges
 	 */
-	public static boolean isAcceptingChanges(RowSet rs) {
-		return rs == null ? false : getRowSetState(rs).isAcceptingChanges();
+	public static boolean isAcceptingCachedRowSetChanges(RowSet rs) {
+		return rs == null ? false : getRowSetState(rs).isAcceptingCachedRowSetChanges();
 	}
 
 	/**
 	 * A {@linkplain CachedRowSet} requires an extra step to effect changes
 	 * in its underlying data source;
-	 * this method does {@linkplain #acceptChanges(CachedRowSet, Runnable)} on the given {@linkplain CachedRowSet}.
+	 * this method does {@link #acceptCachedRowSetChanges(CachedRowSet, Runnable)} on the given {@linkplain CachedRowSet}.
 	 * Set the state for the CachedRowSet so that it's listeners can ignore
 	 * the extra events.
 	 * The runnable {@code runAfterChanges}, if not null, is executed after
 	 * acceptChanges on the CachedRowSet is successful.
 	 * @param _crs accept change on this.
-	 * @param runAfterChanges execute if not null
+	 * @param runAfterCachedRowSetChanges execute if not null
 	 * @throws SQLException
 	 */
 	//
@@ -342,10 +342,11 @@ public class RowSetState
 	//		 something that contains the flag,
 	//		 something that can throw SQLException
 	//
-	public static void acceptChanges(CachedRowSet _crs, Runnable runAfterChanges) throws SQLException {
+	public static void acceptCachedRowSetChanges(
+			CachedRowSet _crs, Runnable runAfterCachedRowSetChanges) throws SQLException {
 		SQLException sqlEx = null;
 		try {
-			setAcceptingChanges(_crs, true);
+			setAcceptingCachedRowSetChanges(_crs, true);
 			_crs.acceptChanges();
 			//if (runAfterChanges != null) {
 			//	runAfterChanges.run();		// assume if acceptChanges throws, don't need "code"
@@ -353,10 +354,10 @@ public class RowSetState
 		} catch(SyncProviderException ex) {
 			sqlEx = ex;
 		} finally {
-			if (runAfterChanges != null) {
-				runAfterChanges.run();
+			if (runAfterCachedRowSetChanges != null) {
+				runAfterCachedRowSetChanges.run();
 			}
-			setAcceptingChanges(_crs, false);
+			setAcceptingCachedRowSetChanges(_crs, false);
 		}
 		if (sqlEx != null)
 			throw sqlEx;
