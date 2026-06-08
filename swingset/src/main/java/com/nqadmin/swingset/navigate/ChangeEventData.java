@@ -27,14 +27,31 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package com.nqadmin.swingset;
+package com.nqadmin.swingset.navigate;
 
-import com.nqadmin.swingset.datasources.DbOpsCustomizer;
+import com.nqadmin.swingset.datasources.RSC;
 
 /**
- * Compatibility.
+ * Implemented by several events.
  */
-public interface SSDBNav extends DbOpsCustomizer
+public interface ChangeEventData
 {
-	
+
+	/**
+	 * The SSComponent for the event.
+	 * @return
+	 */
+	RSC getRSC();
+
+	/**
+	 * The new value of the event.
+	 * @return
+	 */
+	Object getValue();
+
+	/**
+	 * Is the data in error.
+	 * @return
+	 */
+	boolean isError();
 }

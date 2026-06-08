@@ -118,39 +118,52 @@ public class Utils
 	}
 
 	/**
-	 * Post a modification event; prefer a local eventBus.
-	 * @param source SSComponent modifying the rowset
+	 * Post a column change event.
+	 * @param source SSComponent modifying the column
 	 * @param value new value
 	 */
-	public static void postRowSetModified(SSComponent source, Object value)
+	public static void postColumnChangeStart(SSComponent source, Object value)
 	{
 		// May want to extend to handling local EventBus per Frame/Panel;
 		// Use either/both source/rs to find a local eventBus.
-		postFieldEvent(new RowSetModificationEvent(source, value));
+		postFieldEvent(new ColumnChangeStartEvent(source, value));
 	}
 
 	/**
-	 * Post an error modification event; prefer a local eventBus.
-	 * @param source SSComponent modifying the rowset
+	 * Post an error column change event.
+	 * @param source SSComponent modifying the column
 	 * @param value new value
 	 */
-	public static void postRowSetModifiedError(SSComponent source, Object value)
+	public static void postColumnChangeStartError(SSComponent source, Object value)
 	{
-		RowSetModificationEvent ev = new RowSetModificationEvent(source, value, true);
+		ColumnChangeStartEvent ev = new ColumnChangeStartEvent(source, value, true);
 		logger.log(DEBUG, () -> ev.toString());
 		postFieldEvent(ev);
 	}
 
 	/**
-	 * Post an undo/redo event and if value an error; prefer a local eventBus.
-	 * @param source SSComponent modifying the rowset
+	 * Post a completion column change event for the parm.
+	 * Typically after undo/redo stack records the change.
+	 * Also broadcast after an undo/redo action.
+	 * @param startEv ColumnChangeStartEvent or RowSetUndoRedoEvent 
+	 */
+	public static void postColumnChangeDone(ChangeEventData startEv)
+	{
+		ColumnChangeDoneEvent ev = new ColumnChangeDoneEvent(startEv);
+		logger.log(DEBUG, () -> ev.toString());
+		postFieldEvent(ev);
+	}
+
+	/**
+	 * Post an undo/redo event and if value an error.
+	 * @param source SSComponent modifying the column
 	 * @param value new value
 	 * @param isError value is an error
 	 */
-	public static void postRowSetUndoRedo(SSComponent source, Object value,
+	public static void postColumnUndoRedo(SSComponent source, Object value,
 									boolean isError)
 	{
-		RowSetUndoRedoEvent ev = new RowSetUndoRedoEvent(source, value, isError);
+		ColumnUndoRedoEvent ev = new ColumnUndoRedoEvent(source, value, isError);
 		if (isError)
 			logger.log(DEBUG, () -> ev.toString());
 		postFieldEvent(ev);

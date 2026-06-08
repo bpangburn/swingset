@@ -157,7 +157,7 @@ final class UndoCol
 	 * On the first change for the column grab the database value as an object.
 	 * @param me modification data
 	 */
-	void addChange(RowSetModificationEvent me) throws SQLException
+	void addChange(ColumnChangeStartEvent me) throws SQLException
 	{
 		// TODO: only do this if null?
 		// Don't push something on the top if it equals what's on the top.

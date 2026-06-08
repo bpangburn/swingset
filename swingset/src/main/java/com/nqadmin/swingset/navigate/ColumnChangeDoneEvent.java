@@ -27,14 +27,20 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package com.nqadmin.swingset;
-
-import com.nqadmin.swingset.datasources.DbOpsCustomizer;
+package com.nqadmin.swingset.navigate;
 
 /**
- * Compatibility.
+ * The modification has propagated, in particular to the undo/redo stack.
  */
-public interface SSDBNav extends DbOpsCustomizer
+@SuppressWarnings("serial")
+public class ColumnChangeDoneEvent extends ColumnChangeEvent
 {
-	
+	/**
+	 * Create a modification done event.
+	 * 
+	 * @param ev the event that started the modification
+	 */
+	public ColumnChangeDoneEvent(ChangeEventData ev) {
+		super(ev);
+	}
 }

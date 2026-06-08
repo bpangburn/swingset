@@ -27,14 +27,36 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package com.nqadmin.swingset;
+package com.nqadmin.swingset.navigate;
 
-import com.nqadmin.swingset.datasources.DbOpsCustomizer;
+
+
+import com.nqadmin.swingset.datasources.RSC;
+
 
 /**
- * Compatibility.
+ * Sent for a component when its value is modified using updateXxx
+ * in {@linkplain com.nqadmin.swingset.datasources.RowSetOps}.
  */
-public interface SSDBNav extends DbOpsCustomizer
+@SuppressWarnings("serial")
+public class ColumnChangeStartEvent extends ColumnChangeEvent
 {
-	
+	/**
+	 * Create a modification event.
+	 * @param source the component making the modification
+	 * @param value the value written to the rowSet
+	 */
+	public ColumnChangeStartEvent(RSC source, Object value) {
+		this(source, value, false);
+	}
+
+	/**
+	 * Create a modification event.
+	 * @param source the component making the modification
+	 * @param value the value written to the rowSet
+	 * @param error true if the component value is in error
+	 */
+	public ColumnChangeStartEvent(RSC source, Object value, boolean error) {
+		super(source, value, error);
+	}
 }

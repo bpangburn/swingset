@@ -42,6 +42,7 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
+
 import java.lang.System.Logger;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -57,6 +58,7 @@ import javax.swing.SpinnerNumberModel;
 
 import com.google.common.collect.MapMaker;
 import com.nqadmin.swingset.*;
+import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
@@ -79,7 +81,7 @@ import static java.lang.System.Logger.Level.*;
 /*
  * External controls
  *     - confirmDeletes
- *     - DBNav
+ *     - DbOpsCustomizer
  *     - deletion (enableDeletion, deleteOK)
  *     - insertion (enableInsertion, insertOK)
  *     - writeable (writeOK)
@@ -238,7 +240,7 @@ final class NavigateState
 	 * Listener(s) for the underlying RowSet used to update the bound SwingSet
 	 * component. When working with a {@linkplain javax.sql.rowset.CachedRowSet} there are
 	 * extra steps involved which require the listener to ignore some events, see
-	 * {@link RowSetState#acceptChanges(javax.sql.rowset.CachedRowSet, java.lang.Runnable) }.
+	 * {@link RowSetState#acceptCachedRowSetChanges(javax.sql.rowset.CachedRowSet, java.lang.Runnable) }.
 	 */
 
 	class BusReceiver {
@@ -297,7 +299,7 @@ final class NavigateState
 		// Following are typically from RowSetOps.
 
 		@WeakSubscribe
-		public void handleRowDataChanged(RowSetModificationEvent ev)
+		public void handleColumnChangeStart(ColumnChangeStartEvent ev)
 		{
 			if (!ev.matches(getRowSet()))
 				return;
@@ -305,48 +307,30 @@ final class NavigateState
 			// Our RowSet's row has changed
 			try {
 				// TODO what about ev.getSource == null ?
-				// TODO: SSComp vs RSC
 				((SSComponent)ev.getSource()).addUndoableChange(ev);
 				// TODO: don't do the rest of this stuff if exception?
 			} catch (SQLException ex) {
 				logger.log(ERROR, "Undo/redo exception", ex);
 			}
-			int sz = errorComponents.size();
-			if(ev.isError())
-				errorComponents.add(ev.getSource());
-			else
-				errorComponents.remove(ev.getSource());
-			if (sz != errorComponents.size())
-				errorComponentsChanged(ev.getSource());
-			
+
+			adjustErrorComponentState(ev.getRSC(), ev.isError());
 			logger.log(TRACE, () -> ev.toString());
 			setRowModified();
 			updateActionState();
+			Utils.postColumnChangeDone(ev);
 		}
 
 		@WeakSubscribe
-		public void handleRowUndoRedo(RowSetUndoRedoEvent ev)
+		public void handleColumnUndoRedo(ColumnUndoRedoEvent ev)
 		{
 			if (!ev.matches(getRowSet()))
 				return;
 
 			// Our RowSet's row had an undo/redo.
-			int sz = errorComponents.size();
-			if(ev.isError())
-				errorComponents.add(ev.getSource());
-			else
-				errorComponents.remove(ev.getSource());
-			if (sz != errorComponents.size())
-				errorComponentsChanged(ev.getSource());
+			adjustErrorComponentState(ev.getRSC(), ev.isError());
 			logger.log(TRACE, () -> ev.toString());
 			updateActionState();
-		}
-
-		private void errorComponentsChanged(RSC rsc) {
-			if (rsc instanceof SSComponent comp)
-				comp.decorate();
-			else
-				throw new IllegalStateException();
+			Utils.postColumnChangeDone(ev);
 		}
 
 		@WeakSubscribe
@@ -361,7 +345,24 @@ final class NavigateState
 		busReceiver = new BusReceiver();
 		WeakEventBus.register(busReceiver, getGlobalEventBus());
 	}
-
+	
+	/** return true if number of components in error changed. */
+	boolean adjustErrorComponentState(RSC rsc, boolean isError) {
+		int sz = errorComponents.size();
+		if(isError)
+			errorComponents.add(rsc);
+		else
+			errorComponents.remove(rsc);
+		if (sz != errorComponents.size()) {
+			if (rsc instanceof SSComponent comp)
+				comp.decorate();
+			else
+				throw new IllegalStateException("Not SSComponent");
+			return true;
+		}
+		return false;
+	}
+	
 	
 	// TODO: Also have Set<SSComponentInterface> modifiedComponents.
 	//		 Paint modified/OK fields with identifying color, e.g. yellow.
@@ -375,7 +376,7 @@ final class NavigateState
 	/*private*/ int currentRow = 0;
 
 	/** Container (frame or internal frame) which contains the navigator. */
-	/*private*/ SSDBNav dBNav = new SSDBNav() {};
+	/*private*/ DbOpsCustomizer dbOps = new DbOpsCustomizer() {};
 
 	/**
 	 * SSDBComboBox used for navigation if applicable.
@@ -568,7 +569,7 @@ final class NavigateState
 	 * @param performPostUpdateOps true if performPostUpdateOps() should
 	 * 	be called after successful update, otherwise false
 	 * 
-	 * @return true unless there are no records OR dBNav.allowUpdate() returns false
+	 * @return true unless there are no records OR dbOps.allowUpdate() returns false
 	 * @throws SQLException SQL Exception if rowset call to updateRow() fails
 	 */
 	/*private*/ boolean commitChangesToDatabase(final boolean performPostUpdateOps)
@@ -587,7 +588,7 @@ final class NavigateState
 		// if we have at least one row and the user has not set modifications to false (read-only)
 		// then continue to attempt to update database based on current rowset values
 		if (result && writable) {
-			if (!dBNav.allowUpdate()) {
+			if (!dbOps.allowUpdate()) {
 				result = false;
 			} else {
 				RowSetOps.updateRow(getRowSet());
@@ -601,12 +602,12 @@ final class NavigateState
 		// successfully updated the database
 
 		// TODO: If updateRow above didn't happen, when writable == false, then
-		//       seems there is no reason to do dBNav.performPostUpdateOps()
+		//       seems there is no reason to do dbOps.performPostUpdateOps()
 		//       under any circumstance.
 		//       undoRow.isDirty() might also be useful...
 
 		if (result && performPostUpdateOps) {
-			dBNav.performPostUpdateOps();
+			dbOps.performPostUpdateOps();
 		}
 		
 		// return
@@ -802,29 +803,29 @@ final class NavigateState
 	}
 
 	/**
-	 * Function that passes the implementation of the SSDBNav interface. This
+	 * Function that passes the implementation of the DbOpsCustomizer interface. This
 	 * interface can be implemented by the developer to perform custom actions when
 	 * the insert button is pressed
 	 *
-	 * @param dBNav implementation of the SSDBNav interface
+	 * @param dbOps implementation of the DbOpsCustomizer interface
 	 */
 	//TODO: does this belong here
-	public void setDBNav(SSDBNav dBNav) {
-		//final SSDBNav oldValue = dBNav;
-		this.dBNav = dBNav != null ? dBNav : new SSDBNav() {};
+	void setDbOps(DbOpsCustomizer dbOps) {
+		Objects.requireNonNull(dbOps);
+		//final DbOpsCustomizer oldValue = dbOps;
+		this.dbOps = dbOps;
 		// TODO: what is this about?
-		//firePropertyChange("dBNav", oldValue, dBNav);
+		//firePropertyChange("dbOps", oldValue, dbOps);
 	}
 
 	/**
-	 * Returns any custom implementation of the SSDBNav interface, which is used
+	 * Returns any custom implementation of the DbOpsCustomizer interface, which is used
 	 * when the insert button is pressed to perform custom actions.
 	 *
-	 * @return any custom implementation of the SSDBNav interface
+	 * @return any custom implementation of the DbOpsCustomizer interface
 	 */
-	// TODO: what's this about
-	public SSDBNav getDBNav() {
-		return dBNav;
+	DbOpsCustomizer getDbOps() {
+		return dbOps;
 	}
 
 	// TODO: handle multipble navCombo?

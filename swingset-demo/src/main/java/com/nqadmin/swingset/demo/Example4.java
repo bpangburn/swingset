@@ -53,13 +53,13 @@ import javax.swing.JLabel;
 
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
-import com.nqadmin.swingset.SSDBNav;
-import com.nqadmin.swingset.SSDBNavImpl;
+import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 
 /**
  * This example displays data from the part_data table.
@@ -259,9 +259,9 @@ public class Example4 extends JFrame {
 		pack();
 	}
 
-	private SSDBNav createDbNav() {
+	private DbOpsCustomizer createDbNav() {
 		
-		return new SSDBNavImpl(this) {
+		return new DbOpsCustomizerImpl(this) {
 			/**
 			 * Re-enable DB Navigator following insertion Cancel
 			 */

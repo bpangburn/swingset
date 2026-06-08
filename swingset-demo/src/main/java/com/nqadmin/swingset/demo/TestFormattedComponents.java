@@ -51,8 +51,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import com.nqadmin.swingset.SSDBComboBox;
-import com.nqadmin.swingset.SSDBNav;
-import com.nqadmin.swingset.SSDBNavImpl;
+import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.formatting.SSCurrencyField;
@@ -68,6 +67,7 @@ import com.nqadmin.swingset.formatting.SSTimestampField;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 
 /**
  * This example demonstrates all of the Formatted SwingSet Components.
@@ -356,14 +356,14 @@ public class TestFormattedComponents extends JFrame {
 		pack();
 	}
 
-	private SSDBNav createDbNav() {
+	private DbOpsCustomizer createDbNav() {
 		/**
 		 * Various navigator overrides needed to support H2
 		 * <p>
 		 * H2 does not fully support updatable rowset so it must be
 		 * re-queried following insert and delete with rowset.execute()
 		 */
-		return new SSDBNavImpl(this) {
+		return new DbOpsCustomizerImpl(this) {
 			/**
 			 * Re-enable DB Navigator following insertion Cancel
 			 */

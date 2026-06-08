@@ -120,7 +120,7 @@ final class UndoRow
 	 * @param me
 	 * @throws SQLException 
 	 */
-	void addChange(RowSetModificationEvent me) throws SQLException
+	void addChange(ColumnChangeStartEvent me) throws SQLException
 	{
 		getCol(me.getSource()).addChange(me);
 	}

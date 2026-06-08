@@ -1,3 +1,53 @@
+BUS Events
+==========
+
+ColumnChangeStartEvent
+----------------------
+    RowSetOps.updateColumnText RowSetOps.updateColumnObject,
+    RowSetOps.updateColumnArray, RowSetOps.updateColumn,
+        post ColumnChangeStartEvent comp,val,isError
+            * NavState.handleColumnChangeStart ColumnChangeStartEvent
+                ssComponent.addUndoableChange ev -> ssCommon
+                    UndoRedo.addUndoableChange ev
+                        undoRow.addChange ev
+                            undoCol.addChange ev
+                    decorate()
+                adjustErrorComponentState
+                updateActionState()
+
+
+ColumnChangeDoneEvent
+---------------------
+
+
+ColumnUndoRedoEvent
+-------------------
+
+SSCommon.setupUndoRedoKeys - KeyStroke
+UndoRedo.undoRedo
+    change = navState.doUndoRedo comp,cmd
+        change = undoRow.undoRedoChange comp,cmd
+        adjustErrorComponentState
+        comp->ssCom.undoRedoUpdateObject cmd,change
+            getRowSet().updateObject 
+            updateSSComponent()
+
+    invokeLater post ColumnUndoRedoEvent comp,change.value,change.isError
+        * NavState..handleRowUndoRedo
+            errorComponents and/remove
+            adjustErrorComponentState       (weird, just happened above, shouldn't matter)
+        * SSCommon
+
+RowsEvent
+---------
+
+RowsModelNewRowSetEvent
+-----------------------
+
+FocusChangeEvent
+----------------
+
+
 Read/write/update rowset/SSComponent
 ====================================
 SSComponent.bind() --- SSComponent.updateSSComponent   <<< 

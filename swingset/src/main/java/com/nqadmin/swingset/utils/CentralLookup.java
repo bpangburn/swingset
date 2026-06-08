@@ -74,7 +74,7 @@ InstanceContent
      * added to make updating the data easier.
      * @return The default CentralLookup which is global in nature.
      */
-    public static CentralLookup getDefault() {
+    public static synchronized CentralLookup getDefault() {
         return def;
     }
 

@@ -46,7 +46,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.nqadmin.swingset.SSDBNavImpl;
+import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 import com.nqadmin.swingset.core.TextField;
 import com.nqadmin.swingset.mock.H2;
 import com.nqadmin.swingset.mock.TestLogging;
@@ -104,7 +104,7 @@ public class RowsModelTest
 	BusReceiver oneTestBusReceiver; // Strong Reference
 
 	//SSDBNav dbNav = new SSDBNavImpl(this)
-	class DbNav extends SSDBNavImpl
+	class DbNav extends DbOpsCustomizerImpl
 	{
 		private final RowsModel rowsModel;
 		@SuppressWarnings("unused")

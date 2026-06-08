@@ -74,7 +74,7 @@ import com.nqadmin.swingset.models.GlazedListsKeyDisplayValueInfo;
 import com.nqadmin.swingset.models.KeyDisplayValueSwingModel;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.models.SSListItemFormat;
-import com.nqadmin.swingset.navigate.RowSetModificationEvent;
+import com.nqadmin.swingset.navigate.ColumnChangeStartEvent;
 import com.nqadmin.swingset.navigate.UndoRedo;
 import com.nqadmin.swingset.navigate.UndoRedo.Change;
 import com.nqadmin.swingset.utils.SSComponent;
@@ -332,7 +332,7 @@ public abstract class ComboBox2<K,D,D2>
 
 	/** {@inheritDoc } */
 	@Override
-	public void addUndoableChange(RowSetModificationEvent ev) throws SQLException
+	public void addUndoableChange(ColumnChangeStartEvent ev) throws SQLException
 	{
 		SSComponent.super.addUndoableChange(ev);
 		UndoRedo.newSlot(this);
@@ -635,7 +635,7 @@ public abstract class ComboBox2<K,D,D2>
 		adjustForNullItem();
 		if (selectionPending) {
 			// Setting to true from false, select the nullItem;
-			// Events are a problem. After SSDBNavImpl.setSelectionPending
+			// Events are a problem. After DbOpsCustomizerImpl.setSelectionPending
 			// the following ends up in ComboBox2Listener.actionPerformed()
 			// then into setColumnText then exception in RowSetOps.updateColumnText.
 			// TODO: merge this into adjustForNullItem, to avoid extra unregister/register
@@ -1404,7 +1404,7 @@ public abstract class ComboBox2<K,D,D2>
 	 */
 	protected void adjustForNullItem() {
 		// 2021-01-20_BP: Slight modification needed to avoid Beep in combo navigator on
-		//   insert row as SSDBNavImpl calls setSelectionPending(true) and that will fail
+		//   insert row as DbOpsCustomizerImpl calls setSelectionPending(true) and that will fail
 		//   for the combo navigator without this tweak.
 		//boolean wantNull = (getAllowNull() || selectionPending) && !isComboBoxNavigator();
 		boolean wantNull = getAllowNull() || selectionPending;

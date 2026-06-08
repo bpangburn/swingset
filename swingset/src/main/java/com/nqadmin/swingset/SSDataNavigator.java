@@ -42,6 +42,7 @@
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
+
 import java.awt.Dimension;
 import java.util.List;
 import java.util.Objects;
@@ -57,6 +58,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 
+import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 import com.nqadmin.swingset.navigate.RowNumberSpinner;
 import com.nqadmin.swingset.navigate.RowsModel;
 
@@ -344,11 +346,11 @@ public class SSDataNavigator extends JPanel
 	 * when the insert button is pressed to perform custom actions.
 	 *
 	 * @return any custom implementation of the SSDBNav interface
-	 * @deprecated use {@linkplain RowsModel#getDBNav() }
+	 * @deprecated use {@linkplain RowsModel#getDbOps()}
 	 */
 	@Deprecated
-	public SSDBNav getDBNav() {
-		return rowsModel.getDBNav();
+	public DbOpsCustomizer getDBNav() {
+		return rowsModel.getDbOps();
 	}
 
 	/**
@@ -446,10 +448,10 @@ public class SSDataNavigator extends JPanel
 	 * the insert button is pressed
 	 *
 	 * @param _dBNav implementation of the SSDBNav interface
-	 * @deprecated use {@linkplain RowsModel#setDBNav(com.nqadmin.swingset.SSDBNav)}
+	 * @deprecated use {@linkplain RowsModel#setRowSet(javax.sql.RowSet, com.nqadmin.swingset.SSDBNav) }
 	 */
 	@Deprecated
-	public void setDBNav(final SSDBNav _dBNav) {
+	public void setDBNav(final DbOpsCustomizer _dBNav) {
 		rowsModel.setDBNav(_dBNav);
 	}
 
