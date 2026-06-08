@@ -33,6 +33,9 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    
+    <!-- Release-safe plugin/dependency versions.
+     	 Avoid beta, milestone, RC, and Maven 4-only plugin lines for SwingSet 4.0.x. -->
 
     <!-- Toolchain -->
     <version.maven>3.9.16</version.maven>
@@ -45,14 +48,15 @@
     <version.h2>2.4.240</version.h2>
     <version.java-getopt>1.0.13</version.java-getopt>
     <version.raelity-lib>1.2.0</version.raelity-lib>
+	<!-- JUnit 6.x requires newer Java; keep JUnit 5.x for Java 8/11 compatibility. -->
     <version.junit-jupiter>5.14.1</version.junit-jupiter>
 
     <!-- Plugins -->
-    <version.versions-maven-plugin>2.20.1</version.versions-maven-plugin>
+    <version.versions-maven-plugin>2.21.0</version.versions-maven-plugin>
     <version.maven-enforcer-plugin>3.6.3</version.maven-enforcer-plugin>
     <version.maven-clean-plugin>3.5.0</version.maven-clean-plugin>
     <version.maven-resources-plugin>3.5.0</version.maven-resources-plugin>
-    <version.maven-compiler-plugin>3.14.1</version.maven-compiler-plugin>
+    <version.maven-compiler-plugin>3.15.0</version.maven-compiler-plugin>
     <version.maven-surefire-plugin>3.5.6</version.maven-surefire-plugin>
     <version.maven-failsafe-plugin>3.5.6</version.maven-failsafe-plugin>
     <version.maven-jar-plugin>3.5.0</version.maven-jar-plugin>
@@ -64,7 +68,7 @@
     <version.maven-assembly-plugin>3.8.0</version.maven-assembly-plugin>
 
     <!-- Security -->
-    <version.dependency-check-maven>12.1.9</version.dependency-check-maven>
+    <version.dependency-check-maven>12.2.2</version.dependency-check-maven>
 
     <!-- Sonatype Central Publishing -->
     <version.central-publishing-maven-plugin>0.10.0</version.central-publishing-maven-plugin>
@@ -267,7 +271,7 @@
               maven.deploy.skip=true and also explicitly configures
               maven-deploy-plugin <skip>true</skip>.
             -->
-            <autoPublish>true</autoPublish>
+            <autoPublish>false</autoPublish>
           </configuration>
         </plugin>
 
