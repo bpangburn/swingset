@@ -66,8 +66,6 @@ import javax.swing.JScrollPane;
 import com.nqadmin.swingset.SSCheckBox;
 import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSDBComboBox;
-import com.nqadmin.swingset.SSDBNav;
-import com.nqadmin.swingset.SSDBNavImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSImage;
 import com.nqadmin.swingset.SSLabel;
@@ -75,12 +73,16 @@ import com.nqadmin.swingset.SSList;
 import com.nqadmin.swingset.SSSlider;
 import com.nqadmin.swingset.SSTextArea;
 import com.nqadmin.swingset.SSTextField;
+import com.nqadmin.swingset.datasources.DbOpsCustomizer;
+import com.nqadmin.swingset.datasources.DbOpsCustomizerCreator;
+import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 import com.nqadmin.swingset.decorators.AlternateBorderDecorator;
 import com.nqadmin.swingset.decorators.TextComponentValidator;
 import com.nqadmin.swingset.demo.datepicker.DbDatePicker;
 import com.nqadmin.swingset.models.SSCollection;
 import com.nqadmin.swingset.models.SSDbArray;
 import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSSyncManager;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -327,6 +329,13 @@ public class TestBaseComponents extends JFrame
 		
 		// SET SCREEN POSITION
 		setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+
+		// TEST DbOpsCustomizerCreator
+		DbOpsCustomizerCreator creator
+				= (RowSet rs, RowsModel rowsModel1) -> createDbNav();
+		CentralLookup lkup = CentralLookup.getDefault();
+		DbOpsCustomizerCreator prevCreator = lkup.lookup(DbOpsCustomizerCreator.class);
+		lkup.replace(DbOpsCustomizerCreator.class, creator);
 		
 		// INITIALIZE DATABASE CONNECTION AND COMPONENTS
 		try {
@@ -335,11 +344,17 @@ public class TestBaseComponents extends JFrame
 			logger.log(INFO, sql);
 			rowset.setCommand(sql);
 			rowset.execute();
-			rowsModel = RowsModel.create(rowset, createDbNav());
+			rowsModel = RowsModel.create(rowset, null);
 			navigator = new SSDataNavigator(rowsModel);
 		} catch (final SQLException se) {
 			logger.log(Level.ERROR, "SQL Exception.", se);
 		}
+		String name = rowsModel.getDbOps().getClass().getSimpleName();
+		if (!name.equals("TestBaseComponentsDbOpsCustomizer")) {
+			throw new IllegalStateException(sf("wrong customizer %s", name));
+		}
+		lkup.remove(creator);
+		if (prevCreator != null) { lkup.add(prevCreator); }
 		
 		
 		if (!activeComps.contains(NAV)) {
@@ -471,92 +486,98 @@ public class TestBaseComponents extends JFrame
 		pack();
 	}
 
-	private SSDBNav createDbNav() {
-		/**
-		 * Various navigator overrides needed to support H2
-		 * <p>
-		 * H2 does not fully support updatable rowset so it must be
-		 * re-queried following insert and delete with rowset.execute()
-		 */
-		return new SSDBNavImpl(this)
+	private DbOpsCustomizer createDbNav() {
+		return new TestBaseComponentsDbOpsCustomizer();
+	}
+
+	/**
+	 * Various navigator overrides needed to support H2
+	 * <p>
+	 * H2 does not fully support updatable rowset so it must be
+	 * re-queried following insert and delete with rowset.execute()
+	 */
+	private class TestBaseComponentsDbOpsCustomizer extends DbOpsCustomizerImpl {
+		
+		public TestBaseComponentsDbOpsCustomizer()
 		{
-			/**
-			 * Requery the rowset following a deletion. This is needed for H2.
-			 */
-			@Override
-			public void performPostDeletionOps() {
-				super.performPostDeletionOps();
-				try {
-					getRowSet().execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				}
-				performRefreshOps();
+			super(TestBaseComponents.this);
+		}
+		/**
+		 * Requery the rowset following a deletion. This is needed for H2.
+		 */
+		@Override
+		public void performPostDeletionOps() {
+			super.performPostDeletionOps();
+			try {
+				getRowSet().execute();
+			} catch (final SQLException se) {
+				logger.log(Level.ERROR, "SQL Exception.", se);
 			}
+			performRefreshOps();
+		}
+		
+		/**
+		 * Requery the rowset following an insertion. This is needed for H2.
+		 */
+		@Override
+		public void performPostInsertOps() {
+			super.performPostInsertOps();
+			//TestBaseComponents.this.cmbSSDBComboNav.setEnabled(true);
+			try {
+				getRowSet().execute();
+			} catch (final SQLException se) {
+				logger.log(Level.ERROR, "SQL Exception.", se);
+			}
+			performRefreshOps();
+		}
+		
+		/**
+		 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
+		 */
+		@Override
+		public void performPreInsertOps() {
+			//
+			// WHERE IS THE PRIMARY KEY SET? See example1
+			//
 			
-			/**
-			 * Requery the rowset following an insertion. This is needed for H2.
-			 */
-			@Override
-			public void performPostInsertOps() {
-				super.performPostInsertOps();
-				//TestBaseComponents.this.cmbSSDBComboNav.setEnabled(true);
-				try {
-					getRowSet().execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				}
-				performRefreshOps();
-			}
+			// SSDBNavImpl will clear the component values
+			super.performPreInsertOps();
 			
-			/**
-			 * Obtain and set the PK value for the new record & perform any other actions needed before an insert.
-			 */
-			@Override
-			public void performPreInsertOps() {
-				//
-				// WHERE IS THE PRIMARY KEY SET? See example1
-				//
-				
-				// SSDBNavImpl will clear the component values
-				super.performPreInsertOps();
-				
-				setDefaultValues();
-				
-			}
+			setDefaultValues();
 			
-			/**
-			 * Manage sync manager during a Refresh
-			 */
-			@Override
-			public void performRefreshOps() {
-				super.performRefreshOps();
-				if (syncManager == null)
-					return;
-				
-				syncManager.async();
-				try {
-					cmbSSDBComboNav.execute();
-				} catch (final SQLException se) {
-					logger.log(Level.ERROR, "SQL Exception.", se);
-				} catch (final Exception e) {
-					logger.log(Level.ERROR, "Exception.", e);
-				}
-				syncManager.sync();
-			}
+		}
+		
+		/**
+		 * Manage sync manager during a Refresh
+		 */
+		@Override
+		public void performRefreshOps() {
+			super.performRefreshOps();
+			if (syncManager == null)
+				return;
 			
-			/**
-			 * Re-enable DB Navigator following insertion Cancel
-			 */
-			@Override
-			public void performCancelOps() {
-				super.performCancelOps();
-				if (cmbSSDBComboNav == null)
-					return;
-				
-				cmbSSDBComboNav.setEnabled(true);
+			syncManager.async();
+			try {
+				cmbSSDBComboNav.execute();
+			} catch (final SQLException se) {
+				logger.log(Level.ERROR, "SQL Exception.", se);
+			} catch (final Exception e) {
+				logger.log(Level.ERROR, "Exception.", e);
 			}
-		};
+			syncManager.sync();
+		}
+		
+		/**
+		 * Re-enable DB Navigator following insertion Cancel
+		 */
+		@Override
+		public void performCancelOps() {
+			super.performCancelOps();
+			if (cmbSSDBComboNav == null)
+				return;
+			
+			cmbSSDBComboNav.setEnabled(true);
+		}
 	}
 
 	/** Some components aren't fully initialized until well after startup,

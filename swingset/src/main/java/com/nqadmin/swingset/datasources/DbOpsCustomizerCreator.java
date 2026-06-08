@@ -27,14 +27,25 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * ****************************************************************************/
-package com.nqadmin.swingset;
+package com.nqadmin.swingset.datasources;
 
-import com.nqadmin.swingset.datasources.DbOpsCustomizer;
+import javax.sql.RowSet;
+
+import com.nqadmin.swingset.navigate.RowsModel;
 
 /**
- * Compatibility.
+ * Stash one of these into lookup...
  */
-public interface SSDBNav extends DbOpsCustomizer
+public interface DbOpsCustomizerCreator
 {
-	
+
+	/**
+	 * Return a {@link DbOpsCustomizer} that works with the specified RowSet.
+	 * Typically called when a RowSet is assigned to a RowsModel.
+	 * 
+	 * @param rs needing a DbOpsCustomizer
+	 * @param rowsModel before the RowSet is assigned, null if not yet created.
+	 * @return DbOpsCustomizer may be null and caller should keep looking.
+	 */
+	DbOpsCustomizer create(RowSet rs, RowsModel rowsModel);
 }

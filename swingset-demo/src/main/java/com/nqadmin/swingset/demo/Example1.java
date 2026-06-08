@@ -64,8 +64,7 @@ import org.netbeans.validation.api.ui.ValidationItem;
 import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
 import org.netbeans.validation.api.ui.swing.ValidationPanel;
 
-import com.nqadmin.swingset.SSDBNav;
-import com.nqadmin.swingset.SSDBNavImpl;
+import com.nqadmin.swingset.datasources.DbOpsCustomizerImpl;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.decorators.BorderDecorator;
@@ -76,6 +75,7 @@ import com.nqadmin.swingset.demo.simpval.StringValidator;
 import com.nqadmin.swingset.navigate.RowsModel;
 import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.SSUtils;
+import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 
 
 /**
@@ -204,7 +204,7 @@ public class Example1 extends JFrame {
 		 * re-queried following insert and delete with rowset.execute()
 		 */
 		//rowsModel.setDBNav(new SSDBNavImpl(this)
-		SSDBNav dbNav = new SSDBNavImpl(this)
+		DbOpsCustomizer dbNav = new DbOpsCustomizerImpl(this)
 		{
 			/**
 			 * Re-query the RowSet following a deletion. This is needed for H2.

@@ -42,6 +42,7 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.navigate;
 
+
 import java.lang.System.Logger;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -57,6 +58,7 @@ import javax.swing.SpinnerNumberModel;
 
 import com.google.common.collect.MapMaker;
 import com.nqadmin.swingset.*;
+import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
@@ -79,7 +81,7 @@ import static java.lang.System.Logger.Level.*;
 /*
  * External controls
  *     - confirmDeletes
- *     - DBNav
+ *     - DbOpsCustomizer
  *     - deletion (enableDeletion, deleteOK)
  *     - insertion (enableInsertion, insertOK)
  *     - writeable (writeOK)
@@ -374,7 +376,7 @@ final class NavigateState
 	/*private*/ int currentRow = 0;
 
 	/** Container (frame or internal frame) which contains the navigator. */
-	/*private*/ SSDBNav dBNav = new SSDBNav() {};
+	/*private*/ DbOpsCustomizer dbOps = new DbOpsCustomizer() {};
 
 	/**
 	 * SSDBComboBox used for navigation if applicable.
@@ -567,7 +569,7 @@ final class NavigateState
 	 * @param performPostUpdateOps true if performPostUpdateOps() should
 	 * 	be called after successful update, otherwise false
 	 * 
-	 * @return true unless there are no records OR dBNav.allowUpdate() returns false
+	 * @return true unless there are no records OR dbOps.allowUpdate() returns false
 	 * @throws SQLException SQL Exception if rowset call to updateRow() fails
 	 */
 	/*private*/ boolean commitChangesToDatabase(final boolean performPostUpdateOps)
@@ -586,7 +588,7 @@ final class NavigateState
 		// if we have at least one row and the user has not set modifications to false (read-only)
 		// then continue to attempt to update database based on current rowset values
 		if (result && writable) {
-			if (!dBNav.allowUpdate()) {
+			if (!dbOps.allowUpdate()) {
 				result = false;
 			} else {
 				RowSetOps.updateRow(getRowSet());
@@ -600,12 +602,12 @@ final class NavigateState
 		// successfully updated the database
 
 		// TODO: If updateRow above didn't happen, when writable == false, then
-		//       seems there is no reason to do dBNav.performPostUpdateOps()
+		//       seems there is no reason to do dbOps.performPostUpdateOps()
 		//       under any circumstance.
 		//       undoRow.isDirty() might also be useful...
 
 		if (result && performPostUpdateOps) {
-			dBNav.performPostUpdateOps();
+			dbOps.performPostUpdateOps();
 		}
 		
 		// return
@@ -801,29 +803,29 @@ final class NavigateState
 	}
 
 	/**
-	 * Function that passes the implementation of the SSDBNav interface. This
+	 * Function that passes the implementation of the DbOpsCustomizer interface. This
 	 * interface can be implemented by the developer to perform custom actions when
 	 * the insert button is pressed
 	 *
-	 * @param dBNav implementation of the SSDBNav interface
+	 * @param dbOps implementation of the DbOpsCustomizer interface
 	 */
 	//TODO: does this belong here
-	public void setDBNav(SSDBNav dBNav) {
-		//final SSDBNav oldValue = dBNav;
-		this.dBNav = dBNav != null ? dBNav : new SSDBNav() {};
+	void setDbOps(DbOpsCustomizer dbOps) {
+		Objects.requireNonNull(dbOps);
+		//final DbOpsCustomizer oldValue = dbOps;
+		this.dbOps = dbOps;
 		// TODO: what is this about?
-		//firePropertyChange("dBNav", oldValue, dBNav);
+		//firePropertyChange("dbOps", oldValue, dbOps);
 	}
 
 	/**
-	 * Returns any custom implementation of the SSDBNav interface, which is used
+	 * Returns any custom implementation of the DbOpsCustomizer interface, which is used
 	 * when the insert button is pressed to perform custom actions.
 	 *
-	 * @return any custom implementation of the SSDBNav interface
+	 * @return any custom implementation of the DbOpsCustomizer interface
 	 */
-	// TODO: what's this about
-	public SSDBNav getDBNav() {
-		return dBNav;
+	DbOpsCustomizer getDbOps() {
+		return dbOps;
 	}
 
 	// TODO: handle multipble navCombo?

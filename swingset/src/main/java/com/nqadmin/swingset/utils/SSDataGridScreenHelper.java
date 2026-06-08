@@ -55,9 +55,9 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.table.TableCellEditor;
 
-import com.nqadmin.swingset.SSDBNav;
 import com.nqadmin.swingset.SSDataGrid;
 import com.nqadmin.swingset.navigate.RowsModel;
+import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 
 /**
  * Helper class for designing SSDataGrid screens.
@@ -324,7 +324,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
 		RowSet rs = getNewRowSet(getConnection());
 		rs.setCommand(getRowsetQuery());
 		rs.execute();
-		setRowsModel(RowsModel.create(rs, new SSDBNav(){}));
+		setRowsModel(RowsModel.create(rs, new DbOpsCustomizer(){}));
 	}
 	
 	/**

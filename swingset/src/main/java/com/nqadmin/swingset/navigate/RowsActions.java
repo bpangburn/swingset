@@ -168,7 +168,7 @@ final class RowsActions
 				getNavState().freshRow();
 				getNavState().updateNavigator();
 
-				getNavState().dBNav.performNavigationOps(Navigation.First);
+				getNavState().dbOps.performNavigationOps(Navigation.First);
 
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
@@ -217,7 +217,7 @@ final class RowsActions
 				getNavState().freshRow();
 				getNavState().updateNavigator();
 
-				getNavState().dBNav.performNavigationOps(Navigation.Previous);
+				getNavState().dbOps.performNavigationOps(Navigation.Previous);
 
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
@@ -259,7 +259,7 @@ final class RowsActions
 				getNavState().freshRow();
 				getNavState().updateNavigator();
 
-				getNavState().dBNav.performNavigationOps(Navigation.Next);
+				getNavState().dbOps.performNavigationOps(Navigation.Next);
 
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
@@ -301,7 +301,7 @@ final class RowsActions
 				getNavState().freshRow();
 				getNavState().updateNavigator();
 				
-				getNavState().dBNav.performNavigationOps(Navigation.Last);
+				getNavState().dbOps.performNavigationOps(Navigation.Last);
 				
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
@@ -341,7 +341,7 @@ final class RowsActions
 				if (RowSetState.isInserting(getRowSet())) {
 					// IF ON INSERT ROW ADD THE ROW.
 					// CHECK IF THE ROW CAN BE INSERTED.
-					if (!getNavState().dBNav.allowInsertion()) {
+					if (!getNavState().dbOps.allowInsertion()) {
 						// WE DO NOTHING. THE ROWSET STAYS IN INSERT ROW. EITHER USER
 						// HAS TO FIX THE DATA AND SAVE THE ROW OR CANCEL THE INSERTION.
 						return;
@@ -349,7 +349,7 @@ final class RowsActions
 					
 					RowSetOps.insertRow(getRowSet());
 					setInserting(getRowSet(), false);
-					getNavState().dBNav.performPostInsertOps();
+					getNavState().dbOps.performPostInsertOps();
 
 					getRowSet().last();
 
@@ -386,7 +386,7 @@ final class RowsActions
 					// TODO: if above cleaned up can remove following in favor
 					//       of simpler commitChangesToDatabase() further above
 					//
-					getNavState().dBNav.performPostUpdateOps();
+					getNavState().dbOps.performPostUpdateOps();
 				}
 
 			} catch (final SQLException se) {
@@ -443,7 +443,7 @@ final class RowsActions
 				getRowSet().cancelRowUpdates();
 
 				setInserting(getRowSet(), false);
-				getNavState().dBNav.performCancelOps();
+				getNavState().dbOps.performCancelOps();
 
 				// Only attempt to refresh row if we have at least one record
 				if (getRowSet().getRow() > 0) {
@@ -509,7 +509,7 @@ final class RowsActions
 
 				//}
 
-				getNavState().dBNav.performRefreshOps();
+				getNavState().dbOps.performRefreshOps();
 				
 			} catch (final SQLException se) {
 				logger.log(ERROR, "SQL Exception.", se);
@@ -582,7 +582,7 @@ final class RowsActions
 					// related to setting up an empty undo/redo stack.
 					RowSetState.setPreInsertOps(getRowSet(), true);
 					try {
-						getNavState().dBNav.performPreInsertOps();
+						getNavState().dbOps.performPreInsertOps();
 					} catch(Exception ex) {
 						// Catch exception to insure that preInsertOps false.
 						logger.log(ERROR, "SQL Exception in preInsertOps.", ex);
@@ -641,7 +641,7 @@ final class RowsActions
 					}
 				}
 
-				if (!getNavState().dBNav.allowDeletion()) {
+				if (!getNavState().dbOps.allowDeletion()) {
 					return;
 				}
 				
@@ -652,13 +652,13 @@ final class RowsActions
 				final int tmpSize = getNavState().rowCount-1;
 				
 				// PERFORM ANY PRE DELETION OPS
-				getNavState().dBNav.performPreDeletionOps();
+				getNavState().dbOps.performPreDeletionOps();
 				
 				// DELETE ROW FROM ROWSET
 				RowSetOps.deleteRow(getRowSet());
 				
 				// PERFORM ANY POST DELETION OPS (WHICH MAY INVOLVE REQUERYING WHICH IS NEEDED FOR H2)
-				getNavState().dBNav.performPostDeletionOps();
+				getNavState().dbOps.performPostDeletionOps();
 				
 				// UPDATE TOTAL ROW COUNT
 				getNavState().rowCount = tmpSize;

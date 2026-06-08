@@ -108,8 +108,6 @@ public abstract class FocusDecorator
 		if (fcomp().isFocusOwner()) {
 			borderState = switch(borderState) {
 			case CLEAN -> ComponentState.FOCUSED_CLEAN;
-
-
 			case MODIFIED -> ComponentState.FOCUSED_MODIFIED;
 			case ERROR -> ComponentState.FOCUSED_ERROR;
 			default -> throw new IllegalStateException("Unexpected value: " + (borderState));
@@ -164,10 +162,11 @@ public abstract class FocusDecorator
 	}
 
 	/**
-	 * Set the color of the text/foreground according to _style.
+	 * Set the color of the text/foreground according to style.
+	 * {@inheritDoc }
 	 */
 	@Override
-	public <E extends Enum<E>> void decorateText(E _style) {
+	public <E extends Enum<E>> boolean decorateText(E _style) {
 		if (_style instanceof TextDecorationStyle style) {
 			textColor = switch (style) {
 			case NEGATIVE_NUMBER  -> Color.RED;
@@ -177,7 +176,9 @@ public abstract class FocusDecorator
 			if (textColor != null) {
 				jc().setForeground(textColor);
 			}
+			return true;
 		}
+		return false;
 	}
 
 	/**

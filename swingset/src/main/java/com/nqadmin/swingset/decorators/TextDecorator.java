@@ -43,14 +43,14 @@ package com.nqadmin.swingset.decorators;
  */
 public interface TextDecorator
 {
-
 	/**
 	 * Modify the text according to style; commonly modifies text color.
 	 * Signature of {@literal "enum<?>"} is so plugin authors can override and
 	 * define their own styles.
-	 * @param _style why the text is decorated
+	 * 
+	 * @param style why the text is decorated
 	 * @param <E> any enum can be used
+	 * @return true if the style was handled; false if unknown style
 	 */
-	<E extends Enum<E>> void decorateText(E _style);
-    
+	<E extends Enum<E>> boolean decorateText(E style);
 }

@@ -1,4 +1,3 @@
-TextDecorator API
 
 Names case conversion. Per dbms/platform plugin. Maybe only needed for metadata
 access. For example, H2 converts column_name to COLUMN_NAME. Currently using
@@ -11,14 +10,19 @@ and print the violated constraint.
 ================================================================================
 
 setColumn()/getColumn() allow to pass in reader/writer? Consider ConsumerSQL.
+Something in RowSetOps/SSComponent. Why is it needed? 2026/05
 
 ================================================================================
 
-Inconsistently used: SSCommon.isRestoreOnError()
+API to control behavior of formatted text field. COMMIT_OR_REVERT...
 
 ================================================================================
 
-DBComboBox2 - firePropertyChange, needed? Ifso use eventbus. setSeparator()
+Inconsistently used: SSCommon.isRestoreOnError(). Currently disabled
+
+================================================================================
+
+DBComboBox2 - firePropertyChange, needed? Ifso use eventbus? setSeparator()
 
 ================================================================================
 

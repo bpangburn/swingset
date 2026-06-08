@@ -55,12 +55,14 @@ import org.openide.util.WeakListeners;
 import com.google.common.collect.MapMaker;
 import com.google.common.eventbus.EventBus;
 import com.nqadmin.swingset.SSDBComboBox;
-import com.nqadmin.swingset.SSDBNav;
+import com.nqadmin.swingset.datasources.DbOpsCustomizer;
+import com.nqadmin.swingset.datasources.DbOpsCustomizerCreator;
 import com.nqadmin.swingset.datasources.RowSetOps;
 import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
 import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.RowsEventSource;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.SimpleEvents;
+import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.LookupDefaults;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSSyncManager;
@@ -117,12 +119,13 @@ public final class RowsModel
 	/**
 	 * Create and return a new RowsModel for the specified RowSet.
 	 * <p>
-	 * NOTE: the RowSet must have a query to execute. (IS THIS OK?)
-	 *       Previously, the query was executed by SSDataNavigator.
+	 * Note the RowSet, if not null, must have a query to execute.
 	 * @param rs
 	 * @return 
 	 * @deprecated 
 	 */
+	// TODO: Is it ok to require a query?
+	//       Previously, the query was executed by SSDataNavigator.
 	@Deprecated
 	public static RowsModel create(RowSet rs) {
 		RowsModel rowsModel = create(rs, null);
@@ -131,17 +134,39 @@ public final class RowsModel
 
 	/**
 	 * Create and return a new RowsModel for the specified RowSet.
+	 * If dbOps is null, find the navigator using
+	 * {@code findDbOps(rowSet, null)}.
 	 * <p>
-	 * NOTE: the RowSet must have a query to execute. (IS THIS OK?)
-	 *       Previously, the query was executed by SSDataNavigator.
+	 * Note the RowSet, if not null, must have a query to execute.
+	 * If the RowSet is null then dbOps is ignored/discarded.
 	 * @param rs
-	 * @param dbNav
+	 * @param dbOps navigator for the RowSet
 	 * @return 
 	 */
-	// TODO: dbNav should be picked up by DB/TBL
-	public static RowsModel create(RowSet rs, SSDBNav dbNav) {
-		RowsModel rowsModel = new RowsModel(rs, dbNav);
+	public static RowsModel create(RowSet rs, DbOpsCustomizer dbOps) {
+		RowsModel rowsModel = new RowsModel(rs, dbOps == null ? findDbOps(rs, null) : dbOps);
 		return rowsModel;
+	}
+	
+	/**
+	 * Find {@link DbOpsCustomizer} for the specified RowSet.
+	 * Looks for {@link DbOpsCustomizerCreator} to create it; if not found
+	 * or its {@code create(rowSet)} method returns null,
+	 * returns {@code new DbOpsCustomizer() {}}.
+	 * 
+	 * @param rs
+	 * @param rowsModel where the RowSet is going, null if new RowsModel
+	 * @return DbOpsCustomizer to use with this RowSet and RowsModel
+	 */
+	public static DbOpsCustomizer findDbOps(RowSet rs, RowsModel rowsModel) {
+		DbOpsCustomizer dbOps = null;
+		// creator may check by DB/TBL/whatever
+		DbOpsCustomizerCreator creator = CentralLookup.defLookup(DbOpsCustomizerCreator.class);
+		if (creator != null)
+			dbOps = creator.create(rs, rowsModel);
+
+		if (dbOps == null) { dbOps = new DbOpsCustomizer() { }; }
+		return dbOps;
 	}
 
 	/**
@@ -189,8 +214,9 @@ public final class RowsModel
 	 * @param rs
 	 */
 	// TODO: handle null RowSet; important, consider empty DataNavigator, build UI first.
-	private RowsModel(RowSet rs, SSDBNav dbNav)
+	private RowsModel(RowSet rs, DbOpsCustomizer dbOps)
 	{
+		Objects.requireNonNull(dbOps);
 		// TODO: get rid of junit test after tests are fully RowsModel ported.
 		if (!SSUtils.isJunit() && rs != null && !verifyExecuted(rs))
 			logger.log(Level.ERROR, "RowSet not executed", new Exception());
@@ -200,7 +226,7 @@ public final class RowsModel
 
 		this.rowsActions = new RowsActions(this);
 
-		setNavState(rs, dbNav);
+		setNavState(rs, dbOps);
 
 		rowSetListener = new SimpleRowSetListener();
 		rowSetListener.registerTo(rs);
@@ -224,17 +250,18 @@ public final class RowsModel
 	 * <br>TODO: clean up the RowsModel/NavState initialization.
 	 * 
 	 * @param rs 
+	 * @param dbOps
 	 */
-	private void setNavState(RowSet rs, SSDBNav dbNav)
+	private void setNavState(RowSet rs, DbOpsCustomizer dbOps)
 	{
+		Objects.requireNonNull(dbOps);
 		if (rs == null) {
 			navState = null;
 			rowsActions.disableAllActions();
 			return;
 		}
 		navState = NavigateState.getOrCreate(rs);
-		if (navState != null)
-			navState.setDBNav(dbNav);
+		navState.setDbOps(dbOps);
 
 		if (navState.getRowSet() == null)
 			navState.setupRowSet(rs);
@@ -270,14 +297,28 @@ public final class RowsModel
 	}
 
 	/**
-	 * Change the RowSet associated with this model.
+	 * Change the RowSet associated with this model; keep the current DbOpsCustomizer.
+	 * <p>
+	 * <em>Be careful</em> using this method. You must be certain that the
+	 * current DbOpsCustomizer is compatible with the new RowSet.
+	 * 
 	 * @param rs new RowSet for this model
-	 * @param dbNav
+	 */
+	public void setRowSet(RowSet rs) {
+		setRowSet(rs, getDbOps());
+	}
+
+	/**
+	 * Change the RowSet associated with this model.
+	 * If _dbOps is null, find the default navigator with
+	 * {@link #findDbOps(javax.sql.RowSet, com.nqadmin.swingset.navigate.RowsModel) }.
+	 * @param rs new RowSet for this model
+	 * @param _dbOps
 	 * @return false if abort and rowSet not set/changed
 	 */
 	// TODO: need programatic disable dialog if discarding uncommited changes? quiet flag.
-	// TODO: if dbNav null, re-use current?
-	public boolean setRowSet(RowSet rs, SSDBNav dbNav) {
+	public boolean setRowSet(RowSet rs, DbOpsCustomizer _dbOps) {
+		DbOpsCustomizer dbOps = _dbOps == null ? findDbOps(rs, this) : _dbOps;
 		logger.log(Level.INFO, () -> sf("RowsModel %s change rowSet from %s to %s",
 				objectID(this), objectID(getRowSet()), objectID(rs)));
 
@@ -308,7 +349,7 @@ public final class RowsModel
 		if (rs != null) {
 			verifyExecuted(rs);
 
-			// TODO: Probably need a setRowSet variant that allows replacing dirty rowSet
+			// TODO: May need a setRowSet variant that allows replacing dirty rowSet.
 			NavigateState newNS = NavigateState.get(rs);
 			if (newNS != null && newNS.undoRow.isDirty())
 				//throw new IllegalStateException("newRS dirty"); ???
@@ -341,7 +382,7 @@ public final class RowsModel
 
 		RowSet oldRowSet = getRowSet();
 		rowSetListener.unregisterFrom(oldRowSet);
-		setNavState(rs, dbNav);
+		setNavState(rs, dbOps);
 
 		rowSetListener.registerTo(rs);
 		enq.postNewRowSetEvent(this, oldRowSet);
@@ -351,15 +392,6 @@ public final class RowsModel
 	// TODO: is this path OK?
 	void syncSyncManager() {
 		getNavState().syncSyncManager();
-	}
-
-	/**
-	 * Change the RowSet associated with this model using current SSDBNav.
-	 * @param rs new RowSet for this model
-	 */
-	// TODO: handle setRowSet only if there's already a dbNav.
-	public void setRowSet(RowSet rs) {
-		setRowSet(rs, getDBNav());
 	}
 
 	/**
@@ -750,37 +782,24 @@ public final class RowsModel
 	 * interface can be implemented by the developer to perform custom actions when
 	 * the insert action is pressed
 	 *
-	 * @param rs
-	 * @param dBNav implementation of the SSDBNav interface
-	 */
-	// TODO: how to get the DBNav? Lookup and needs to be split.
-	// TODO: should dBNav be local to this class? Hm, does seem like a rowset thing.
-	public void setDBNav(RowSet rs, SSDBNav dBNav) {
-		NavigateState nState = NavigateState.get(rs);
-		nState.setDBNav(dBNav);
-	}
-
-	/**
-	 * Function that passes the implementation of the SSDBNav interface. This
-	 * interface can be implemented by the developer to perform custom actions when
-	 * the insert action is pressed
-	 *
 	 * @param dBNav implementation of the SSDBNav interface
 	 * @deprecated use setDBNav(Rowset, SSDBNav)
+	 * @deprecated use {@linkplain #setRowSet(javax.sql.RowSet,
+	 * com.nqadmin.swingset.datasources.DbOpsCustomizer) }
 	 */
 	@Deprecated
-	public void setDBNav(SSDBNav dBNav) {
-		navState.setDBNav(dBNav);
+	public void setDBNav(DbOpsCustomizer dBNav) {
+		navState.setDbOps(dBNav);
 	}
 
 	/**
-	 * Returns any custom implementation of the SSDBNav interface, which is used
-	 * when the insert action is pressed, to perform custom actions.
+	 * Returns DbOpsCustomizer which is used
+	 * when the insert action, and much more, is pressed, to perform custom actions.
 	 *
-	 * @return any custom implementation of the SSDBNav interface
+	 * @return the DbOpsCustomizer
 	 */
-	public SSDBNav getDBNav() {
-		return navState != null ? navState.getDBNav() : null;
+	public DbOpsCustomizer getDbOps() {
+		return navState != null ? navState.getDbOps() : null;
 	}
 
 	/**

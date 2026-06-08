@@ -76,9 +76,9 @@ import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.datasources.ConvertType.checkConvertToJdbcType;
 import static com.nqadmin.swingset.datasources.ConvertType.convertToType;
+import static com.nqadmin.swingset.navigate.Utils.postColumnChangeStartError;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
 import static java.lang.System.Logger.Level.*;
-import static com.nqadmin.swingset.navigate.Utils.postColumnChangeStartError;
 
 // TODO: Review state transitions (where it can happen).
 //		 Make sure to decorate at these points.
@@ -553,14 +553,14 @@ public class SSFormattedTextField extends JFormattedTextField
 		decorate();
 	}
 
-	// TODO: is this needed? If it is, it should be in 
-	private boolean enableTextDecorator = true;
+	// TODO: is this needed? If it is, put it in SSComponent
+	private boolean textDecoratorEnabled = true;
 	/**
 	 * Set/reset the flag to enable text decoration.
 	 * @param flag
 	 */
 	public final void setTextDecoratorEnabled(boolean flag) {
-		enableTextDecorator = flag;
+		textDecoratorEnabled = flag;
 	}
 
 	/**
@@ -568,7 +568,7 @@ public class SSFormattedTextField extends JFormattedTextField
 	 * @return true if enabled
 	 */
 	public final boolean isTextDecoratorEnabled() {
-		return enableTextDecorator;
+		return textDecoratorEnabled;
 	}
 
 	/**
@@ -584,20 +584,21 @@ public class SSFormattedTextField extends JFormattedTextField
 	public void decorateText() {
 		if (!isTextDecoratorEnabled())
 			return;
-		Object value = getValue();
-		if (getDecorator() instanceof TextDecorator textDecorator) {
-			boolean isNeg = switch(value) {
-			case Double val ->		val < 0.0;
-			case Float val ->		val < 0.0;
-			case Long val ->		val < 0;
-			case Integer val ->		val < 0;
-			case BigDecimal val ->	val.signum() < 0;
-			case null, default ->	false;
-			};
+		if (!(getDecorator() instanceof TextDecorator textDecorator))
+			return;
 
-			textDecorator.decorateText(isNeg ? TextDecorationStyle.NEGATIVE_NUMBER
-									   : TextDecorationStyle.RESET);
-		}
+		Object value = getValue();
+		boolean isNeg = switch(value) {
+		case Double val ->		val < 0.0;
+		case Float val ->		val < 0.0;
+		case Long val ->		val < 0;
+		case Integer val ->		val < 0;
+		case BigDecimal val ->	val.signum() < 0;
+		case null, default ->	false;
+		};
+		
+		textDecorator.decorateText(isNeg ? TextDecorationStyle.NEGATIVE_NUMBER
+				: TextDecorationStyle.RESET);
 	}
 
 	/** {@inheritDoc} */
