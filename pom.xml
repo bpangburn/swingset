@@ -273,11 +273,19 @@
 
                   <autoPublish>true</autoPublish>
 
-              The demo module should remain excluded because its POM sets
-              maven.deploy.skip=true and also explicitly configures
-              maven-deploy-plugin <skip>true</skip>.
-            -->
-            <autoPublish>true</autoPublish>
+		      Do not include the demo module in the Central Portal bundle.
+		
+		      maven.deploy.skip=true and maven-deploy-plugin <skip>true</skip>
+		      prevent the Maven Deploy Plugin from deploying the demo module, but the
+		      Central Publishing Plugin may still assemble artifacts from the reactor.
+		
+		      excludeArtifacts prevents artifacts with this artifactId from being added
+		      to the Central Publishing bundle.
+		    -->
+		    <excludeArtifacts>
+		      <excludeArtifact>swingset-demo</excludeArtifact>
+		    </excludeArtifacts>
+            <autoPublish>false</autoPublish>
           </configuration>
         </plugin>
 
