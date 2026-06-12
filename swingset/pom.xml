@@ -1,420 +1,118 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<!-- NOT SPECIFYING PARENT SO EACH MODULE STANDS ALONE -->
+  <modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.nqadmin.swingset</groupId>
-	<artifactId>swingset</artifactId>
-	<version>4.0.12</version>
-	<packaging>jar</packaging>
+  <parent>
+    <groupId>com.nqadmin.swingset</groupId>
+    <artifactId>swingset-parent</artifactId>
+    <version>4.0.13</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
-	<name>swingset</name>
-	<description>Data-aware replacements for many of the standard Java Swing components</description>
-	<url>https://github.com/bpangburn/swingset</url>
+  <artifactId>swingset</artifactId>
+  <packaging>jar</packaging>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  <name>swingset</name>
+  <description>Swingset library</description>
+  <url>https://github.com/bpangburn/swingset</url>
 
-		<!-- MAVEN AND JAVA VERSIONS -->
-		<version.maven>3.6.3</version.maven>
-		<version.java>8</version.java>
+  <licenses>
+    <license>
+      <name>BSD 3-Clause</name>
+      <url>https://spdx.org/licenses/BSD-3-Clause.html</url>
+    </license>
+  </licenses>
 
-		<!-- DEPENDENCIES -->
-		<!--<version.glazedlists>1.11.0</version.glazedlists> -->
-		<version.glazedlists>1.11.1203</version.glazedlists>
-		<version.log4j>2.22.0</version.log4j>
-		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
+  <developers>
+    <developer>
+      <name>Prasanth R. Pasala</name>
+      <email>swingset@pangburngroup.com</email>
+      <organization>The Pangburn Group, Inc.</organization>
+      <organizationUrl>https://pangburngroup.com</organizationUrl>
+    </developer>
+    <developer>
+      <name>Brian E. Pangburn</name>
+      <email>brian@pangburngroup.com</email>
+      <organization>The Pangburn Group, Inc.</organization>
+      <organizationUrl>https://pangburngroup.com</organizationUrl>
+    </developer>
+  </developers>
 
-		<!-- PLUGINS -->
-		<!-- Shared by swingset-parent, swingset, and swingset-demo -->
-		<version.versions-maven-plugin>2.16.2</version.versions-maven-plugin>
-		<version.maven-enforcer-plugin>3.4.1</version.maven-enforcer-plugin>
-		<version.maven-clean-plugin>3.3.2</version.maven-clean-plugin>
-		<version.maven-deploy-plugin>3.1.1</version.maven-deploy-plugin>
-		<version.maven-install-plugin>3.1.1</version.maven-install-plugin>
-		<version.maven-site-plugin>4.0.0-M12</version.maven-site-plugin>
+  <scm>
+    <url>https://github.com/bpangburn/swingset</url>
+    <connection>scm:git:git@github.com:bpangburn/swingset.git</connection>
+    <developerConnection>scm:git:git@github.com:bpangburn/swingset.git</developerConnection>
+  </scm>
 
-		<!-- Shared by swingset and swingset-demo -->
-		<version.maven-jar-plugin>3.3.0</version.maven-jar-plugin>
-		<version.maven-resources-plugin>3.3.1</version.maven-resources-plugin>
-		<version.maven-compiler-plugin>3.11.0</version.maven-compiler-plugin>
-		<version.dependency-check-maven>9.0.7</version.dependency-check-maven>
-		<version.maven-gpg-plugin>3.1.0</version.maven-gpg-plugin>
-		<version.maven-surefire-plugin>3.2.3</version.maven-surefire-plugin>
-		<version.maven-source-plugin>3.3.0</version.maven-source-plugin>
+  <dependencies>
 
-		<!-- swingset-only -->
-		<version.maven-javadoc-plugin>3.6.3</version.maven-javadoc-plugin>
-		<version.nexus-staging-maven-plugin>1.6.13</version.nexus-staging-maven-plugin>
-		<version.maven-failsafe-plugin>3.2.3</version.maven-failsafe-plugin>
-		<version.junit-jupiter-any>5.10.1</version.junit-jupiter-any>
-	</properties>
+    <dependency>
+      <groupId>com.raelity.3rdparty.com.glazedlists</groupId>
+      <artifactId>glazedlists</artifactId>
+    </dependency>
 
-	<licenses>
-		<license>
-			<name>BSD 3-Clause</name>
-			<url>https://spdx.org/licenses/BSD-3-Clause.html</url>
-		</license>
-	</licenses>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+    </dependency>
 
-	<developers>
-		<developer>
-			<name>Prasanth R. Pasala</name>
-			<email>swingset@pangburngroup.com</email>
-			<organization>The Pangburn Group, Inc.</organization>
-			<organizationUrl>https://pangburngroup.com</organizationUrl>
-		</developer>
-		<developer>
-			<name>Brian E. Pangburn</name>
-			<email>swingset@pangburngroup.com</email>
-			<organization>The Pangburn Group, Inc.</organization>
-			<organizationUrl>https://pangburngroup.com</organizationUrl>
-		</developer>
-	</developers>
+    <dependency>
+      <groupId>com.nqadmin.rowset</groupId>
+      <artifactId>jdbcrowsetimpl</artifactId>
+    </dependency>
 
-	<scm>
-		<url>https://github.com/bpangburn/swingset</url>
-		<connection>scm:git:git@github.com:bpangburn/swingset.git</connection>
-		<developerConnection>scm:git:git@github.com:bpangburn/swingset.git</developerConnection>
-	</scm>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
 
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
+  </dependencies>
 
-	<!-- SUPPORT SNAPSHOT DEPENDENCIES AS NEEDED -->
-	<repositories>
-		<repository>
-			<id>oss-sonatype</id>
-			<name>oss-sonatype</name>
-			<url> https://oss.sonatype.org/content/repositories/snapshots/ </url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
+  <build>
+    <plugins>
 
-	<dependencies>
-		<!-- MAIN GLAZED LIST ARTIFACT - CURRENTLY DISABLED AWAITING NEXT RELEASE FEATURES:
-		     https://github.com/glazedlists/glazedlists -->
-		<!-- https://mvnrepository.com/artifact/com.glazedlists/glazedlists -->
-		<!-- 
-		<dependency>
-			<groupId>com.glazedlists</groupId>
-			<artifactId>glazedlists</artifactId> 
-			<version>${version.glazedlists}</version>
-		</dependency>
-		-->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
 
-		<!-- ERNIE RAEL'S CUSTOM GLAZEDLIST ARTIFACT -->
-		<!-- https://mvnrepository.com/artifact/com.raelity.3rdparty.com.glazedlists -->
-		<dependency>
-			<groupId>com.raelity.3rdparty.com.glazedlists</groupId>
-			<artifactId>glazedlists</artifactId>
-			<version>${version.glazedlists}</version>
-		</dependency>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
 
-		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-api</artifactId>
-			<version>${version.log4j}</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.nqadmin.rowset/jdbcrowsetimpl -->
-		<dependency>
-			<groupId>com.nqadmin.rowset</groupId>
-			<artifactId>jdbcrowsetimpl</artifactId>
-			<version>${version.jdbcrowsetimpl}</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
-		<dependency>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-surefire-plugin</artifactId>
-			<version>${version.maven-surefire-plugin}</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-failsafe-plugin -->
-		<dependency>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-failsafe-plugin</artifactId>
-			<version>${version.maven-failsafe-plugin}</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<version>${version.junit-jupiter-any}</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-params -->
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-params</artifactId>
-			<version>${version.junit-jupiter-any}</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<version>${version.junit-jupiter-any}</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+    </plugins>
+  </build>
 
-	<build>
-		<plugins>
-			<!--
-			https://mvnrepository.com/artifact/org.codehaus.mojo/versions-maven-plugin -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>versions-maven-plugin</artifactId>
-				<version>${version.versions-maven-plugin}</version>
-			</plugin>
-			<!-- Maven Enforcer forces specified version of Java and Maven -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>${version.maven-enforcer-plugin}</version>
-				<executions>
-					<execution>
-						<id>enforce-versions</id>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<configuration>
-							<rules>
-								<requirePluginVersions>
-									<message>Best Practice is to always define plugin versions!</message>
-									<banLatest>true</banLatest>
-									<banRelease>true</banRelease>
-									<banSnapshots>true</banSnapshots>
-								</requirePluginVersions>
-
-								<requireMavenVersion>
-									<version>${version.maven}</version>
-								</requireMavenVersion>
-
-								<requireJavaVersion>
-									<version>${version.java}</version>
-								</requireJavaVersion>
-							</rules>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>${version.maven-clean-plugin}</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<version>${version.maven-deploy-plugin}</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-install-plugin</artifactId>
-				<version>${version.maven-install-plugin}</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>${version.maven-jar-plugin}</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>${version.maven-resources-plugin}</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-site-plugin</artifactId>
-				<version>${version.maven-site-plugin}</version>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${version.maven-compiler-plugin}</version><!--$NO-MVN-MAN-VER$-->
-
-				<configuration>
-					<release>${version.java}</release>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>${version.maven-surefire-plugin}</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>${version.maven-failsafe-plugin}</version>
-			</plugin>
-
-		</plugins>
-	</build>
-
-	<profiles>
-		<profile>
-			<!-- invoked during verify phase -->
-			<!-- https://jeremylong.github.io/DependencyCheck/dependency-check-maven/ -->
-			<id>owasp-check</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.owasp</groupId>
-						<artifactId>dependency-check-maven</artifactId>
-						<version>${version.dependency-check-maven}</version>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<goals>
-									<goal>check</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>${version.maven-source-plugin}</version>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<phase>package</phase>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>${version.maven-javadoc-plugin}</version>
-						<configuration>
-							<release>${version.java}</release>
-							<failOnError>false</failOnError>
-						</configuration>
-						<executions>
-							<execution>
-								<id>attach-javadoc</id>
-								<phase>package</phase>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>${version.maven-gpg-plugin}</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-								<configuration>
-									<keyname>${gpg.keyname}</keyname>
-									<passphraseServerId>${gpg.keyname}</passphraseServerId>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-
-					<plugin>
-						<groupId>org.sonatype.plugins</groupId>
-						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>${version.nexus-staging-maven-plugin}</version>
-						<executions>
-							<execution>
-								<id>default-deploy</id>
-								<phase>deploy</phase>
-								<goals>
-									<goal>deploy</goal>
-								</goals>
-							</execution>
-						</executions>
-						<extensions>true</extensions>
-						<configuration>
-							<serverId>ossrh</serverId>
-							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-							<autoReleaseAfterClose>false</autoReleaseAfterClose>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<!-- java-9-plus profile
-			* set javac release=8
-			* javadoc
-			  - target html5
-			  - Newer javadoc complains about private methods/fields missing javadoc.
-			    So, at least for now, add "all,-missing"
-			  - Add ",-html" to avoid 'rel=' issue.
-
-			  Removing these checks is not too bad since there's a lot of
-			  dependency on the IDE for most checking.
-		-->
-		<profile>
-			<id>java-9-plus</id>
-			<activation>
-				<jdk>[1.9,)</jdk>
-			</activation>
-			<build>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-compiler-plugin</artifactId>
-							<version>${version.maven-compiler-plugin}</version>
-							<configuration>
-								<release>${version.java}</release>
-							</configuration>
-						</plugin>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-javadoc-plugin</artifactId>
-							<version>${version.maven-javadoc-plugin}</version>
-							<configuration>
-								<additionalOptions>-html5</additionalOptions>
-								<doclint>all,-missing,-html</doclint>
-								<links>
-									<link>https://javadoc.io/static/com.glazedlists/glazedlists/${version.glazedlists}</link>
-								</links>
-							</configuration>
-						</plugin>
-					</plugins>
-				</pluginManagement>
-			</build>
-		</profile>
-	</profiles>
+  <profiles>
+    <profile>
+      <id>java-9-plus</id>
+      <activation>
+        <jdk>[1.9,)</jdk>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+              <configuration>
+                <additionalOptions>-html5</additionalOptions>
+                <doclint>all,-missing,-html</doclint>
+                <links>
+                  <link>https://javadoc.io/static/com.raelity.3rdparty.com.glazedlists/glazedlists/${version.glazedlists}</link>
+                </links>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

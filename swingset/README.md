@@ -1,334 +1,178 @@
-# ReadMe file for the SwingSet Open Toolkit for Java Swing.
-
-## LICENSE
-
-Copyright (C) 2003-2024, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+# SwingSet Library
 
-1. Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
+SwingSet is an open source Java Swing toolkit that provides data-aware replacements for many standard Swing components. It is intended for Java desktop applications that bind Swing forms, navigators, grids, and supporting controls to JDBC `RowSet`-style data sources.
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+## Features
 
-3. Neither the name of the copyright holder nor the names of its contributors
-   may be used to endorse or promote products derived from this software
-   without specific prior written permission.
+SwingSet includes:
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-POSSIBILITY OF SUCH DAMAGE.
+- Data-aware replacements for common Swing components, including `JTextField`, `JTextArea`, `JComboBox`, `JCheckBox`, `JLabel`, `JSlider`, and `JFormattedTextField`.
+- Combo box support for storing numeric or database-backed values while displaying user-friendly text.
+- Database-driven combo boxes that can populate choices from query results and optionally support record navigation.
+- A data-aware image component for loading, storing, and displaying database-backed image data.
+- A graphical record navigator for traversal, insertion, deletion, commit, rollback, current-record display, and total-record display.
+- A data grid component for datasheet, spreadsheet, and table-style views of query results.
+- Formatted field helpers for values such as currency, percent, Social Security number, date, and related formats.
 
-Contributors:
-  Prasanth R. Pasala
-  Brian E. Pangburn
-  Diego Gil
-  Man "Bee" Vo
-  Ernie R. Rael
-
-## DESCRIPTION
-
-SwingSet is an open source Java toolkit containing data-aware replacements for many of the standard Java Swing components.
-
-The SwingSet feature-set currently includes:
-1. data-aware replacements for JTextField, JTextArea, JComboBox, JCheckBox, JLabel, JSlider, & JFormattedTextField
-2. binding of a "hidden" numeric column for combo boxes with text choices
-   (e.g., 0, 1, & 2 are stored for "Yes," "No," & "Maybe," respectively)
-3. population of combo boxes based on columns in a database query (can also be used for combo box-based record navigation)
-4. a data-aware image component with image support
-5. a graphical record navigator  
-    a. allows for database traversal, insertion, deletion, commit, and rollback  
-    b. supplies current record index (editable) and total record count  
-6. a data grid component for creating datasheet/spreadsheet/table views of queries  
-    a. allows cut & paste to/from spreadsheet programs or other data grids  
-    b. allows custom column headings  
-    c. allows hiding of specified columns  
-    d. allows disabling of specified columns  
-    e. allows columns to be displayed as text boxes or combo boxes  
-    f. allows addition and deletion of records  
-    g. allows deletion of multiple, non-consecutive records  
-    h. allows data entry "masks" to be applied to text columns  
-7. formatted fields for various types like currency, percent, SSN, date etc.
-
-More information on SwingSet is available from:
-https://github.com/bpangburn/swingset
-
-For questions regarding SwingSet, send an email to:
-swingset#NO-SPAM#@pangburngroup.com
-
-## COMPILATION
-
-The SwingSet samples/demo requires Java 1.8 or later.
-
-Git/Maven:
-  `git clone https://github.com/bpangburn/swingset.git`
-
-  After cloning, you can use an IDE, e.g. Eclipse or NetBeans, to compile/run.
-  Or you can use mvn directly and then run as shown here. Note that compiled
-  jar files will be in the ./target subdirectory.
-  
-  SwingSet Library:
-    `cd ./swingset/swingset/`
-    `mvn clean package -Prelease`
-
-## DEPENDENCY INTEGRATION
-
-  Add SwingSet to the Maven dependencies in your POM file:  
-
-    <dependency>
-        <groupId>com.nqadmin.swingset</groupId>
-        <artifactId>swingset</artifactId>
-        <version>x.y.z</version>
-    </dependency>
-
-## SAMPLE/DEMO PROGRAMS
-
-See https://github.com/bpangburn/swingset/blob/master/swingset-demo/README.md
-
-## CLASS DESCRIPTIONS - SWINGSET COMPONENTS
-
-### SSTextField
-
-SSTextField extends the JTextField. This class provides RowSet binding and different masks including a date mask, a social security number mask, etc.
-
-### SSTextArea
-
-SSTextArea extends the JTextArea to include RowSet binding.
-
-### SSCheckBox
-
-Used to display the boolean values stored in the database. The SSCheckBox can be bound to either a numeric or boolean column.  A checked SSCheckBox returns a '1' to the database and an unchecked SSCheckBox returns a '0'.
-
-### SSComboBox
-
-Provides a way of displaying text corresponding to codes that are stored in the database. By default the codes start from zero. If you want to provide a different mapping for the items in the combo box then a string of integers containing the corresponding numeric values for each choice must be provided.
-
-e.g.,  
-
-    SSComboBox combo = new SSComboBox();
-    String[] options = {"111", "2222", "33333"};
-    combo.setOptions(options);
-    
-    //For the above items the combo box assumes that the values start from zero:
-    //     "111" -> 0, "2222" -> 1, "33333" -> 2
-    
-    //To give your own mappings  you can set the mappings separately or pass
-    //them along with the options:
-       
-    SSComboBox combo = new SSComboBox();
-    String[] options = {"111", "2222", "33333"};
-    int[] mappings = { 1,5,7 };
-    combo.setOptions(options, mappings);
-    
-    // next line is assuming myrowset has been initialized and my_column is a
-    // column in myrowset
-    combo.bind(myrowset,"my_column");
-    
-    //Note that if you DO NOT want to use the default mappings, the custom
-    //mappings must be set before calling the bind() method to bind the
-    // combo box to a database column.
-
-### SSDBComboBox
-
-Similar to the SSComboBox, but used when both the 'bound' values and the 'display' values are pulled from a database table.  Generally the bound value represents a foreign key to another table, and the combo box needs to diplay a list of one (or more) columns from the other table.
-  
-e.g.,  
-    
-    /*
-    Consider two tables:
-        1. part_data (part_id, part_name, ...)
-        2. shipment_data (shipment_id, part_id, quantity, ...)
-    
-    Assume you would like to develop a screen for the shipment table and you
-    want to have a screen with a combo box where the user can choose a
-    part and a text box where the user can specify a  quantity.
+## Requirements
 
-    In the combo box you would want to display the part name rather than
-    part_id so that it is easier for the user to choose. At the same time you
-    want to store the id of the part chosen by the user in the shipment
-    table.
-    */
-    
-    Connection connection = null;
-    RowSet rowSet = null;
-    SSDataNavigator navigator = null;
-    SSDBComboBox combo = null;
-    
-    try {
-    
-        // CREATE A DATABASE CONNECTION OBJECT
-          connection = new Connection(........);
-    
-        // CREATE AN INSTANCE OF JdbcRowSetImpl
-           rowSet = new JdbcRowSetImpl(connection);
-           rowSet.setCommand("SELECT * FROM shipment_data;");
-    
-        // DATA NAVIGATOR CALLS THE EXECUTE AND NEXT FUNCTIONS ON THE ROWSET.
-        // IF YOU ARE NOT USING THE DATA NAVIGATOR YOU HAVE TO INCLUDE THOSE.
-        //   rowSet.execute();
-        //   rowSet.next();
-           SSDataNavigator navigator = new SSDataNavigator(rowSet);
-    
-       // QUERY FOR THE COMBO BOX.
-           String query = "SELECT * FROM part_data;";
+- Java 8 or later.
+- Maven 3.9.6 or later is recommended for project builds.
 
-       // CREATE AN INSTANCE OF THE SSDBCOMBOBOX WITH THE CONNECTION OBJECT
-       // QUERY AND COLUMN NAMES
-           combo = new SSDBComboBox(ssConnection, query, "part_id", "part_name");
+## Maven dependency
 
-       // THIS BASICALLY SPECIFIES THE COLUMN AND THE SSROWSET WHERE UPDATES HAVE
-       // TO BE MADE.
-           combo.bind(rowSet, "part_id");
-           combo.execute();
-    
-        // CREATE A TEXTFIELD
-           SSTextField myText = new SSTextField();
+After SwingSet is available from your Maven repository, add the library dependency to your application POM:
 
-        // BIND TEXTFIELD
-           myText.bind(rowSet, "quantity");
-    
-    } catch(Exception e) {
-        // EXCEPTION HANDLER HERE...
-    }
-    
-    // ADD THE SSDBCOMBOBOX TO THE JFRAME
-        getContentPane().add(combo);
-          
-    // ADD THE SSTEXTFIELD TO THE JFRAME
-        getContentPane().add(myText);
+```xml
+<dependency>
+    <groupId>com.nqadmin.swingset</groupId>
+    <artifactId>swingset</artifactId>
+    <version>x.y.z</version>
+</dependency>
+```
 
-### SSImage
+Replace `x.y.z` with the SwingSet release version you want to use.
 
-SSImage is a component which can be used to load, store, & display JPEG & GIF images stored in a database.
+## Build from source
 
-### SSLabel
+Clone the repository and build from the repository root:
 
-SSLabel extends the JLabel. This class provides RowSet binding and can be used to display database values in a "read-only" JLabel.
+```bash
+git clone https://github.com/bpangburn/swingset.git
+cd swingset
+mvn clean package
+```
 
-### SSSlider
+To build only the core library module:
 
-SSLabel extends the JLabel. This class provides RowSet binding and can be used to link a JSlider to a numeric column in a database.
+```bash
+cd swingset
+mvn clean package
+```
 
-### SSDataNavigator
+For release-style local builds that attach source and Javadoc artifacts, use the release profile from the repository root or module directory:
 
-Component that can be used for data navigation. It provides buttons for navigation, insertion, and deletion of records in a RowSet. The modification of a RowSet can be prevented using the setModificaton() method.  Any changes made to the columns of a record will be updated whenever there is a navigation.
+```bash
+mvn clean package -Prelease
+```
 
-For example if you are displaying three columns using the JTextField and the user changes the text in the text fields then the columns will be updated to the new values when the user navigates the RowSet. If the user wants to revert the changes he made he can press the Undo button, however this must be done before any navigation.  Once navigation takes place changes can't be reverted using Undo button (has to be done manually by the user).
+Compiled JAR files are written to the relevant `target/` directory.
 
-### SSDataGrid
+## Demo and examples
 
-SSDataGrid provides a way to display information from a database in a table format (aka "spreadsheet" or "datasheet" view). The SSDataGrid takes a RowSet as a source of data. It also provides different cell renderers including a combo box renderer and a date renderer.
+The companion [`swingset-demo`](../swingset-demo/) module contains runnable examples that demonstrate the core library components using an in-memory H2 database. See [`swingset-demo/README.md`](../swingset-demo/README.md) for demo build and execution instructions.
 
-SSDataGrid internally uses the SSTableModel to display the information in a  table format. SSDataGrid also provides an easy means for displaying headers. Columns can be hidden or made uneditable. In addition, it provides much finer control over which cells can be edited and which cells can't be edited.  It uses the SSCellEditing interface for achieving this. The implementation of this interface also provides a way to specify what kind of information is valid for each cell.
+## Component overview
 
-SSDataGrid uses the isCellEditable() method in SSCellEditing to determine if a cell is editable or not.  The cellUpdateRequested() method of SSCellEditing is used to notify a user program when an update is requested. While doing so it provides the present value in the cell and also the new value. Based on this information the new value can be rejected or accepted by the program.
+### Core SwingSet components
 
-SSDataGrid also provides an "extra" row to facilitate the addition of rows to the table.  Default values for various columns can be set programmatically.  A programmer can also specify which column is the primary key column for the underlying RowSet and supply a primary key for that column when a new row is being added.
+| Component | Description |
+| --- | --- |
+| `SSTextField` | Extends `JTextField` with `RowSet` binding and optional masks such as date and Social Security number formats. |
+| `SSTextArea` | Extends `JTextArea` with `RowSet` binding. |
+| `SSCheckBox` | Displays and updates boolean-style database values. It can bind to numeric or boolean columns. |
+| `SSComboBox` | Displays text choices while storing mapped numeric values in a bound database column. |
+| `SSDBComboBox` | Displays values from a database query while binding a selected key/value to another `RowSet`. Useful for lookup tables and foreign-key style selections. |
+| `SSImage` | Loads, stores, and displays database-backed image data. |
+| `SSLabel` | Extends `JLabel` with read-only `RowSet` binding. |
+| `SSSlider` | Links a `JSlider` to a numeric database column. |
+| `SSDataNavigator` | Provides record navigation, insertion, deletion, commit, and rollback controls for a `RowSet`. |
+| `SSDataGrid` | Displays `RowSet` data in a table/grid view with support for hidden columns, read-only columns, renderers, validation hooks, row insertion, and row deletion. |
 
-## CLASS DESCRIPTIONS - DATASOURCES
+### Data source utilities
 
-### RowSetOps
+| Class | Description |
+| --- | --- |
+| `RowSetOps` | Utility methods for working with `RowSet`, `ResultSet`, metadata, and database-type conversions. |
 
-Utility class for working with RowSets and ResultSets. Some methods for converting to/from text from/to objects according to database type. Several convenience methods for accessing metadata.
+### Helper classes
 
-## CLASS DESCRIPTIONS - "HELPER" CLASSES
+| Class | Description |
+| --- | --- |
+| `SSCommon` | Shared binding state and methods used by SwingSet components. |
+| `SSComponentInterface` | Interface with default methods shared by most SwingSet components. |
+| `SSDataGridScreenHelper` | Helper for constructing screens based on `SSDataGrid`. |
+| `SSFormViewScreenHelper` | Helper for constructing form-view screens using SwingSet components. |
+| `SSSyncManager` | Synchronizes a data navigator and a navigation combo box. |
 
-### SSCommon
+### Supporting classes and interfaces
 
-Datasource binding data members and methods common to all SwingSetcomponents.
+| Class or interface | Description |
+| --- | --- |
+| `SSDBNav` | Hook interface for custom operations before/after insert and delete operations. |
+| `SSDBNavImpl` | Default `SSDBNav` implementation that clears or resets bound fields during insert operations. |
+| `SSTableModel` | Table model used by `SSDataGrid`; can also be used directly with `JTable`. |
+| `SSDataValue` | Interface used by `SSTableModel` to obtain new primary-key values for inserted rows. |
+| `SSTableKeyAdapter` | Copy/paste support for `JTable` and `SSDataGrid`, including spreadsheet interoperability. |
+| `SSCellEditing` | Validation/editability interface used by `SSTableModel` and `SSDataGrid`. |
+| `SSCellEditingAdapter` | Convenience adapter for creating `SSCellEditing` implementations. |
+| `SSDataGridHandler` | Hook interface for row deletion, insertion, and related grid operations. |
+| `SSDataGridAdapter` | Convenience adapter for creating `SSDataGridHandler` implementations. |
 
-All SwingSet components should have a ssCommon datamember of type SSCommonand should implement SSComponentInterface.
+## Basic examples
 
-### SSComponentInterface
+### `SSComboBox` value mappings
 
-Interface with default methods shared by most SwingSet components.
+By default, `SSComboBox` maps displayed options to zero-based numeric values:
 
-### SSDataGridScreenHelper
+```java
+SSComboBox combo = new SSComboBox();
+String[] options = {"Yes", "No", "Maybe"};
+combo.setOptions(options);
 
-Helper class for designing SSDataGrid screens.
+// Default mappings:
+// "Yes"   -> 0
+// "No"    -> 1
+// "Maybe" -> 2
+```
 
-### SSFormViewScreenHelper
+Custom mappings can be supplied before binding the combo box:
 
-Helper class for designing SwingSet Form View screens.
+```java
+SSComboBox combo = new SSComboBox();
+String[] options = {"Yes", "No", "Maybe"};
+int[] mappings = {1, 0, 2};
 
-### SSSyncManager
+combo.setOptions(options, mappings);
+combo.bind(myRowSet, "my_column");
+```
 
-SSSyncManager simplifies synchronization of a data navigator and a navigation combo box.
+### `SSDBComboBox` lookup binding
 
+`SSDBComboBox` is useful when a screen should display friendly text from a lookup table while storing a key value in the bound table.
 
-## CLASS DESCRIPTIONS - SUPPORTING CLASSES
+```java
+RowSet rowSet = new JdbcRowSetImpl(connection);
+rowSet.setCommand("SELECT * FROM shipment_data");
 
-### SSDBNav
+SSDataNavigator navigator = new SSDataNavigator(rowSet);
 
-Interface that provides a set of functions to perform some custom operation before a record is added, after a record is added, before a record is deleted and after a record is deleted.
-  
-These functions are called by the SSDataNavigator if the SSDBNav datamember of the SSDataNavigator is set using the setDBNav() function of the SSDataNavigator.
+String query = "SELECT * FROM part_data";
+SSDBComboBox combo = new SSDBComboBox(connection, query, "part_id", "part_name");
+combo.bind(rowSet, "part_id");
+combo.execute();
 
-     performPreInsertOps() is called when the user presses the insert button.
-     
-     performPostInsertOps() is called when the user presses the commit button
-          after updating the values for the newly inserted row. If the user
-          presses the Undo button after the insert button is pressed the
-          insertion is cancelled and this function will not be called.
+SSTextField quantity = new SSTextField();
+quantity.bind(rowSet, "quantity");
+```
 
-     performPreDeletionOps() is called when the user presses the delete
-          button, but just before the deleteRow() method is called on the
-          RowSet.
+## Notes for maintainers
 
-     performPostDeletionOps() is called when the user presses the delete
-          button and after the deleteRow() method is called on the RowSet.
+- Keep the repository-level `README.md` short and use this module README for library-specific documentation.
+- Keep demo-specific execution instructions in `swingset-demo/README.md` so the library README remains focused on the reusable artifact.
+- If screenshots are maintained in the repository, consider keeping them in a stable `docs/images/` or `swingset-demo/images/` folder and linking them from the demo README.
 
-     Note that both the performPreDeletionOps() and performPostDeletionOps()
-     will be executed when the user presses the delete button.
+## Contributors
 
-### SSDBNavImpl
+- Prasanth R. Pasala
+- Brian E. Pangburn
+- The Pangburn Group
+- Ernie R. Rael
+- Diego Gil
+- Man "Bee" Vo
 
-Custom implementation of SSDBNav that clears/resets the various database-aware fields on a screen when the user adds a new record.  To achieve this, special implementation of the performPreInsertOps() method is provided.  An instance of this class can be created for the container where the fields are to be cleared and passed to the data navigator.
+## License
 
-The data navigator will call the performPreInsertOps() method whenever the user presses the insert button on the navigator. This fuctions recursively clears any JTextFields, JTextAreas, and SSCheckBoxes, and if their are any SSComboBoxes or SSDBComboBoxes they will be reset to the first item in the list.
+SwingSet is distributed under the BSD 3-Clause License. See [`../LICENSE.md`](../LICENSE.md).
 
-This recursive behavior performed on all the components inside the JPanel or JTabbedPane inside the specified container.
-
-### SSTableModel    
-
-SSTableModel provides an implementation of the TableModel interface. The SSDataGrid uses this class for providing a grid view for a RowSet. SSTableModel can be used without the SSDataGrid (e.g., in conjunction with a JTable), but the cell renderers and hidden columns features of the SSDataGrid will not be available.
-
-### SSDataValue
-
-The SSDataValue interface specifies methods for SSTableModel to retrieve new values for the primary key column in a JTable.
-
-### SSTableKeyAdapter    
-
-The SSTableKeyAdapter class provides copy & paste support for JTable. This is also used by SSDataGrid. This class facilitates copy & paste between two JTables or between a spread sheet and a JTable.
-
-### SSCellEditing
-
-The SSCellEditing interface specifies the methods the SSTableModel will use to determine whether or not a given cell can be edited or if a user-specified value for a cell is valid or invalid.
-
-### SSCellEditingAdapter
-
-This abstract adapter class is provided as a convenience for creating custom SSCellEditing objects.  Extend this class to create a SSCellEditing implementation.
-
-SSCellEditingAdapter defines empty functions so that the programmer can define only the functions desired.  Both isCellEditable() and cellUpdateRequested() always return true.
-
-### SSDataGridHandler
-
-The SSDataGridHandler interface specifies set of methods that can be used to determine whether or not a given row can be deleted, and operation to be performed before and after deletion or insertion of a record.
-
-### SSDataGridAdapter
-
-This abstract class is provided as a convenience for creating custom SSDataGridHandler objects. Extend this class to create a SSDataGridHandler implementation.
-
-SSDataGridAdapter defines empty functions so that the programmer can define only the functions desired.
+For questions regarding SwingSet, send an email to `swingset#NO-SPAM#@pangburngroup.com`.

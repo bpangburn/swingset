@@ -1,49 +1,32 @@
-# ReadMe file for the SwingSet Open Toolkit for Java Swing.
+# SwingSet
 
-## DESCRIPTION
+SwingSet is an open source Java Swing toolkit that provides data-aware replacements and helpers for building database-backed Swing user interfaces.
 
-SwingSet is an open source Java toolkit containing data-aware replacements for many of the standard Java Swing components.
+This repository is a multi-module Maven project:
 
-The SwingSet feature-set currently includes:
+| Module | Description |
+| --- | --- |
+| [`swingset`](swingset/) | Core SwingSet library components. Start here for usage, dependency, build, and component documentation. |
+| [`swingset-demo`](swingset-demo/) | Sample/demo application showing the SwingSet components with an in-memory H2 database. |
 
-1. data-aware replacements for JTextField, JTextArea, JComboBox, JCheckBox, JLabel, JSlider, & JFormattedTextField
-2. binding of a "hidden" numeric column for combo boxes with text choices
-   (e.g., 0, 1, & 2 are stored for "Yes," "No," & "Maybe," respectively)
-3. population of combo boxes based on columns in a database query (can also be used for combo box-based record navigation)
-4. a data-aware image component with image support
-5. a graphical record navigator
-    (a) allows for database traversal, insertion, deletion, commit, and rollback
-    (b) supplies current record index (editable) and total record count
-6. a data grid component for creating datasheet/spreadsheet/table views of queries
-    (a) allows cut & paste to/from spreadsheet programs or other data grids
-    (b) allows custom column headings
-    (c) allows hiding of specified columns
-    (d) allows disabling of specified columns
-    (e) allows columns to be displayed as text boxes or combo boxes
-    (f) allows addition and deletion of records
-    (g) allows deletion of multiple, non-consecutive records
-    (h) allows data entry "masks" to be applied to text columns
-7. formatted fields for various types like currency, percent, SSN, date etc.
+For library documentation, see [`swingset/README.md`](swingset/README.md).
 
-More information on SwingSet is available from:
-https://github.com/bpangburn/swingset
+## Quick build
 
-For questions regarding SwingSet, send an email to:
-swingset#NO-SPAM#@pangburngroup.com
+```bash
+git clone https://github.com/bpangburn/swingset.git
+cd swingset
+mvn clean package
+```
 
-## SCREENSHOTS
+The built artifacts will be written to each module's `target/` directory.
 
-### SwingSet Demo - Example 1
-![SwingSet Demo - Example 1](https://a.fsdn.com/con/app/proj/swingset/screenshots/example1.png)
+## More information
 
-### SwingSet Demo - Example 2
-![SwingSet Demo - Example 2](https://a.fsdn.com/con/app/proj/swingset/screenshots/example2.png)
+- Demo documentation: [`swingset-demo/README.md`](swingset-demo/README.md)
+- Issues: <https://github.com/bpangburn/swingset/issues>
+- Contact: `swingset#NO-SPAM#@pangburngroup.com`
 
-### SwingSet Demo - Example 3
-![SwingSet Demo - Example 3](https://a.fsdn.com/con/app/proj/swingset/screenshots/example3.png)
+## License
 
-### SwingSet Demo - Example 4
-![SwingSet Demo - Example 4](https://a.fsdn.com/con/app/proj/swingset/screenshots/example4.png)
-
-### SwingSet Demo - Example 5
-![SwingSet Demo - Example 5](https://a.fsdn.com/con/app/proj/swingset/screenshots/example5.png)
+SwingSet is distributed under the BSD 3-Clause License. See [`LICENSE.md`](LICENSE.md).
