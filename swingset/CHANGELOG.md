@@ -6,6 +6,9 @@ This file is the maintainer changelog for user-visible SwingSet changes. Depende
 Maven, and plugin version changes beginning with SwingSet 4.0.11 are tracked separately
 in [`CHANGELOG-POMS.md`](CHANGELOG-POMS.md).
 
+## SwingSet 4.0.14 — Released TBD
+
+1. Something goes here...
 
 ## SwingSet 4.0.13 — Released 2026-06-12
 

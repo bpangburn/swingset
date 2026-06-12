@@ -24,7 +24,7 @@ could affect compatibility, public API, behavior, or dependency policy.
 ## Scope
 
 - Start: `arelease` / `02e8413fae1105a2d691a86d4925f70434e9f984`
-- End: `4.0.13-SNAPSHOT` branch, based on comparison from `swingset-4.0.12`
+- End: `swingset-4.0.13`, based on comparison from `swingset-4.0.12`
 - Repository: `https://github.com/bpangburn/swingset`
 
 ## Notes on interpretation
@@ -35,7 +35,7 @@ entries below are intentionally conservative and describe broad project evolutio
 than claiming every change was newly introduced in a particular semantic-release sense.
 
 For the 4.x series, the changelog reflects both the published release notes and additional
-details found by reviewing compare/patch output between tags. The 4.0.13 entry is based on the `4.0.13-SNAPSHOT` branch and should be finalized when the release tag is created.
+details found by reviewing compare/patch output between tags.
 
 ---
 
@@ -60,10 +60,13 @@ Long-term project themes include:
 
 # Release history, newest first
 
+## SwingSet 4.0.14 — Released TBD
+
+1. Something goes here...
 
 ## SwingSet 4.0.13 — Released 2026-06-12
 
-Tag/commit: pending. Reviewed from the `4.0.13-SNAPSHOT` branch compared with `swingset-4.0.12`.
+Tag/commit: `swingset-4.0.13` / `ee2f51c`. Reviewed from the `4.0.13-SNAPSHOT` branch compared with `swingset-4.0.12`.
 
 Release-preparation, dependency, build-tool, and documentation maintenance release.
 
