@@ -11,9 +11,9 @@ Starting with SwingSet 4.0.11, POM updates are tracked in this separate file.
 
 ### All modules — Java and Maven version
 
-1. `maven`: 3.6.3 → 3.9.6  
-   Latest noted: 3.9.12; 4.0.0-rc-5 also available.
-2. `java`: 1.8 → 8  
+1. `maven`: 3.6.3 → 3.9.16
+   Latest noted: 3.9.16; 4.0.0-rc-5 also available as a preview release.
+2. `java`: 1.8 → 8
    Uses `<maven.compiler.release>` rather than `<maven.compiler.source>` and
    `<maven.compiler.target>`.
 
@@ -24,54 +24,56 @@ Starting with SwingSet 4.0.11, POM updates are tracked in this separate file.
 ### `swingset` dependencies
 
 1. `glazedlists`: 1.11.1203 → no change.
-2. `log4j-core`: 2.22.0 → 2.25.3  
-   Latest noted: 3.0.0-beta3.
-3. `jdbcrowsetimpl`: 1.0.3 → no change.
+2. `log4j-api`: 2.22.0 → 2.26.0.
+3. `log4j-core`: 2.22.0 → 2.26.0.
+4. `jdbcrowsetimpl`: 1.0.3 → no change.
 
 ### `swingset-demo` dependencies
 
 1. `swingset`: 4.0.12 → 4.0.13.
-2. `log4j-api`: 2.22.0 → 2.25.3  
-   Latest noted: 3.0.0-beta3.
-3. `log4j-core`: 2.22.0 → 2.25.3  
-   Latest noted: 3.0.0-beta3.
+2. `log4j-api`: 2.22.0 → 2.26.0.
+3. `log4j-core`: 2.22.0 → 2.26.0.
 4. `h2`: 2.2.224 → 2.4.240.
 5. `java-getopt`: 1.0.13 → no change.
 6. `raelity-lib`: 1.2.0 → no change.
 
 ### `swingset-parent`, `swingset`, and `swingset-demo` plugins
 
-1. `versions-maven-plugin`: 2.16.2 → 2.20.1.
-2. `maven-enforcer-plugin`: 3.4.1 → 3.6.2.
-3. `maven-clean-plugin`: 3.3.2 → 3.5.0  
-   Latest noted: 4.0.0-beta-2.
-4. `maven-deploy-plugin`: 3.1.1 → 3.1.4  
-   Latest noted: 4.0.0-beta-2.
-5. `maven-install-plugin`: 3.1.1 → 3.1.4  
-   Latest noted: 4.0.0-beta-2.
+1. `versions-maven-plugin`: 2.16.2 → 2.21.0.
+2. `maven-enforcer-plugin`: 3.4.1 → 3.6.3.
+3. `maven-clean-plugin`: 3.3.2 → 3.5.0.
+   Latest noted: 4.0.0-beta-2 also available.
+4. `maven-deploy-plugin`: 3.1.1 → 3.1.4.
+   Latest noted: 4.0.0-beta-2 also available.
+5. `maven-install-plugin`: 3.1.1 → 3.1.4.
+   Latest noted: 4.0.0-beta-2 also available.
 6. `maven-site-plugin`: 4.0.0-M12 → 4.0.0-M16.
-7. `dependency-check-maven`: 9.0.6 → 12.1.9.
+7. `dependency-check-maven`: 9.0.6 → 12.2.2.
 
 ### `swingset` and `swingset-demo` plugins
 
-1. `maven-jar-plugin`: 3.3.0 → 3.5.0  
-   Latest noted: 4.0.0-beta-1.
-2. `maven-resources-plugin`: 3.3.1 → 3.4.0  
-   Latest noted: 4.0.0-beta-1.
-3. `maven-compiler-plugin`: 3.11.0 → 3.14.1  
-   Latest noted: 4.0.0-beta-3.
+1. `maven-jar-plugin`: 3.3.0 → 3.5.0.
+   Latest noted: 4.0.0-beta-1 also available.
+2. `maven-resources-plugin`: 3.3.1 → 3.5.0.
+   Latest noted: 4.0.0-beta-1 also available.
+3. `maven-compiler-plugin`: 3.11.0 → 3.15.0.
+   Latest noted: 4.0.0-beta-3 also available.
 4. `maven-gpg-plugin`: 3.1.0 → 3.2.8.
-5. `maven-surefire-plugin`: 3.2.3 → 3.5.4.
-6. `maven-source-plugin`: 3.3.0 → 3.4.0  
-   Latest noted: 4.0.0-beta-1.
+5. `maven-surefire-plugin`: 3.2.3 → 3.5.6.
+   Latest noted: 3.6.0-M1 also available.
+6. `maven-source-plugin`: 3.3.0 → 3.4.0.
+   Latest noted: 4.0.0-beta-1 also available.
 
 ### `swingset` plugins
 
 1. `maven-javadoc-plugin`: 3.6.3 → 3.12.0.
-2. `nexus-staging-maven-plugin`: 1.6.13 → 1.7.0.
-3. `maven-failsafe-plugin`: 3.2.3 → 3.5.4.
-4. `junit-jupiter`: 5.10.1 → 5.14.1  
-   Latest noted: 6.1.0-M1.
+2. `nexus-staging-maven-plugin`: 1.6.13 → removed/replaced.
+3. `central-publishing-maven-plugin`: new → 0.10.0.
+4. `maven-failsafe-plugin`: 3.2.3 → 3.5.6.
+   Latest noted: 3.6.0-M1 also available.
+5. `junit-jupiter`: 5.10.1 → 5.14.4.
+   JUnit 6.1.0 is available, but JUnit 6 requires Java 17+ at runtime. Staying on
+   the latest 5.14.x line preserves the Java 8-compatible test baseline.
 
 ### `swingset-demo` plugins
 
