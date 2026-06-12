@@ -33,22 +33,22 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    
-    <!-- Release-safe plugin/dependency versions.
-     	 Avoid beta, milestone, RC, and Maven 4-only plugin lines for SwingSet 4.0.x. -->
 
     <!-- Toolchain -->
     <version.maven>3.9.16</version.maven>
     <maven.compiler.release>8</maven.compiler.release>
 
+    <!-- Java runtime requirements -->
+    <version.java.minimum>[1.8,)</version.java.minimum>
+    <version.owasp.java.minimum>[11,)</version.owasp.java.minimum>
+
     <!-- Dependencies -->
     <version.glazedlists>1.11.1203</version.glazedlists>
     <version.log4j>2.26.0</version.log4j>
-    <version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
+    <version.jdbcrowsetimpl>1.0.4</version.jdbcrowsetimpl>
     <version.h2>2.4.240</version.h2>
     <version.java-getopt>1.0.13</version.java-getopt>
     <version.raelity-lib>1.2.0</version.raelity-lib>
-	<!-- JUnit 6.x requires newer Java; keep JUnit 5.x for Java 8/11 compatibility. -->
     <version.junit-jupiter>5.14.1</version.junit-jupiter>
 
     <!-- Plugins -->
@@ -224,15 +224,21 @@
           <version>${version.maven-assembly-plugin}</version>
         </plugin>
 
-        <!-- OWASP (managed; executed only in -Psecurity-scan) -->
+        <!-- OWASP (managed; executed only in -Powasp-check) -->
         <plugin>
-          <groupId>org.owasp</groupId>
-          <artifactId>dependency-check-maven</artifactId>
-          <version>${version.dependency-check-maven}</version>
-          <configuration>
-            <nvdApiServerId>nvd</nvdApiServerId>
-            <ossIndexServerId>ossindex</ossIndexServerId>
-          </configuration>
+			<groupId>org.owasp</groupId>
+			<artifactId>dependency-check-maven</artifactId>
+			<version>${version.dependency-check-maven}</version>
+	        <configuration>
+	        	<nvdApiServerId>nvd</nvdApiServerId>
+	            <failBuildOnCVSS>7.0</failBuildOnCVSS>
+			    <ossIndexServerId>sonatype-guide</ossIndexServerId>
+			    <ossIndexAnalyzerUrl>https://api.guide.sonatype.com</ossIndexAnalyzerUrl>
+			    <suppressionFiles>
+			        <suppressionFile>./dependency-check-suppressions.xml</suppressionFile>
+			    </suppressionFiles>
+				
+			</configuration>
         </plugin>
 
         <!-- Central Publishing (managed; executed only in -Prelease) -->
@@ -271,14 +277,14 @@
               maven.deploy.skip=true and also explicitly configures
               maven-deploy-plugin <skip>true</skip>.
             -->
-            <autoPublish>false</autoPublish>
+            <autoPublish>true</autoPublish>
           </configuration>
         </plugin>
 
       </plugins>
     </pluginManagement>
 
-    <!-- Always-on enforcer -->
+    <!-- Always-on enforcer for normal builds -->
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -296,7 +302,7 @@
                   <version>[${version.maven},)</version>
                 </requireMavenVersion>
                 <requireJavaVersion>
-                  <version>[1.8,)</version>
+                  <version>${version.java.minimum}</version>
                 </requireJavaVersion>
               </rules>
             </configuration>
@@ -308,26 +314,58 @@
 
   <profiles>
 
-    <profile>
-      <id>security-scan</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.owasp</groupId>
-            <artifactId>dependency-check-maven</artifactId>
-            <executions>
-              <execution>
-                <id>owasp-check</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>check</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
+   <profile>
+	  <id>owasp-check</id>
+	  <build>
+	    <plugins>
+	
+	      <!--
+	        OWASP Dependency-Check 11.x/12.x requires Maven to run on JDK 11+.
+	        This does not change SwingSet's Java 8 bytecode target.
+	      -->
+	      <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-enforcer-plugin</artifactId>
+	        <executions>
+	          <execution>
+	            <id>enforce-owasp-java-baseline</id>
+	            <goals>
+	              <goal>enforce</goal>
+	            </goals>
+	            <configuration>
+	              <rules>
+	                <requireJavaVersion>
+	                  <version>${version.owasp.java.minimum}</version>
+	                  <message>
+	                    OWASP Dependency-Check ${version.dependency-check-maven}
+	                    requires Maven to run on JDK 11 or newer. This requirement
+	                    applies only to the owasp-check profile and does not change
+	                    the SwingSet Java 8 compatibility target.
+	                  </message>
+	                </requireJavaVersion>
+	              </rules>
+	            </configuration>
+	          </execution>
+	        </executions>
+	      </plugin>
+	
+	      <plugin>
+	        <groupId>org.owasp</groupId>
+	        <artifactId>dependency-check-maven</artifactId>
+	        <executions>
+	          <execution>
+	            <id>owasp-aggregate-check</id>
+	            <phase>verify</phase>
+	            <goals>
+	              <goal>aggregate</goal>
+	            </goals>
+	          </execution>
+	        </executions>
+	      </plugin>
+	
+	    </plugins>
+	  </build>
+	</profile>
 
     <profile>
       <id>release</id>

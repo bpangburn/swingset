@@ -7,7 +7,7 @@ Latest non-beta versions were originally determined based on review of
 
 Starting with SwingSet 4.0.11, POM updates are tracked in this separate file.
 
-## SwingSet 4.0.13 — Pending release / 4.0.13-SNAPSHOT
+## SwingSet 4.0.13 — Released 2026-06-12
 
 ### All modules — Java and Maven version
 

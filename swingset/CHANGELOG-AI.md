@@ -61,7 +61,7 @@ Long-term project themes include:
 # Release history, newest first
 
 
-## SwingSet 4.0.13 — Pending release / 4.0.13-SNAPSHOT
+## SwingSet 4.0.13 — Released 2026-06-12
 
 Tag/commit: pending. Reviewed from the `4.0.13-SNAPSHOT` branch compared with `swingset-4.0.12`.
 

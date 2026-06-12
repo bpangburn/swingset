@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.4.xsd"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.4.xsd
+                                  https://dependency-check.github.io/DependencyCheck/dependency-suppression.1.4.xsd">
+
+    <suppress>
+        <notes><![CDATA[
+        False positive for com.h2database:h2:2.4.240.
+        CVE-2018-14335 applies to H2 1.4.197 / versions before 1.4.198.
+        Snyk affected range: [1.1.100,1.4.198).
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.h2database/h2@2\.4\.240.*$</packageUrl>
+        <vulnerabilityName>CVE-2018-14335</vulnerabilityName>
+    </suppress>
+
+</suppressions>
