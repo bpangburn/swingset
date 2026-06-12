@@ -8,7 +8,7 @@ For the core library documentation, see [`../swingset/README.md`](../swingset/RE
 
 ## Requirements
 
-- Java 8 or later.
+- Java 11 or later.
 - Maven 3.9.6 or later is recommended for building from source.
 
 ## Running the executable demo JAR
