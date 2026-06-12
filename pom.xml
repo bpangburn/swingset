@@ -12,7 +12,30 @@
   <packaging>pom</packaging>
 
   <name>swingset-parent</name>
+  <description>Parent wrapper for swingset and swingset-demo</description>
   <url>https://github.com/bpangburn/swingset</url>
+  
+  <licenses>
+    <license>
+      <name>BSD 3-Clause</name>
+      <url>https://spdx.org/licenses/BSD-3-Clause.html</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Prasanth R. Pasala</name>
+      <email>swingset@pangburngroup.com</email>
+      <organization>The Pangburn Group, Inc.</organization>
+      <organizationUrl>https://pangburngroup.com</organizationUrl>
+    </developer>
+    <developer>
+      <name>Brian E. Pangburn</name>
+      <email>brian@pangburngroup.com</email>
+      <organization>The Pangburn Group, Inc.</organization>
+      <organizationUrl>https://pangburngroup.com</organizationUrl>
+    </developer>
+  </developers>
 
   <scm>
     <url>https://github.com/bpangburn/swingset</url>
@@ -273,11 +296,19 @@
 
                   <autoPublish>true</autoPublish>
 
-              The demo module should remain excluded because its POM sets
-              maven.deploy.skip=true and also explicitly configures
-              maven-deploy-plugin <skip>true</skip>.
-            -->
-            <autoPublish>true</autoPublish>
+		      Do not include the demo module in the Central Portal bundle.
+		
+		      maven.deploy.skip=true and maven-deploy-plugin <skip>true</skip>
+		      prevent the Maven Deploy Plugin from deploying the demo module, but the
+		      Central Publishing Plugin may still assemble artifacts from the reactor.
+		
+		      excludeArtifacts prevents artifacts with this artifactId from being added
+		      to the Central Publishing bundle.
+		    -->
+		    <excludeArtifacts>
+		      <excludeArtifact>swingset-demo</excludeArtifact>
+		    </excludeArtifacts>
+            <autoPublish>false</autoPublish>
           </configuration>
         </plugin>
 
