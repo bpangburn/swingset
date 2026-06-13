@@ -30,7 +30,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 8
+          java-version: ${{ matrix.java }}
           cache: maven
 
       - name: Initialize CodeQL
@@ -39,8 +39,13 @@ jobs:
           languages: java
           queries: security-extended,security-and-quality
 
-      - name: Build project
-        run: mvn -B -ntp clean compile
+      - name: Build SwingSet core on Java 8
+        if: matrix.java == '8'
+        run: mvn -B -ntp clean verify -pl swingset -am
+    
+      - name: Build full project on Java 11+
+        if: matrix.java != '8'
+        run: mvn -B -ntp clean verify
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
