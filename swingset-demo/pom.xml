@@ -22,6 +22,9 @@
   <url>https://github.com/bpangburn/swingset</url>
 
   <properties>
+    <!-- swingset-demo requires Java 11+ because current H2 releases require Java 11+ -->
+    <maven.compiler.release>11</maven.compiler.release>
+
     <!-- Never publish demo artifacts to Maven Central -->
     <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
