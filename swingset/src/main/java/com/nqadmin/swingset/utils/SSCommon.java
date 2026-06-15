@@ -46,7 +46,6 @@ import java.awt.AWTKeyStroke;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.lang.StackWalker.StackFrame;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.sql.Array;
@@ -97,13 +96,11 @@ import com.raelity.lib.eventbus.WeakSubscribe;
 
 import static com.nqadmin.swingset.navigate.RowSetState.isAcceptingCachedRowSetChanges;
 import static com.nqadmin.swingset.navigate.Utils.getGlobalEventBus;
-import static com.nqadmin.swingset.navigate.Utils.hasActiveRow;
 import static com.nqadmin.swingset.navigate.Utils.postColumnChangeStartError;
 import static com.nqadmin.swingset.utils.SSUtils.JDBCTypeMismatch;
 import static com.nqadmin.swingset.utils.SSUtils.NullabilityMismatch;
 import static com.nqadmin.swingset.utils.SSUtils.objectID;
 import static com.nqadmin.swingset.utils.SSUtils.sf;
-import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -679,7 +676,7 @@ final class SSCommon
 		String value = "";
 
 		try {
-			if (hasActiveRow(ssComponent)) {
+			if (getRowsModel().hasActiveRow()) {
 				value = RowSetOps.getColumnObjectText(ssComponent);
 				if (!getAllowNull() && (value == null)) {
 					value = "";
@@ -704,7 +701,7 @@ final class SSCommon
 		Object value = null;
 
 		try {
-			if (hasActiveRow(getSSComponent())) {
+			if (getRowsModel().hasActiveRow()) {
 				value = RowSetOps.getColumnObject(ssComponent);
 			}
 		} catch (SQLException se) {
@@ -749,7 +746,7 @@ final class SSCommon
 		Array value = null;
 
 		try {
-			if (hasActiveRow(getSSComponent())) {
+			if (getRowsModel().hasActiveRow()) {
 				value = RowSetOps.getColumnArray(ssComponent);
 			}
 		} catch (SQLException se) {
@@ -854,7 +851,7 @@ final class SSCommon
 	 * @return true if no error
 	 */
 	boolean setColumn(Object value, ConsumerSQL<Object> op) {
-		logger.log(DEBUG, () -> sf("%s: '%s' {%s}", getColumnForLog(), value, getCaller(4)));
+		logger.log(DEBUG, () -> sf("%s: '%s' {%s}", getColumnForLog(), value, SSUtils.getCaller(4)));
 		boolean ok = false;
 		try {
 			op.accept(value);
@@ -873,16 +870,6 @@ final class SSCommon
 		boolean fOK = ok;
 		logger.log(DEBUG, () -> sf("return ok: %b", fOK));
 		return ok;
-	}
-
-	private String getCaller(int skip) {
-		Optional<StackFrame> caller = StackWalker.getInstance(
-				Set.of(RETAIN_CLASS_REFERENCE), skip+1).walk(s ->
-						s.skip(skip)
-								.findFirst());
-		String meth = caller.isEmpty() ? null
-				: caller.get().getDeclaringClass().getSimpleName() + '.' + caller.get().getMethodName();
-		return meth;
 	}
 
 	DbWriter<RowSet, Integer, SSComponent, Object> getColumnWriter() {
@@ -1100,7 +1087,7 @@ final class SSCommon
 		// to give multiple dialogs.
 		if (doingCheckRowOK) 
 			try {
-				return hasActiveRow(getSSComponent());
+				return getRowsModel().hasActiveRow();
 			} catch (SQLException ex) {
 				return false;
 			}
@@ -1108,7 +1095,7 @@ final class SSCommon
 		doingCheckRowOK = true;
 		try {
 			try {
-				if (hasActiveRow(getSSComponent()))
+				if (getRowsModel().hasActiveRow())
 					return true;
 			} catch (SQLException ex) {
 			}

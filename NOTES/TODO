@@ -14,7 +14,34 @@ Something in RowSetOps/SSComponent. Why is it needed? 2026/05
 
 ================================================================================
 
+Update the test databases with current dates: 2025-2027
+
+================================================================================
+
 API to control behavior of formatted text field. COMMIT_OR_REVERT...
+
+Need to come up with an API that can be applied to both formatted
+and non-formatted text fields. In fact to any SSComponent in general.
+But some fields can never be in an error state, eg combo.
+
+Note that JFormattedTextField has "ESC" to cancel/remove changes.
+How should this interact with undo/redo? Get rid of and only use undo?
+Use ESC with any field to remove changes; and also clear the undo/redo stack?
+
+API options
+-----------
+
+- lock in field if error: true/false
+    Single global that controls all fields? Have a setting per SSComponent?
+    Have a global settings and a per component override?
+
+- ESC handling options
+
+- Should all text fields, not just formatted, handle text decoration?
+  What other types of text decoration, other than red for negative, might
+  be useful in general?
+
+Other options and/or variants?
 
 ================================================================================
 
@@ -36,8 +63,8 @@ Validator is connected to SSComponent; but it really should be connected
 to some RowSet column. Consider two components for same column but with
 different validation criteria.
 
-Related. Could mark SSComponent read only, so all input goes through
-only one spot.
+Related. Could mark the "other" SSComponent read only, so all input goes
+through only one component.
 
 ================================================================================
 

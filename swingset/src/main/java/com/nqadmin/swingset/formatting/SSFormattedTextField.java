@@ -488,7 +488,7 @@ public class SSFormattedTextField extends JFormattedTextField
 				// If no records, no columns, bail.
 				// TODO: is this check needed?
 
-				if (!Utils.hasActiveRow(this)
+				if (!getRowsModel().hasActiveRow()
 					|| RowSetOps.getColumnCount(getRowSet())==0) {
 					// TODO: should this check allow null?
 					setValue(null);

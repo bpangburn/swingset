@@ -46,6 +46,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Toolkit;
 import java.lang.StackWalker.Option;
+import java.lang.StackWalker.StackFrame;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.nio.file.Path;
@@ -59,6 +60,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
@@ -71,6 +73,8 @@ import javax.swing.JOptionPane;
 
 import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.navigate.RowsModel;
+
+import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;
 
 
 /**
@@ -164,6 +168,32 @@ public class SSUtils {
 	 */
 	public static String sf(String fmt, Object... args) {
 		return args.length == 0 ? fmt : String.format(fmt, args);
+	}
+
+	/**
+	 * Get a "class.method" name from the call stack.
+	 * The skip param indicates how far down the stack to look for
+	 * the caller's frame. For example, if {@code getCaller(skip)} is
+	 * used in a message supplier in a log statement need to skip more
+	 * than other cases:
+	 * {@snippet :
+	 *     void someMethod() {
+	 *         log(Level, () -> String.format("Called by: {%s}", getCaller(4)))
+	 *     }
+	 * }
+	 * logs the name of the method that called someMethod.
+	 * 
+	 * @param skip
+	 * @return "simpleClassName.methodName"
+	 */
+	public static String getCaller(int skip) {
+		Optional<StackFrame> caller = StackWalker.getInstance(
+				Set.of(RETAIN_CLASS_REFERENCE), skip+1).walk(s ->
+						s.skip(skip)
+								.findFirst());
+		String meth = caller.isEmpty() ? null
+				: caller.get().getDeclaringClass().getSimpleName() + '.' + caller.get().getMethodName();
+		return meth;
 	}
 
 

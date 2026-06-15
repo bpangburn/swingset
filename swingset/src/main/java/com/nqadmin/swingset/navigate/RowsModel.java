@@ -58,6 +58,7 @@ import com.nqadmin.swingset.SSDBComboBox;
 import com.nqadmin.swingset.datasources.DbOpsCustomizer;
 import com.nqadmin.swingset.datasources.DbOpsCustomizerCreator;
 import com.nqadmin.swingset.datasources.RowSetOps;
+import com.nqadmin.swingset.datasources.SSDBSupport;
 import com.nqadmin.swingset.navigate.RowsEvent.OperatorKind;
 import com.nqadmin.swingset.navigate.RowsEvent.RowSetEventType;
 import com.nqadmin.swingset.navigate.RowsModelEventHandling.RowsEventSource;
@@ -486,19 +487,29 @@ public final class RowsModel
 	}
 
 	/**
+	 * Check if this RowsModel's rowSet's cursor is on any row or on the insert row.
+	 * @return true if cursor on a row or insert row
+	 * @throws SQLException 
+	 */
+	public boolean hasActiveRow() throws SQLException {
+		return getRow() != 0 || isOnInsertRow();
+	}
+
+	/**
 	 * Return the associated RowSet's current row number.
 	 * @return row number
 	 */
 	public int getRow() {
 		int spin_row = getSpinnerModel().getNumber().intValue();
-		if (Boolean.TRUE) {
+		if (Boolean.TRUE) { // consistency check
 			int rs_row = -1;
 			try {
 				rs_row = getRowSet().getRow();
 			} catch (SQLException ex) {
 			}
 			if (spin_row != rs_row) {
-				logger.log(ERROR, sf("spinner model out of sync with row set"));
+				logger.log(ERROR, sf("spinner model, %d, out of sync with row set %d", spin_row, rs_row), new IllegalStateException("getRow sync"));
+				spin_row = rs_row;
 			}
 		}
 		return spin_row;
@@ -568,15 +579,6 @@ public final class RowsModel
 		return navState.rowNumberModel;
 	}
 
-	/** Like Runnable, but may throw SQLException */
-	public interface DBRunnable
-	{
-		/**
-		 * @throws SQLException 
-		 */
-		public void run() throws SQLException ;
-	}
-
 	/**
 	 * Use rsOp to capture multiple RowSet eventsNextQ into a single event.
 	 * 
@@ -584,7 +586,7 @@ public final class RowsModel
 	 * @param r code that operates on a RowSet
 	 * @throws java.sql.SQLException
 	 */
-	public void rsOp(Object operator, DBRunnable r) throws SQLException
+	public void rsOp(Object operator, SSDBSupport.RunnableSQL r) throws SQLException
 	{
 			RowsModel.startRowsEvent(OperatorKind.OTHER, this, operator);
 			try {
@@ -922,7 +924,7 @@ public final class RowsModel
 	}
 
 	/**
-	 * @return boolean indicating if the navigator is on an insert row
+	 * @return boolean indicating if the rowSet is on an insert row
 	 */
 	public boolean isOnInsertRow() {
 		return navState.isOnInsertRow();

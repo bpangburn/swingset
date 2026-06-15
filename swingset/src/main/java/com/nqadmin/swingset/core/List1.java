@@ -74,7 +74,6 @@ import com.nqadmin.swingset.models.SSDbStringCollection;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.navigate.UndoRedo;
 import com.nqadmin.swingset.navigate.UndoRedo.Change;
-import com.nqadmin.swingset.navigate.Utils;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -525,7 +524,7 @@ public class List1<K,D> extends JList<SSListItem> implements SSComponent
 		//		 Seems like it, it's used just about everywhere else.
 		//
 		try {
-			if (Utils.hasActiveRow(this))
+			if (getRowsModel().hasActiveRow())
 				array = dbCollection.readData(List1.this);
 		} catch (final SQLException se) {
 			logger.log(Level.ERROR, () -> sf("%s: SQL Exception.", getColumnForLog()), se);

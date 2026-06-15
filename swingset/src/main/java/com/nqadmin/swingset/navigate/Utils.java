@@ -44,16 +44,12 @@ package com.nqadmin.swingset.navigate;
 
 import java.awt.KeyboardFocusManager;
 import java.lang.System.Logger.Level;
-import java.sql.SQLException;
 import java.util.ArrayDeque;
 import java.util.Queue;
-
-import javax.sql.RowSet;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.SubscriberExceptionContext;
 import com.google.common.eventbus.SubscriberExceptionHandler;
-import com.nqadmin.swingset.datasources.RSC;
 import com.nqadmin.swingset.utils.CentralLookup;
 import com.nqadmin.swingset.utils.SSComponent;
 import com.nqadmin.swingset.utils.SSUtils;
@@ -71,29 +67,6 @@ public class Utils
 	private static final System.Logger logger = getLogger();
 
 	private Utils() { }
-
-	/**
-	 * Check if the rowSet's cursor is on a row or on the insert row.
-	 * @param rs rowset for this component
-	 * @return true if cursor on a row or insert row
-	 * @throws SQLException 
-	 */
-	public static boolean hasActiveRow(RowSet rs) throws SQLException
-	{
-		return rs.getRow() != 0
-				|| RowSetState.isInserting(rs);
-	}
-
-	/**
-	 * Check if the rowSet's cursor is on a row or on the insert row.
-	 * @param comp rowset for this component
-	 * @return true if cursor on a row or insert row
-	 * @throws SQLException 
-	 */
-	public static boolean hasActiveRow(RSC comp) throws SQLException
-	{
-		return hasActiveRow(comp.getRowSet());
-	}
 
 	////////////////////////////////////////////////////////////////////////////
 	//

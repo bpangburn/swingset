@@ -234,6 +234,12 @@ final class NavigateState
 	// INSTANCE starts here
 	//
 
+	BusReceiver busReceiver; // Must have a strong reference.
+	private void setupEventBus() {
+		busReceiver = new BusReceiver();
+		WeakEventBus.register(busReceiver, getGlobalEventBus());
+	}
+
 	//Weak Subscriber notes: {@link com.nqadmin.swingset.navigate.Utils}.
 
 	/**
@@ -305,6 +311,7 @@ final class NavigateState
 				return;
 
 			// Our RowSet's row has changed
+			logger.log(TRACE, () -> ev.toString());
 			try {
 				// TODO what about ev.getSource == null ?
 				((SSComponent)ev.getSource()).addUndoableChange(ev);
@@ -314,9 +321,6 @@ final class NavigateState
 			}
 
 			adjustErrorComponentState(ev.getRSC(), ev.isError());
-			logger.log(TRACE, () -> ev.toString());
-			setRowModified();
-			updateActionState();
 			Utils.postColumnChangeDone(ev);
 		}
 
@@ -327,9 +331,8 @@ final class NavigateState
 				return;
 
 			// Our RowSet's row had an undo/redo.
-			adjustErrorComponentState(ev.getRSC(), ev.isError());
 			logger.log(TRACE, () -> ev.toString());
-			updateActionState();
+			adjustErrorComponentState(ev.getRSC(), ev.isError());
 			Utils.postColumnChangeDone(ev);
 		}
 
@@ -339,12 +342,6 @@ final class NavigateState
 			undoRow.focusChange(ev);
 		}
 	}
-
-	BusReceiver busReceiver; // Must have a strong reference.
-	private void setupEventBus() {
-		busReceiver = new BusReceiver();
-		WeakEventBus.register(busReceiver, getGlobalEventBus());
-	}
 	
 	/** return true if number of components in error changed. */
 	boolean adjustErrorComponentState(RSC rsc, boolean isError) {
@@ -353,14 +350,17 @@ final class NavigateState
 			errorComponents.add(rsc);
 		else
 			errorComponents.remove(rsc);
-		if (sz != errorComponents.size()) {
+		logger.log(TRACE, () -> sf("{%s} %s error: %b, sz: %d -> %d", SSUtils.getCaller(4), rsc.getColumnForLog(), isError, sz, errorComponents.size()));
+
+		boolean compsChange = sz != errorComponents.size();
+		if (compsChange) {
 			if (rsc instanceof SSComponent comp)
 				comp.decorate();
 			else
 				throw new IllegalStateException("Not SSComponent");
-			return true;
 		}
-		return false;
+		updateActionState();
+		return compsChange;
 	}
 	
 	
@@ -882,17 +882,6 @@ final class NavigateState
 		errorComponents.clear();
 	}
 
-
-	// TODO: Use undoRow.isDirty() to check for writable.
-
-	// TODO: get rid of the following
-	private void setRowModified() {
-		//isRowModified = true; // TODO: get rid of this
-		//if (!isDirty) {
-		//	undoRow.clear();
-		//	errorComponents.clear();
-		//}
-	}
 	
 	private void updateEnable(RowsAction navAction, boolean flag) {
 		List<RowsModel> rowsModels = RowsModel.getActiveRowModels(getRowSet());
