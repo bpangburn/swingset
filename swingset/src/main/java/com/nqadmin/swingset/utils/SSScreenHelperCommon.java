@@ -39,6 +39,7 @@ package com.nqadmin.swingset.utils;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Frame;
 import java.beans.PropertyVetoException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
@@ -599,4 +600,23 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
    * bindComponents().
    */
   protected abstract void updateSSDBComboBoxes();
+  
+//=====================================================================================
+//2026-04-28_BP: The code BELOW is needed for SwingSet 4.0.x compatibility
+//=====================================================================================
+
+  /**
+   * @return Parent window/container.
+   *
+   * @deprecated Starting in 4.0.0+ use {@link #getRootFrame()} instead.
+   */
+  @Deprecated
+  protected Frame getMainFrame() {
+    return getRootFrame();
+  }
+
+//=====================================================================================
+//2026-04-28_BP: The code ABOVE is needed for SwingSet 4.0.x compatibility
+//=====================================================================================
+   
 }

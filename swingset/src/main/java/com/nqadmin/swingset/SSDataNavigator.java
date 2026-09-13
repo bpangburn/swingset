@@ -42,16 +42,16 @@
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
+import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
+
 import java.awt.Dimension;
 
 import javax.sql.RowSet;
 
+import dev.visdb.seesaw.datasources.DbOps;
+import dev.visdb.seesaw.navigate.RowSetState;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.SsDataNavigator;
-
-import static com.nqadmin.swingset.utils.SSUtils.findRowsModel;
-
-import dev.visdb.seesaw.datasources.DbOps;
 
 /**
  * See {@link SsDataNavigator}.
@@ -349,5 +349,107 @@ public class SSDataNavigator extends SsDataNavigator {
   public SSDataNavigator(final RowSet rowSet, final Dimension buttonSize) {
     this(findRowsModel(rowSet), buttonSize);
   }
+  
+//=====================================================================================
+//2026-01-12_BP: The code BELOW is needed for SwingSet 4.0.x compatibility
+//===================================================================================== 
 
+  /**
+   * Returns the RowSet being used.
+   *
+   * @return returns the RowSet being used.
+   */
+  @Deprecated
+  public RowSet getRowSet() {
+    return getRowsModel() != null ? getRowsModel().getRowSet() : null;
+  }
+
+  /**
+   * Find out if the specified RowSet is on the insert row.
+   * 
+   * @param rs get state for this RowSet
+   * @return true if on the insert row
+   * @deprecated use {@link #isOnInsertRow()}
+   */
+  @Deprecated
+  public static boolean isInserting(RowSet rs) {
+    return rs == null ? false : RowSetState.isInserting(rs);
+  }
+
+  /**
+   * Calls the doClick on Add Button.
+   */
+  @Deprecated
+  public void doAddButtonClick() {
+    addButton.doClick();
+  }
+
+  /**
+   * Calls the doClick on Commit Button.
+   */
+  @Deprecated
+  public void doCommitButtonClick() {
+    commitButton.doClick();
+  }
+
+  /**
+   * Calls the doClick on Delete Button.
+   */
+  @Deprecated
+  public void doDeleteButtonClick() {
+    deleteButton.doClick();
+  }
+
+  /**
+   * Calls the doClick on First Button.
+   */
+  @Deprecated
+  public void doFirstButtonClick() {
+    firstButton.doClick();
+  }
+
+  /**
+   * Calls the doClick on Last Button.
+   */
+  @Deprecated
+  public void doLastButtonClick() {
+    lastButton.doClick();
+  }
+
+  /**
+   * Calls the doClick on Next Button.
+   */
+  @Deprecated
+  public void doNextButtonClick() {
+    nextButton.doClick();
+  }
+
+  /**
+   * Calls the doClick on Previous Button.
+   */
+  @Deprecated
+  public void doPreviousButtonClick() {
+    previousButton.doClick();
+  }
+
+  /**
+   * Calls the doClick on Refresh Button.
+   */
+  @Deprecated
+  public void doRefreshButtonClick() {
+    refreshButton.doClick();
+  }
+
+  /**
+   * Calls the doClick on Undo Button.
+   */
+  @Deprecated
+  public void doUndoButtonClick() {
+    undoButton.doClick();
+  }
+
+//=====================================================================================
+//2026-01-12_BP: The code ABOVE is needed for SwingSet 4.0.x compatibility
+//=====================================================================================
+  
 } // end public class SSDataNavigator extends JPanel {

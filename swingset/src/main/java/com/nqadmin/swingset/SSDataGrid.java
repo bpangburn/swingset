@@ -37,6 +37,12 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import javax.sql.RowSet;
 
 import dev.visdb.seesaw.navigate.RowsModel;
@@ -72,4 +78,59 @@ public class SSDataGrid extends dev.visdb.seesaw.SsTable {
   protected SSTableModel createDefaultDataModel() {
     return new SSTableModel();
   }
+  
+//=====================================================================================
+//2026-01-12_BP: The code BELOW is needed for SwingSet 4.0.x compatibility
+//=====================================================================================     
+
+  /**
+   * Sets the column numbers that should be hidden.
+   * 
+   * @param _columnNumbers columms to hide
+   * @deprecated use setHiddenColumns(List)}
+   */
+  @Deprecated
+  public void setHiddenColumns(final int[] _columnNumbers) {
+    if (_columnNumbers == null) {
+      setHiddenColumns(Collections.emptyList());
+      return;
+    }
+    setHiddenColumns(IntStream.of(_columnNumbers).boxed().collect(Collectors.toList()));
+  }
+
+  /**
+   * Sets the column numbers that should be hidden.
+   * 
+   * @param _columnNames names
+   * @throws SQLException SQL Exception
+   * @deprecated use SetHiddenColumnsByName
+   */
+  @Deprecated
+  public void setHiddenColumns(final String[] _columnNames) throws SQLException {
+    // TODO: does null need to be supported?
+    if (_columnNames == null) {
+      setHiddenColumnsByName(Collections.emptyList());
+      return;
+    }
+    setHiddenColumnsByName(Arrays.stream(_columnNames).collect(Collectors.toList()));
+  }
+
+  /**
+   * Sets the implementation of the DataGridHandler, which is used to handle row
+   * deletions and insertions.
+   *
+   * @param _dataGridHandler the implementation of the SSDataGridHandler
+   *                         interface.
+   * @deprecated Use {@code getModel().setSSDataGridHandler(_dataGridHandler)}
+   *             instead.
+   */
+  @Deprecated
+  public void setSSDataGridHandler(final SSDataGridHandler _dataGridHandler) {
+    getModel().setSSDataGridHandler(_dataGridHandler);
+  }
+
+//=====================================================================================
+//2026-01-12_BP: The code ABOVE is needed for SwingSet 4.0.x compatibility
+//=====================================================================================   
+    
 }
