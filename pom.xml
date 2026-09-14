@@ -50,7 +50,7 @@
 		<version.weak-event-bus-receiver>1.0.0</version.weak-event-bus-receiver>
                 <!--        Demo -->
 		<version.log4j>2.25.3</version.log4j>
-		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
+		<version.jdbcrowsetimpl>1.0.4</version.jdbcrowsetimpl>
 		<version.h2>2.4.240</version.h2>
 		<version.java-getopt>1.0.13</version.java-getopt>
 		<version.raelity-lib>1.2.0</version.raelity-lib>
