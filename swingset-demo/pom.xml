@@ -111,23 +111,15 @@
       <artifactId>logman-lib</artifactId>
     </dependency>
 
-    <!-- pick up simplevalidation from logman-lib
     <dependency>
-            <groupId>com.mastfrog</groupId>
-            <artifactId>simplevalidation-standalone</artifactId>
+      <groupId>dev.visdb.seesaw.contrib</groupId>
+      <artifactId>simplevalidation</artifactId>
     </dependency>
-    -->
 
     <dependency>
-      <groupId>com.github.lgooddatepicker</groupId>
-      <artifactId>LGoodDatePicker</artifactId>
+      <groupId>dev.visdb.seesaw.contrib</groupId>
+      <artifactId>lgooddatepicker</artifactId>
     </dependency>
-    <!--
-                    <dependency>
-                            <groupId>com.raelity.3rdparty.com.github.lgooddatepicker</groupId>
-                            <artifactId>LGoodDatePicker</artifactId>
-                    </dependency>
-    -->
   </dependencies>
 
   <build>
