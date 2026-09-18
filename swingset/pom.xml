@@ -55,6 +55,10 @@
 	</scm>
 
 	<dependencies>
+			<dependency>
+			<groupId>com.nqadmin.rowset</groupId>
+			<artifactId>jdbcrowsetimpl</artifactId>
+		</dependency>
                 <dependency>
                   <groupId>dev.visdb.seesaw</groupId>
                   <artifactId>seesaw</artifactId>

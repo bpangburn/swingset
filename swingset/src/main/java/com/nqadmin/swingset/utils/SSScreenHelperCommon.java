@@ -228,12 +228,12 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
     return readOnlyStatement;
   }
 
-  /**
-   * @param connectionOrDataSource either Connection or String dataSourceName
-   * @return a new rowset
-   * @throws java.sql.SQLException
-   */
-  protected abstract RowSet getNewRowSet(Object connectionOrDataSource) throws SQLException;
+//  /**
+//   * @param connectionOrDataSource either Connection or String dataSourceName
+//   * @return a new rowset
+//   * @throws java.sql.SQLException
+//   */
+//  protected abstract RowSet getNewRowSet(Object connectionOrDataSource) throws SQLException;
 
   /**
    * Builds and returns custom menu bar and with applicable listeners.
@@ -604,6 +604,25 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
 //=====================================================================================
 //2026-04-28_BP: The code BELOW is needed for SwingSet 4.0.x compatibility
 //=====================================================================================
+  
+  /**
+   * TODO: 2026-04-28_BP: We may want to add/use code from:
+   * com.nqadmin.swingset.demo.DemoUtil.getNewRowSet(Connection) to have more
+   * flexible connection/rowset options.
+   * 
+   * For now, I'm just hard-coding this to assume that connectionOrDataSource is a
+   * java.sql.Connection and returning a com.nqadmin.rowset.JdbcRowSetImpl rowset.
+   * 
+   * Don't want to implement in SSFormViewScreenHelper and/or
+   * SSDataGridScreenHelper or screens that extend them.
+   * 
+   * @param connectionOrDataSource either Connection or String dataSourceName
+   * @return a new rowset
+   * @throws java.sql.SQLException
+   */
+  protected RowSet getNewRowSet(Object connectionOrDataSource) throws SQLException {
+    return new com.nqadmin.rowset.JdbcRowSetImpl((Connection) connectionOrDataSource);
+  }
 
   /**
    * @return Parent window/container.
