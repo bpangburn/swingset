@@ -194,7 +194,8 @@ public class Example1 extends JFrame {
       SwingValidationGroup.setComponentName(txtSupplierName, "Supplier Name");
       StringValidator validator = SVUtils.getStringValidator(
           validateSupplierName, () -> "Supplier can not end with 'oops..'");
-      decoSupplierName = SVUtils.decorator(txtSupplierName, validator);
+      //decoSupplierName = SVUtils.decorator(txtSupplierName, validator);
+      decoSupplierName = SVUtils.setDecoratorValidator(txtSupplierName, validator);
     }
 
     RowSetButtons rsButtons = new RowSetButtons() {
