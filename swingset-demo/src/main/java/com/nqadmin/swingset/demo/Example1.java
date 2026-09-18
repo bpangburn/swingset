@@ -67,13 +67,12 @@ import org.netbeans.validation.api.ui.swing.ValidationPanel;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 
+import dev.visdb.seesaw.contrib.simplevalidation.SVUtils;
+import dev.visdb.seesaw.contrib.simplevalidation.StringValidator;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.decorators.BorderDecorator;
 import dev.visdb.seesaw.decorators.ComponentState;
 import dev.visdb.seesaw.decorators.TextComponentValidator;
-
-import com.nqadmin.swingset.demo.simpval.SVUtils;
-import com.nqadmin.swingset.demo.simpval.StringValidator;
 
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.CentralLookup;

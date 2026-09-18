@@ -80,9 +80,9 @@ import com.nqadmin.swingset.SSList;
 import com.nqadmin.swingset.SSSlider;
 import com.nqadmin.swingset.SSTextArea;
 import com.nqadmin.swingset.SSTextField;
-import com.nqadmin.swingset.demo.datepicker.DbDatePicker;
 import com.nqadmin.swingset.utils.SSSyncManager;
 
+import dev.visdb.seesaw.contrib.lgooddatepicker.SsLGoodDatePicker;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.datasources.products.DbOpsCreator;
@@ -284,7 +284,7 @@ public class TestBaseComponents extends JFrame {
   SSTextArea txtSSTextArea = new SSTextArea();
   SSTextField txtSSTextField = new SSTextField();
   SSTextField txtSSTextFieldB = new SSTextField();
-  DbDatePicker dpDatePicker = new DbDatePicker();
+  SsLGoodDatePicker dpDatePicker = new SsLGoodDatePicker();
 
   /**
    * database component declarations

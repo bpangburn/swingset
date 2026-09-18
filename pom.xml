@@ -43,7 +43,7 @@
 		<java-target>17</java-target>
 
 		<!-- Dependencies -->
-                <version.visdb>0.5.0</version.visdb>
+                <version.visdb>0.5.1</version.visdb>
 		<version.glazedlists>1.11.1203</version.glazedlists>
 		<version.table-sort-header>1.0.1</version.table-sort-header>
 		<version.google-guava>33.6.0-jre</version.google-guava>
@@ -154,17 +154,17 @@
 				<version>${version.raelity-lib}</version>
 			</dependency>
 
-			<dependency>
-				<groupId>com.mastfrog</groupId>
-				<artifactId>simplevalidation-standalone</artifactId>
-				<version>${version.simplevalidation}</version>
-			</dependency>
+                        <dependency>
+                                <groupId>dev.visdb.seesaw.contrib</groupId>
+                                <artifactId>simplevalidation</artifactId>
+                                <version>${version.visdb}</version>
+                        </dependency>
 
-			<dependency>
-				<groupId>com.github.lgooddatepicker</groupId>
-				<artifactId>LGoodDatePicker</artifactId>
-				<version>${version.ldatepicker}</version>
-			</dependency>
+                        <dependency>
+                                <groupId>dev.visdb.seesaw.contrib</groupId>
+                                <artifactId>lgooddatepicker</artifactId>
+                                <version>${version.visdb}</version>
+                        </dependency>
 	<!--
 			<dependency>
 				<groupId>com.raelity.3rdparty.com.github.lgooddatepicker</groupId>
