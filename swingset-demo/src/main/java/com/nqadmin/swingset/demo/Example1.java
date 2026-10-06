@@ -52,7 +52,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.function.Function;
 
 import javax.sql.RowSet;
 import javax.swing.JFrame;
@@ -60,22 +59,18 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.netbeans.validation.api.ui.ValidationGroup;
-import org.netbeans.validation.api.ui.ValidationItem;
-import org.netbeans.validation.api.ui.swing.SwingValidationGroup;
 import org.netbeans.validation.api.ui.swing.ValidationPanel;
 
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 
 import dev.visdb.seesaw.contrib.simplevalidation.SVUtils;
-import dev.visdb.seesaw.contrib.simplevalidation.StringValidator;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.decorators.BorderDecorator;
 import dev.visdb.seesaw.decorators.ComponentState;
-import dev.visdb.seesaw.decorators.TextComponentValidator;
 
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.CentralLookup;
+import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
 
 /**
@@ -125,27 +120,25 @@ public class Example1 extends JFrame {
     // After the first time, change modified color to BLUE
     switch (newBorderSet) {
       case 0 -> {
-        CentralLookup.getDefault().replace(BorderDecorator.BorderDecoratorPaint.class,
-                                           new BorderDecorator.BorderDecoratorPaint() {
-                                             @Override
-                                             public Color getBorderColor(ComponentState state) {
-                                               return switch (state) {
-                                                 case CLEAN -> null;
-                                                 case FOCUSED_CLEAN -> Color.GREEN;
-                                                 case MODIFIED, FOCUSED_MODIFIED -> Color.BLUE;
-                                                 case ERROR, FOCUSED_ERROR -> Color.RED;
-                                               };
-                                             }
-                                           });
+        Globals.setOption(BorderDecorator.BorderDecoratorPaint.class,
+            new BorderDecorator.BorderDecoratorPaint() {
+              @Override
+              public Color getBorderColor(ComponentState state) {
+                return switch (state) {
+                  case CLEAN -> null;
+                  case FOCUSED_CLEAN -> Color.GREEN;
+                  case MODIFIED, FOCUSED_MODIFIED -> Color.BLUE;
+                  case ERROR, FOCUSED_ERROR -> Color.RED;
+                };
+              }
+            });
       }
       case 1 -> {
-        // Should keep the previous
-        CentralLookup def = CentralLookup.getDefault();
-        def.lookupAll(BorderDecorator.BorderDecoratorPaint.class).forEach(p -> def.remove(p));
+        // Used to remove paint. Should keep the previous
       }
       case 2 -> {
-        CentralLookup.getDefault().replace(BorderDecorator.BorderDecoratorPaint.class,
-                                           new BorderDecorator.BorderDecoratorPaint());
+        Globals.setOption(BorderDecorator.BorderDecoratorPaint.class,
+            new BorderDecorator.BorderDecoratorPaint());
       }
     }
     newBorderSet++;
@@ -177,26 +170,13 @@ public class Example1 extends JFrame {
     // Set screen position.
     setLocation(DemoUtil.getChildScreenLocation(this.getName()));
 
-    // Set a validator.
-    final boolean USE_SIMPLE_VALIDATION = false;
-    //SSTextComponentValidationItem valSupplierName = null;
-    ValidationItem decoSupplierName = null;
-    Function<String, Boolean> validateSupplierName = (str) -> {
-      boolean valid = str == null || !str.matches("(?i).*oops.{0,2}$");
-      //logger.log(Level.TRACE, ()->sf("validateSupplierName %s", valid));
-      return valid;
-    };
-    if (!USE_SIMPLE_VALIDATION) {
-      txtSupplierName.setPluginValidator(TextComponentValidator.create(validateSupplierName));
-      txtSupplierCity.setPluginValidator(
-          TextComponentValidator.create((str) -> !str.matches(".*X")));
-    } else {
-      SwingValidationGroup.setComponentName(txtSupplierName, "Supplier Name");
-      StringValidator validator = SVUtils.getStringValidator(
-          validateSupplierName, () -> "Supplier can not end with 'oops..'");
-      //decoSupplierName = SVUtils.decorator(txtSupplierName, validator);
-      decoSupplierName = SVUtils.setDecoratorValidator(txtSupplierName, validator);
-    }
+    // Set some validation criteria.
+    txtSupplierName.setTextValidationCondition(
+        str -> str == null || !str.matches("(?i).*oops.{0,2}$"),
+        (ssComp) -> "Supplier name can not end with 'oops..'");
+    txtSupplierCity.setTextValidationCondition(
+        str -> str == null || !str.matches(".*X"),
+        (ssComp) -> "City can not end in 'X'");
 
     RowSetButtons rsButtons = new RowSetButtons() {
       @Override
@@ -293,13 +273,14 @@ public class Example1 extends JFrame {
     constraints.gridwidth = 2;
     contentPane.add(rsButtons, constraints);
 
+    final boolean USE_SIMPLE_VALIDATION = false;
     // Set up the simple validation panel.
     JPanel uiPanel;
     if (USE_SIMPLE_VALIDATION) {
       ValidationPanel valiPanel = new ValidationPanel();
       valiPanel.setInnerComponent(contentPane);
       ValidationGroup group = valiPanel.getValidationGroup();
-      group.addItem(decoSupplierName, false);
+      group.addItem(SVUtils.setTextDecorator(txtSupplierName, "Supplier Name"), false);
       uiPanel = valiPanel;
     } else {
       uiPanel = (JPanel) contentPane;

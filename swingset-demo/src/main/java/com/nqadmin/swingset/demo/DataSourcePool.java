@@ -73,7 +73,8 @@ import dev.visdb.seesaw.utils.JStuff;
 
 import com.nqadmin.swingset.utils.SSUtils;
 
-import static dev.visdb.seesaw.utils.CentralLookup.defLookup;
+import dev.visdb.seesaw.utils.Globals;
+
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
@@ -100,7 +101,7 @@ public class DataSourcePool {
       // Setup the connection pool
       JdbcDataSource ds01 = new JdbcDataSource();
       ds01.setURL("jdbc:h2:mem:" + MainClass.DATABASE_NAME
-                  + defLookup(H2Trace.class).getTraceUrlFlags());
+                  + Globals.getOption(H2Trace.class).getTraceUrlFlags());
       cp = JdbcConnectionPool.create(ds01);
       ds = ds01;
     }

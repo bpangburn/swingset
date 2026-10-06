@@ -117,6 +117,14 @@ public class Example2 extends JFrame {
     // SET SCREEN POSITION
     setLocation(DemoUtil.getChildScreenLocation(this.getName()));
 
+    // Set some validation criteria.
+    txtSupplierName.setTextValidationCondition(
+        (str) -> str == null || !str.matches("(?i).*oops.{0,2}$"),
+        (ssComp) -> "Supplier name can not end with 'oops..'");
+    txtSupplierCity.setTextValidationCondition(
+        (str) -> str == null || !str.matches(".*X"),
+        null);
+
     // INITIALIZE DATABASE CONNECTION AND COMPONENTS
     try {
       RowSet rowset = DemoUtil.getNewRowSet(connection);
