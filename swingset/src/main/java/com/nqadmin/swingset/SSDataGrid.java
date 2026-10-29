@@ -37,6 +37,7 @@
  ******************************************************************************/
 package com.nqadmin.swingset;
 
+import java.beans.Beans;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,6 +45,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.sql.RowSet;
+import javax.swing.table.TableModel;
 
 import dev.visdb.seesaw.navigate.RowsModel;
 
@@ -67,6 +69,21 @@ public class SSDataGrid extends dev.visdb.seesaw.SsTable {
     super(RowsModel.create(rowSet));
   }
 
+  /**
+   * @param dataModel
+   */
+  @Override
+  public void setModel(TableModel dataModel) {
+    if (Beans.isDesignTime()) {
+      super.setModel(dataModel instanceof SSTableModel tableModel
+                           ? tableModel : new SSTableModel());
+      return;
+    }
+    if (!(dataModel instanceof SSTableModel))
+      throw new IllegalArgumentException("Must be an SSTableModel");
+    super.setModel(dataModel);
+  }
+
   /** {@inheritDoc } */
   @Override
   public SSTableModel getModel() {
@@ -77,6 +94,20 @@ public class SSDataGrid extends dev.visdb.seesaw.SsTable {
   @Override
   protected SSTableModel createDefaultDataModel() {
     return new SSTableModel();
+  }
+
+  /**
+   * @param cellEditing
+   */
+  public void setSSCellEditing(SSCellEditing cellEditing) {
+    setSsCellEditing(cellEditing);
+  }
+
+  /**
+   * @param dataValue
+   */
+  public void setSSDataValue(SSDataValue dataValue) {
+    setSsDataValue(dataValue);
   }
   
 //=====================================================================================
