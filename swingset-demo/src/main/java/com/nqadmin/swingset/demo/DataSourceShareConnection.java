@@ -55,7 +55,7 @@ import org.h2.jdbcx.JdbcDataSource;
 
 import com.nqadmin.swingset.demo.MainClass.H2Trace;
 
-import static dev.visdb.seesaw.utils.CentralLookup.defLookup;
+import dev.visdb.seesaw.utils.Globals;
 
 /**
  * Provides a data source that returns a pre-specified connection; typically
@@ -76,7 +76,7 @@ public class DataSourceShareConnection {
   public static DataSource getDataSource(Connection conn) {
     JdbcDataSource ds01 = new JdbcDataSource();
     ds01.setURL("jdbc:h2:mem:" + MainClass.DATABASE_NAME
-                + defLookup(H2Trace.class).getTraceUrlFlags());
+                + Globals.getOption(H2Trace.class).getTraceUrlFlags());
     return new MyDataSource(ds01, conn);
   }
 

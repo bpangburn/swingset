@@ -51,7 +51,7 @@ import javax.sql.RowSet;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.navigate.RowSetState;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.SsDataNavigator;
+import dev.visdb.seesaw.SsDataNavigator;
 
 /**
  * See {@link SsDataNavigator}.

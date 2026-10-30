@@ -69,6 +69,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.text.JTextComponent;
 
 import com.nqadmin.swingset.SSCheckBox;
 import com.nqadmin.swingset.SSComboBox;
@@ -88,13 +89,12 @@ import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.datasources.products.DbOpsCreator;
 import dev.visdb.seesaw.decorators.ComponentState;
 import dev.visdb.seesaw.decorators.ComponentStateTextDecorator;
-import dev.visdb.seesaw.decorators.TextComponentValidator;
 import dev.visdb.seesaw.decorators.TextStyles;
 import dev.visdb.seesaw.models.DbCollection;
 import dev.visdb.seesaw.models.DbArray;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.CentralLookup;
-import dev.visdb.seesaw.utils.SsDataNavigator;
+import dev.visdb.seesaw.utils.Globals;
+import dev.visdb.seesaw.SsDataNavigator;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
 
@@ -360,9 +360,8 @@ public class TestBaseComponents extends JFrame {
 
     // TEST DbOpsCreator
     DbOpsCreator creator = (RowSet rs, RowsModel rowsModel1) -> createDbNav();
-    CentralLookup lkup = CentralLookup.getDefault();
-    DbOpsCreator prevCreator = lkup.lookup(DbOpsCreator.class);
-    lkup.replace(DbOpsCreator.class, creator);
+    DbOpsCreator prevCreator = Globals.getOption(DbOpsCreator.class);
+    Globals.setOption(DbOpsCreator.class, creator);
 
     // initialize database connection and components
     try {
@@ -381,10 +380,9 @@ public class TestBaseComponents extends JFrame {
     if (!name.equals("TestBaseComponentsDbOps")) {
       throw new IllegalStateException(sf("wrong customizer %s", name));
     }
-    lkup.remove(creator);
-    if (prevCreator != null) {
-      lkup.add(prevCreator);
-    }
+
+    if (prevCreator != null)
+      Globals.setOption(DbOpsCreator.class, prevCreator);
 
     if (!activeComps.contains(NAV)) {
       cmbSSDBComboNav = null;
@@ -448,21 +446,25 @@ public class TestBaseComponents extends JFrame {
     replaceComponent(NAV, cmbSSDBComboNav);
     replaceComponent(DB_COMBO, cmbSSDBComboBox);
 
+    // This is used by a text field for the ComponentStateTextDecorator
+    try {
+      setupOurTextStyles();
+    } catch (IOException ex) {
+      logger.log(Level.ERROR, (String) null, ex);
+    }
     // validators for the text fields
-    Function<String, Boolean> validator = (str) -> str == null || !str.matches("(?i).*oops.{0,2}$");
+    Function<String, Boolean> validationCondition
+        = str -> str == null || !str.matches("(?i).*oops.{0,2}$");
     if (activeComps.contains(TEXT_FIELD)) {
-      txtSSTextField.setPluginValidator(TextComponentValidator.create(validator));
+      txtSSTextField.setTextValidationCondition(
+          validationCondition, (ssComp) -> "Supplier name can not end with 'oops..'");
     }
     if (activeComps.contains(TEXT_FIELD_B)) {
-      txtSSTextFieldB.setPluginValidator(TextComponentValidator.create(validator));
-      try {
-        setupOurTextStyles();
-      } catch (IOException ex) {
-        logger.log(Level.ERROR, (String) null, ex);
-      }
+      txtSSTextFieldB.setTextValidationCondition(
+          validationCondition, (ssComp) -> "Supplier name can not end with 'oops..'");
       txtSSTextFieldB.setTextDecorator(new ComponentStateTextDecorator(
-          Map.of(ComponentState.ERROR, "testComponents_componentStateError",
-                 ComponentState.MODIFIED, "testComponents_componentStateModified")));
+          Map.of(ComponentState.ERROR, "testComponents_ErrorStyle",
+                 ComponentState.MODIFIED, "testComponents_ModifiedStyle")));
     }
 
     // Bind the components to their database columns.
@@ -488,7 +490,6 @@ public class TestBaseComponents extends JFrame {
       lstScrollPane = new JScrollPane(lstSSList);
       lstScrollPane.setPreferredSize(MainClass.ssDimTall);
       lstSSList.setDecorateTarget(lstScrollPane);
-      lstSSList.setFocusTarget(lstSSList);
     }
 
     JScrollPane lstScrollPane2 = null;
@@ -496,7 +497,6 @@ public class TestBaseComponents extends JFrame {
       lstScrollPane2 = new JScrollPane(lstSSList2);
       lstScrollPane2.setPreferredSize(MainClass.ssDimTall);
       lstSSList2.setDecorateTarget(lstScrollPane2);
-      lstSSList2.setFocusTarget(lstSSList2);
     }
     // Disable the primary key so the user can't change it.
     txtTestPK.setEnabled(false);
