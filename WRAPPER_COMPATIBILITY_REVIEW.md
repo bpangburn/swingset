@@ -90,3 +90,32 @@ or behavioral replacement. In particular:
 The next acceptance step is compiling the application and testing representative
 data-entry, list, table-editing and navigation workflows. Keep wrappers thin
 and add a regression test whenever another compatibility gap is found.
+
+## Follow-up: integer field and combo editor
+
+The incremental follow-up adds `formatting.SSIntegerField` with the three legacy
+constructors, integer precision accessors and SeeSaw number-field null handling.
+It retains `SSFormattedTextField` as its legacy superclass and explicitly uses
+`super.` for inherited operations. `SSBaseComboBox` now declares `getEditor()`;
+the concrete combo wrappers already inherit the required Swing implementation.
+The suite now contains 17 passing tests, and the complete Maven reactor passes
+with enforcement enabled on Java 17 using the configured Frgaal compiler.
+
+This follow-up patch applies on top of the refreshed compatibility patch, not
+instead of it. Its paths deliberately omit Git's `a/` and `b/` prefixes:
+
+- Eclipse Apply Patch: repository root, ignore **zero** leading path segments.
+- Command line from repository root: `git apply -p0 --check /path/to/patch`,
+  then `git apply -p0 /path/to/patch`.
+- Run `mvn install -DskipTests` afterwards when Eclipse workspace dependency
+  resolution remains disabled, then update the consuming Maven projects.
+
+The reported `List<ListItem>` to `List<SSListItem>` mismatch requires the
+application statement at ParticipantCallLogReports.java line 351 before choosing
+a migration. No unchecked cast or raw-list override has been added. In
+particular, SeeSaw deliberately disables `getSelectedValuesList()` by throwing
+`UnsupportedOperationException`; merely changing the application's generic type
+would not make that method safe to call. For selected keys use
+`getSelectedMappings()`; for selected display strings SeeSaw provides
+`getChosenDisplayValues()`. Neither should be substituted without checking how
+the application consumes the result.

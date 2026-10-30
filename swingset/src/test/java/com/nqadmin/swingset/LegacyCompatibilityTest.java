@@ -27,6 +27,7 @@ import com.nqadmin.swingset.enums.Gender3;
 import com.nqadmin.swingset.formatting.SSCurrencyField;
 import com.nqadmin.swingset.formatting.SSDateField;
 import com.nqadmin.swingset.formatting.SSFormattedTextField;
+import com.nqadmin.swingset.formatting.SSIntegerField;
 import com.nqadmin.swingset.formatting.SSNumericField;
 import com.nqadmin.swingset.formatting.SSTimestampField;
 import com.nqadmin.swingset.models.SSListItem;
@@ -92,6 +93,7 @@ class LegacyCompatibilityTest {
       assertLegacyFormattedField(new SSCurrencyField());
       assertLegacyFormattedField(new SSDateField(SSDateField.DDMMYYYY));
       assertLegacyFormattedField(new SSNumericField());
+      assertLegacyFormattedField(new SSIntegerField());
       assertLegacyFormattedField(new SSTimestampField());
     });
   }
@@ -352,5 +354,58 @@ class LegacyCompatibilityTest {
 
   private static void assertLegacyFormattedField(SSFormattedTextField field) {
     assertInstanceOf(SsComponent.class, field);
+  }
+
+  @Test
+  void legacyBaseComboExposesTheConcreteSwingEditor() throws Exception {
+    SwingUtilities.invokeAndWait(() -> {
+      SSComboBox combo = new SSComboBox();
+      SSDBComboBox dbCombo = new SSDBComboBox();
+      SSBaseComboBox<?, ?, ?> baseCombo = combo;
+      SSBaseComboBox<?, ?, ?> baseDbCombo = dbCombo;
+      org.junit.jupiter.api.Assertions.assertSame(combo.getEditor(), baseCombo.getEditor());
+      org.junit.jupiter.api.Assertions.assertSame(dbCombo.getEditor(), baseDbCombo.getEditor());
+      assertInstanceOf(java.awt.Component.class, baseCombo.getEditor().getEditorComponent());
+      assertInstanceOf(java.awt.Component.class, baseDbCombo.getEditor().getEditorComponent());
+    });
+  }
+
+  @Test
+  void integerFieldRetainsLegacyConstructorsPrecisionAndNullHandling() throws Exception {
+    SwingUtilities.invokeAndWait(() -> {
+      SSIntegerField field = new SSIntegerField(9);
+      assertEquals(9, field.getPrecision());
+      field.setPrecision(12);
+      assertEquals(12, field.getPrecision());
+      assertEquals(javax.swing.SwingConstants.RIGHT, field.getHorizontalAlignment());
+
+      SSIntegerField defaultField = new SSIntegerField();
+      defaultField.setValue(1234567);
+      try {
+        Number value = (Number) defaultField.getFormatter().stringToValue(defaultField.getText());
+        assertEquals(1234567, value.intValue());
+      } catch (ParseException exception) {
+        throw new AssertionError(exception);
+      }
+
+      field.setAllowNull(false);
+      field.cleanField();
+      assertEquals(0, ((Number) field.getValue()).intValue());
+      assertTrue(field.componentValidate());
+      field.setAllowNull(true);
+      field.cleanField();
+      assertNull(field.getValue());
+      assertTrue(field.componentValidate());
+      field.setAllowNull(false);
+      assertFalse(field.componentValidate());
+
+      javax.swing.text.NumberFormatter formatter = new javax.swing.text.NumberFormatter(
+          java.text.NumberFormat.getIntegerInstance());
+      javax.swing.text.DefaultFormatterFactory factory =
+          new javax.swing.text.DefaultFormatterFactory(formatter);
+      SSIntegerField customField = new SSIntegerField(factory);
+      org.junit.jupiter.api.Assertions.assertSame(factory, customField.getFormatterFactory());
+      assertLegacyFormattedField(customField);
+    });
   }
 }

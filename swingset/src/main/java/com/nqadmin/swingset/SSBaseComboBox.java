@@ -4,6 +4,8 @@
  */
 package com.nqadmin.swingset;
 
+import javax.swing.ComboBoxEditor;
+
 /**
  * Source-compatibility view of the SwingSet 4 combo-box API.
  *
@@ -21,6 +23,12 @@ package com.nqadmin.swingset;
  * @param <O2> optional second display-value type
  */
 public interface SSBaseComboBox<M, O, O2> {
+  /**
+   * Returns the editor supplied by the concrete Swing combo-box superclass.
+   * @return the combo-box editor
+   */
+  ComboBoxEditor getEditor();
+
   /** @return the mapping/key for the selected item */
   M getSelectedMapping();
 
