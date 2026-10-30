@@ -45,11 +45,11 @@ package com.nqadmin.swingset;
 import dev.visdb.seesaw.table.SsTableModel;
 
 /**
- * See {@link dev.visdb.seesaw.table.SSTableModel}
+ * See {@link SsTableModel}.
  */
 @SuppressWarnings("serial")
 public class SSTableModel extends SsTableModel {
-    public void setSSDataGridHandler(SSDataGridHandler dataGridHandler) {
-        super.setSsDataGridHandler(dataGridHandler);
-    }
+  public void setSSDataGridHandler(SSDataGridHandler dataGridHandler) {
+    super.setSsDataGridHandler(dataGridHandler);
+  }
 }

@@ -43,6 +43,8 @@
 package com.nqadmin.swingset;
 
 import java.sql.JDBCType;
+import java.util.Arrays;
+import java.util.List;
 
 import dev.visdb.seesaw.SsList1;
 import dev.visdb.seesaw.models.DbCollection;
@@ -81,5 +83,54 @@ of {@link dev.visdb.seesaw.models.SSDbArray}
    */
   public SSList(DbCollection collectionModel) {
     super(collectionModel);
+  }
+
+  /** SwingSet 4 name for {@link #getChosenKeys()}. */
+  public List<Object> getSelectedMappings() {
+    return super.getChosenKeys();
+  }
+
+  /**
+   * Returns selected mappings, not SeeSaw's internal list-item objects.
+   * @deprecated use {@link #getSelectedMappings()}
+   */
+  @Deprecated
+  @Override
+  public Object[] getSelectedValues() {
+    if (super.getSelectedIndex() == -1) {
+      return new Object[] {Integer.valueOf(-1)};
+    }
+    return super.getChosenKeys().toArray();
+  }
+
+  /** SwingSet 4 name for SeeSaw display values. */
+  public void setOptions(List<String> options) {
+    super.setDisplayValues(options);
+  }
+
+  /** SwingSet 4 name for SeeSaw display values and keys. */
+  public void setOptions(List<String> options, List<Object> mappings) {
+    super.setDisplayValues(options, mappings);
+  }
+
+  /** SwingSet 4 array overload for SeeSaw display values and keys. */
+  public boolean setOptions(String[] options, Object[] mappings) {
+    super.setDisplayValues(Arrays.asList(options), mappings == null ? null : Arrays.asList(mappings));
+    return true;
+  }
+
+  /** SwingSet 4 name for SeeSaw display values. */
+  public void setOptions(String[] options) {
+    super.setDisplayValues(Arrays.asList(options));
+  }
+
+  /** SwingSet 4 name for SeeSaw enum display values. */
+  public <T extends Enum<T>> void setOptions(Class<T> enumOptions) {
+    super.setDisplayValues(enumOptions);
+  }
+
+  /** SwingSet 4 name for {@link #setChosenKeys(Object[])}. */
+  public void setSelectedValues(Object[] selectedMappings) {
+    super.setChosenKeys(selectedMappings);
   }
 }

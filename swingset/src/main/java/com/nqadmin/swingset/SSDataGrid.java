@@ -100,14 +100,14 @@ public class SSDataGrid extends dev.visdb.seesaw.SsTable {
    * @param cellEditing
    */
   public void setSSCellEditing(SSCellEditing cellEditing) {
-    setSsCellEditing(cellEditing);
+    super.setSsCellEditing(cellEditing);
   }
 
   /**
    * @param dataValue
    */
   public void setSSDataValue(SSDataValue dataValue) {
-    setSsDataValue(dataValue);
+    super.setSsDataValue(dataValue);
   }
   
 //=====================================================================================
@@ -123,10 +123,10 @@ public class SSDataGrid extends dev.visdb.seesaw.SsTable {
   @Deprecated
   public void setHiddenColumns(final int[] _columnNumbers) {
     if (_columnNumbers == null) {
-      setHiddenColumns(Collections.emptyList());
+      super.setHiddenColumns(Collections.emptyList());
       return;
     }
-    setHiddenColumns(IntStream.of(_columnNumbers).boxed().collect(Collectors.toList()));
+    super.setHiddenColumns(IntStream.of(_columnNumbers).boxed().collect(Collectors.toList()));
   }
 
   /**
@@ -140,10 +140,10 @@ public class SSDataGrid extends dev.visdb.seesaw.SsTable {
   public void setHiddenColumns(final String[] _columnNames) throws SQLException {
     // TODO: does null need to be supported?
     if (_columnNames == null) {
-      setHiddenColumnsByName(Collections.emptyList());
+      super.setHiddenColumnsByName(Collections.emptyList());
       return;
     }
-    setHiddenColumnsByName(Arrays.stream(_columnNames).collect(Collectors.toList()));
+    super.setHiddenColumnsByName(Arrays.stream(_columnNames).collect(Collectors.toList()));
   }
 
   /**

@@ -42,17 +42,22 @@
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import dev.visdb.seesaw.SsComboBox1;
 import dev.visdb.seesaw.models.Item1;
 
 /**
  * This class provides a ComboBox with an Integer key and String value.
- * See {@link dev.visdb.seesaw.ComboBox2} for detailed documentation.
+ * See {@link dev.visdb.seesaw.SsComboBox2} for detailed documentation.
  */
 @SuppressWarnings("serial")
-public class SSComboBox extends SsComboBox1<Integer, String> {
+public class SSComboBox extends SsComboBox1<Integer, String>
+    implements SSBaseComboBox<Integer, String, Object> {
   /** Builder */
   public static class Builder extends SsComboBox1.AbstractBuilder<Integer, String, Builder> {
     /** self type idiom */
@@ -94,22 +99,95 @@ public class SSComboBox extends SsComboBox1<Integer, String> {
     this(new Builder().modelType(modelType));
   }
 
+  /** SwingSet 4 constructor selecting GlazedLists or the Swing model. */
+  public SSComboBox(boolean useGlazedLists) {
+    this(useGlazedLists ? ModelType.GLAZED : ModelType.SWING);
+  }
+
   /**
    * @return a copy of the chosenItem with methods getKey(), getDisplayValue()
    */
   @Override
   public Item getChosenItem() {
     //   return new Item(getChosenKey(), getChosenDisplayValue());
-    Optional<Item> item = getChosenItem((remodel, lItem) -> {
+    Optional<Item> item = super.getChosenItem((remodel, lItem) -> {
       return new Item(remodel.getKey(lItem), remodel.getDisplayValue(lItem));
     });
     return item.orElse(new Item(null, null));
   }
 
+  /** SwingSet 4 name for {@link #getChosenKey()}. */
+  @Override
+  public Integer getSelectedMapping() {
+    return super.getChosenKey();
+  }
+
+  /** SwingSet 4 name for {@link #setChosenKey(Integer)}. */
+  @Override
+  public void setSelectedMapping(Integer mapping) {
+    super.setChosenKey(mapping);
+  }
+
+  /** SwingSet 4 name for {@link #getChosenDisplayValue()}. */
+  @Override
+  public String getSelectedOption() {
+    return super.getChosenDisplayValue();
+  }
+
+  /** SwingSet 4 name for {@link #setChosenDisplayValue(String)}. */
+  @Override
+  public void setSelectedOption(String option) {
+    super.setChosenDisplayValue(option);
+  }
+
+  /** SwingSet 4 name for {@link #getChosenEnum()}. */
+  public Enum<?> getSelectedEnum() {
+    return super.getChosenEnum();
+  }
+
+  /** SwingSet 4 name for {@link #setChosenEnum(Enum)}. */
+  public void setSelectedEnum(Enum<?> option) {
+    super.setChosenEnum(option);
+  }
+
+  /** SwingSet 4 name for SeeSaw display values. */
+  public void setOptions(String[] options) {
+    super.setDisplayValues(Arrays.asList(options));
+  }
+
+  /**
+   * SwingSet 4 array overload for SeeSaw display values and keys.
+   *
+   * @return {@code true}, retained for the legacy method contract
+   */
+  public boolean setOptions(String[] options, int[] mappings) {
+    List<Integer> mappingList = mappings == null
+        ? null
+        : IntStream.of(mappings).boxed().collect(Collectors.toList());
+    super.setDisplayValues(Arrays.asList(options), mappingList);
+    return true;
+  }
+
+  /** SwingSet 4 name for SeeSaw display values and keys. */
+  public void setOptions(List<String> options, List<Integer> mappings) {
+    super.setDisplayValues(options, mappings);
+  }
+
+  /** SwingSet 4 name for SeeSaw display values. */
+  public void setOptions(List<String> options) {
+    super.setDisplayValues(options);
+  }
+
+  /** SwingSet 4 name for SeeSaw enum display values. */
+  public <T extends Enum<T>> void setOptions(Class<T> enumOptions) {
+    super.setDisplayValues(enumOptions);
+  }
+
   /**
    * For non generic getChosenItem().
    */
-  public static class Item extends Item1<Integer, String> {
+  public static class Item extends Item1<Integer, String>
+      implements com.nqadmin.swingset.models.SSListItem {
     /** Create an Item
      * @param key
      * @param displayValue */

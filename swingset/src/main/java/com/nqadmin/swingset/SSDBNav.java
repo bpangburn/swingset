@@ -29,9 +29,51 @@
  * ****************************************************************************/
 package com.nqadmin.swingset;
 
+import com.nqadmin.swingset.utils.SSEnums.Navigation;
+
 import dev.visdb.seesaw.datasources.DbOps;
 
 /**
  * Compatibility.
  */
-public interface SSDBNav extends DbOps {}
+public interface SSDBNav extends DbOps {
+  /** @deprecated use {@link Navigation#First} */
+  @Deprecated
+  int FIRST = 3;
+
+  /** @deprecated use {@link Navigation#Last} */
+  @Deprecated
+  int LAST = 4;
+
+  /** @deprecated use {@link Navigation#Next} */
+  @Deprecated
+  int NEXT = 1;
+
+  /** @deprecated use {@link Navigation#Previous} */
+  @Deprecated
+  int PREVIOUS = 2;
+
+  /**
+   * Bridge SeeSaw navigation callbacks to the SwingSet 4 enum namespace.
+   */
+  @Override
+  default void performNavigationOps(
+      dev.visdb.seesaw.navigate.RowsAction.Navigation navigationType) {
+    performNavigationOps(Navigation.valueOf(navigationType.name()));
+  }
+
+  /** SwingSet 4 navigation callback. */
+  default void performNavigationOps(Navigation navigationType) {}
+
+  /** @deprecated use {@link #performNavigationOps(Navigation)} */
+  @Deprecated
+  default void performNavigationOps(int navigationType) {
+    for (Navigation navigation : Navigation.values()) {
+      if (navigation.getValue() == navigationType) {
+        performNavigationOps(navigation);
+        return;
+      }
+    }
+    throw new IllegalArgumentException("Unknown navigation value: " + navigationType);
+  }
+}

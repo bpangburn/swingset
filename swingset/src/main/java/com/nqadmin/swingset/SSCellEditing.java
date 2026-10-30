@@ -11,6 +11,8 @@
 
 package com.nqadmin.swingset;
 
+import java.io.Serializable;
+
 import dev.visdb.seesaw.table.SsCellEditing;
 
 /**
@@ -18,5 +20,6 @@ import dev.visdb.seesaw.table.SsCellEditing;
  * to determine whether or not a given cell can be edited or if a user-specified
  * value for a cell is valid or invalid.
  */
-public interface SSCellEditing extends SsCellEditing {
+public interface SSCellEditing extends SsCellEditing, Serializable {
+  long serialVersionUID = -8081589343308592606L;
 }

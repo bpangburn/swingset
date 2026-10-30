@@ -721,7 +721,16 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
    *
    * @param _navigationType Enum indicating type of navigation
    */
-  protected void ssDBNavPerformNavigationOps(Navigation _navigationType) {}
+  protected void ssDBNavPerformNavigationOps(Navigation navigationType) {
+    ssDBNavPerformNavigationOps(SSEnums.Navigation.valueOf(navigationType.name()));
+  }
+
+  /**
+   * SwingSet 4 navigation hook retained for source compatibility.
+   *
+   * @param navigationType completed navigation operation
+   */
+  protected void ssDBNavPerformNavigationOps(SSEnums.Navigation navigationType) {}
 
   /**
    * Perform any actions needed after a deletion.

@@ -43,6 +43,9 @@
 package com.nqadmin.swingset;
 
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import dev.visdb.seesaw.SsDbComboBox2;
@@ -52,14 +55,22 @@ import dev.visdb.seesaw.models.Item2;
  * See {@link SsDbComboBox2}.
  */
 @SuppressWarnings("serial")
-public class SSDBComboBox extends SsDbComboBox2<Long, Object, Object> {
+public class SSDBComboBox extends SsDbComboBox2<Long, Object, Object>
+    implements SSBaseComboBox<Long, Object, Object> {
+  private static final String LEGACY_D2_COLUMN = "_swingset_option2_";
+
   /**
    * Builder.
    */
   public static class Builder extends SsDbComboBox2.AbstractBuilder<Long, Object, Object, Builder> {
     /** defaults to ModelTYpe.GLAZED */
     public Builder() {
-      modelType(ModelType.GLAZED);
+      super.modelType(ModelType.GLAZED);
+      // SeeSaw requires both names during construction. SwingSet 4 allowed an
+      // empty constructor followed by setters, so use inert placeholders until
+      // the application supplies the real database column names.
+      super.primaryKeyColumnName("_swingset_mapping_");
+      super.displayColumnName("_swingset_option_");
     }
 
     /** self type idiom */
@@ -130,17 +141,103 @@ public class SSDBComboBox extends SsDbComboBox2<Long, Object, Object> {
   @Override
   public Item getChosenItem() {
     //   return new Item(getChosenKey(), getChosenDisplayValue());
-    Optional<Item> item = getChosenItem((remodel, lItem) -> {
+    Optional<Item> item = super.getChosenItem((remodel, lItem) -> {
       return new Item(remodel.getKey(lItem), remodel.getDisplayValue(lItem),
-          hasD2() ? remodel.getD2(lItem) : Item2.NO_D2);
+          super.hasD2() ? remodel.getD2(lItem) : Item2.NO_D2);
     });
     return item.orElse(new Item(null, null, null));
+  }
+
+  /** SwingSet 4 name for {@link #getChosenKey()}. */
+  @Override
+  public Long getSelectedMapping() {
+    return super.getChosenKey();
+  }
+
+  /** SwingSet 4 name for {@link #setChosenKey(Long)}. */
+  @Override
+  public void setSelectedMapping(Long mapping) {
+    super.setChosenKey(mapping);
+  }
+
+  /** SwingSet 4 name for {@link #getChosenDisplayValue()}. */
+  @Override
+  public Object getSelectedOption() {
+    return super.getChosenDisplayValue();
+  }
+
+  /** SwingSet 4 name for {@link #setChosenDisplayValue(Object)}. */
+  @Override
+  public void setSelectedOption(Object option) {
+    if (!super.hasD2()) {
+      super.setChosenDisplayValue(option);
+      return;
+    }
+
+    int index = super.getDisplayValues().indexOf(option);
+    if (index >= 0) {
+      super.setChosenKey(super.getKeys().get(index));
+    } else {
+      super.setSelectedItem(option);
+    }
+  }
+
+  /** SwingSet 4 name for {@link #addDisplayValue(Object, Long)}. */
+  public void addOption(Object option, Long mapping) {
+    super.addDisplayValue(option, mapping);
+  }
+
+  /** SwingSet 4 name for {@link #addDisplayValue(Object, Object, Long)}. */
+  public void addOption(Object option, Object option2, Long mapping) {
+    if (!super.hasD2()) {
+      enableLegacyD2(option, option2, mapping);
+      return;
+    }
+    super.addDisplayValue(option, option2, mapping);
+  }
+
+  private void enableLegacyD2(Object option, Object option2, Long mapping) {
+    Long selectedMapping = super.getChosenKey();
+    int selectedIndex = super.getSelectedIndex();
+    List<Long> mappings = new ArrayList<>(super.getKeys());
+    List<Object> options = new ArrayList<>(super.getDisplayValues());
+
+    if (super.getAllowNull() && !mappings.isEmpty() && mappings.get(0) == null) {
+      mappings.remove(0);
+      options.remove(0);
+    }
+
+    // SeeSaw permits its D2 model shape to change only while the list is empty.
+    // Do not use setDisplayValuesInternal to clear here: when nulls are allowed,
+    // it immediately inserts a null item and the D2 shape change then fails.
+    try (var remodel = super.keyVisual.getRemodel()) {
+      remodel.clear();
+    }
+    super.setD2ColumnName(LEGACY_D2_COLUMN);
+
+    List<Object> option2s = new ArrayList<>(Collections.nCopies(options.size(), null));
+    mappings.add(mapping);
+    options.add(option);
+    option2s.add(option2);
+    super.setDisplayValuesInternal(options, mappings, option2s);
+    // Rebuilding the model must not silently change an existing selection.
+    if (selectedIndex < 0) {
+      super.setSelectedIndex(-1);
+    } else {
+      super.setChosenKey(selectedMapping);
+    }
+  }
+
+  /** SwingSet 4 name for {@link #updateDisplayValue(Long, Object)}. */
+  public boolean updateOption(Long mapping, String option) {
+    return super.updateDisplayValue(mapping, option);
   }
 
   /**
    * For non generic getChosenItem().
    */
-  public static class Item extends Item2<Long, Object, Object> {
+  public static class Item extends Item2<Long, Object, Object>
+      implements com.nqadmin.swingset.models.SSListItem {
     /** Create an Item
      * @param key
      * @param displayValue
@@ -155,6 +252,6 @@ public class SSDBComboBox extends SsDbComboBox2<Long, Object, Object> {
   }
 
   public void setSeparator(final String separator) {
-    getListItemFormat().setSeparator(separator);
+    super.getListItemFormat().setSeparator(separator);
   }
 }
