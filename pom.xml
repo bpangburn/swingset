@@ -67,7 +67,7 @@
 
     <!-- Dependencies -->
     <version.glazedlists>1.11.1203</version.glazedlists>
-    <version.log4j>2.26.0</version.log4j>
+    <version.log4j>2.26.1</version.log4j>
     <version.jdbcrowsetimpl>1.0.4</version.jdbcrowsetimpl>
     <version.h2>2.4.240</version.h2>
     <version.java-getopt>1.0.13</version.java-getopt>
