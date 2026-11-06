@@ -39,7 +39,7 @@
 		<java-release>25</java-release>
 		<!-- source/target for using frgaal -->
 		<version.frgaal>25.0.0</version.frgaal>
-		<java-source>24</java-source>
+		<java-source>25</java-source>
 		<java-target>17</java-target>
 
 		<!-- Dependencies -->
