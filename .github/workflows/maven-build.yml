@@ -1,22 +1,31 @@
 name: Maven Build
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
-      - 4.0.*-SNAPSHOT
+      - '4.0.*-SNAPSHOT'
   pull_request:
     branches:
       - master
-      - 4.0.*-SNAPSHOT
+      - '4.0.*-SNAPSHOT'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maven-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 30
     strategy:
+      fail-fast: false
       matrix:
-        java-version: [8, 11, 21]
+        java-version: [8, 11, 21, 25]
 
     steps:
       - name: Check out repository
@@ -29,10 +38,11 @@ jobs:
           java-version: ${{ matrix.java-version }}
           cache: maven
 
+      # The core library supports Java 8; the demo requires a newer JDK.
       - name: Build SwingSet core on Java 8
-        if: matrix.java-version == '8'
+        if: matrix.java-version == 8
         run: mvn -B -ntp clean verify -pl swingset -am
-    
+
       - name: Build full project on Java 11+
-        if: matrix.java-version != '8'
+        if: matrix.java-version != 8
         run: mvn -B -ntp clean verify
