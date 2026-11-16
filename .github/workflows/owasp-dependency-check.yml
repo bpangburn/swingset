@@ -50,7 +50,7 @@ jobs:
         run: mvn --version
 
       - name: Restore vulnerability database cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/owasp-dependency-check
           key: owasp-nvd-${{ runner.os }}-${{ github.run_id }}
