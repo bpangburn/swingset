@@ -1,11 +1,10 @@
 name: Maven Build (SS-5-WRAPPER)
 
+# Temporary manual-only workflow while dev.visdb.seesaw:seesaw:0.5.2
+# is not published to Maven Central. Restore push/PR triggers after release.
+# Manual runs currently fail at dependency resolution; this is expected.
 on:
   workflow_dispatch:
-  push:
-    branches: [SS-5-WRAPPER]
-  pull_request:
-    branches: [SS-5-WRAPPER]
 
 permissions:
   contents: read
