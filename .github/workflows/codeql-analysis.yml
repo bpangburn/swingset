@@ -30,7 +30,9 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 8
+          # Full reactor includes H2 2.x, which requires Java 11 or newer.
+          # Java 8 compatibility of swingset core is tested separately in Maven Build.
+          java-version: '11'
           cache: maven
 
       - name: Install Maven 3.9.16
