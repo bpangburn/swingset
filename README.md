@@ -2,6 +2,8 @@
 
 SwingSet is an open source Java Swing toolkit that provides data-aware replacements and helpers for building database-backed Swing user interfaces.
 
+See [IDE_SETUP.md](IDE_SETUP.md) for Eclipse m2e / NetBeans import instructions, Java 25 development settings, and tracked IDE configuration.
+
 This repository is a multi-module Maven project:
 
 | Module | Description |

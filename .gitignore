@@ -1,1 +1,39 @@
-/target/
+# Maven-generated output in any module
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+.flattened-pom.xml
+
+# Eclipse / m2e generated metadata
+.project
+.classpath
+.factorypath
+.metadata/
+bin/
+.apt_generated/
+.apt_generated_tests/
+
+# These generated preferences are redundant with Maven or m2e defaults.
+# Do NOT ignore the whole .settings/ directory: custom JDT / APT
+# preferences remain intentionally version-controlled.
+.settings/org.eclipse.core.resources.prefs
+.settings/org.eclipse.m2e.core.prefs
+
+# NetBeans generated metadata (custom run/config files retained)
+nbproject/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+
+# OS / editor temporary files
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
