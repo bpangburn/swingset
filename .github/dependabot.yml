@@ -1,13 +1,49 @@
 version: 2
+
+# Keep the default branch and maintained release/development lines
+# independent; updates still require compatibility checks before merging.
 updates:
   - package-ecosystem: maven
     directory: /
+    target-branch: master
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
 
   - package-ecosystem: github-actions
     directory: /
+    target-branch: master
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+
+  # Java 8 core compatibility branch. Review all proposed upgrades for
+  # Java 8 bytecode/runtime requirements and verify the core CI matrix.
+  - package-ecosystem: maven
+    directory: /
+    target-branch: 4.0.14-SNAPSHOT
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: 4.0.14-SNAPSHOT
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+
+  # SeeSaw wrapper: frgaal compiles Java 25 sources to Java 17 target.
+  - package-ecosystem: maven
+    directory: /
+    target-branch: SS-5-WRAPPER
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: SS-5-WRAPPER
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
