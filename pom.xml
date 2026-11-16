@@ -47,7 +47,7 @@
 		<version.glazedlists>1.11.1203</version.glazedlists>
 		<version.table-sort-header>1.0.1</version.table-sort-header>
 		<version.google-guava>33.6.0-jre</version.google-guava>
-		<version.netbeans>RELEASE240</version.netbeans>
+		<version.netbeans>RELEASE320</version.netbeans>
 		<version.weak-event-bus-receiver>1.0.0</version.weak-event-bus-receiver>
                 <!--        Demo -->
 		<version.log4j>2.25.3</version.log4j>
@@ -63,7 +63,7 @@
 		<version.logman>2.3.1</version.logman>
                 <!--        Test -->
 		<version.junit-jupiter>5.14.1</version.junit-jupiter>
-		<version.mockito>5.14.2</version.mockito>
+		<version.mockito>5.24.0</version.mockito>
 
 		<!-- Plugins -->
 		<version.versions-maven-plugin>2.20.1</version.versions-maven-plugin>
