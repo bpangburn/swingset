@@ -39,6 +39,23 @@ jobs:
           cache: maven
 
       # The core library supports Java 8; the demo requires a newer JDK.
+      - name: Install Maven 3.9.16
+        shell: bash
+        run: |
+          set -euo pipefail
+          version=3.9.16
+          base="https://downloads.apache.org/maven/maven-3/${version}/binaries"
+          archive="$RUNNER_TEMP/apache-maven-${version}-bin.tar.gz"
+          curl --fail --silent --show-error --location "${base}/apache-maven-${version}-bin.tar.gz" -o "$archive"
+          curl --fail --silent --show-error --location "${base}/apache-maven-${version}-bin.tar.gz.sha512" -o "$archive.sha512"
+          expected="$(tr -d '[:space:]' < "$archive.sha512")"
+          echo "$expected  $archive" | sha512sum --check --status
+          tar -xzf "$archive" -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/apache-maven-${version}/bin" >> "$GITHUB_PATH"
+
+      - name: Verify Maven version
+        run: mvn --version
+
       - name: Build SwingSet core on Java 8
         if: matrix.java-version == 8
         run: mvn -B -ntp clean verify -pl swingset -am
