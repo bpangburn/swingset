@@ -66,17 +66,17 @@
 		<version.mockito>5.24.0</version.mockito>
 
 		<!-- Plugins -->
-		<version.versions-maven-plugin>2.20.1</version.versions-maven-plugin>
+		<version.versions-maven-plugin>2.25.1</version.versions-maven-plugin>
 		<version.maven-enforcer-plugin>3.7.0</version.maven-enforcer-plugin>
 		<version.maven-clean-plugin>3.5.0</version.maven-clean-plugin>
-		<version.maven-resources-plugin>3.4.0</version.maven-resources-plugin>
+		<version.maven-resources-plugin>3.5.0</version.maven-resources-plugin>
 		<version.maven-compiler-plugin>3.16.0</version.maven-compiler-plugin>
-		<version.maven-surefire-plugin>3.5.4</version.maven-surefire-plugin>
+		<version.maven-surefire-plugin>3.6.1</version.maven-surefire-plugin>
 		<version.maven-failsafe-plugin>3.6.1</version.maven-failsafe-plugin>
 		<version.maven-jar-plugin>3.5.1</version.maven-jar-plugin>
 		<version.maven-source-plugin>3.4.0</version.maven-source-plugin>
 		<version.maven-javadoc-plugin>3.12.0</version.maven-javadoc-plugin>
-		<version.maven-install-plugin>3.1.4</version.maven-install-plugin>
+		<version.maven-install-plugin>3.2.0</version.maven-install-plugin>
 		<version.maven-deploy-plugin>3.2.0</version.maven-deploy-plugin>
 		<version.maven-site-plugin>4.0.0-M16</version.maven-site-plugin>
 		<version.maven-gpg-plugin>3.2.8</version.maven-gpg-plugin>
@@ -390,7 +390,7 @@
                                 <plugin>
                                     <groupId>org.apache.maven.plugins</groupId>
                                     <artifactId>maven-antrun-plugin</artifactId>
-                                    <version>3.0.0</version>
+                                    <version>3.2.0</version>
                                     <executions>
                                         <execution>
                                             <id>display-variable-value</id>
