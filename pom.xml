@@ -62,7 +62,7 @@
 		-->
 		<version.logman>2.3.1</version.logman>
                 <!--        Test -->
-		<version.junit-jupiter>5.14.1</version.junit-jupiter>
+		<version.junit-jupiter>6.1.3</version.junit-jupiter>
 		<version.mockito>5.24.0</version.mockito>
 
 		<!-- Plugins -->
