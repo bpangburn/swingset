@@ -1,0 +1,51 @@
+name: CodeQL (SS-5-WRAPPER)
+
+# Temporary manual-only workflow while dev.visdb.seesaw:seesaw:0.5.2
+# is not published to Maven Central. Restore push/PR triggers after release.
+# Manual runs currently fail at dependency resolution; this is expected.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codeql-wrapper-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Analyze Java with JDK 25
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Verify toolchain
+        run: |
+          java -version
+          mvn -version
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: java
+          build-mode: manual
+
+      - name: Build project (frgaal)
+        run: mvn -B -ntp clean compile
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v4
