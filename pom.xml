@@ -52,7 +52,7 @@
                 <!--        Demo -->
 		<version.log4j>2.25.3</version.log4j>
 		<version.jdbcrowsetimpl>1.0.3</version.jdbcrowsetimpl>
-		<version.h2>2.4.240</version.h2>
+		<version.h2>2.5.252</version.h2>
 		<version.java-getopt>1.0.13</version.java-getopt>
 		<version.raelity-lib>1.2.0</version.raelity-lib>
 		<version.simplevalidation>1.14.1</version.simplevalidation>
