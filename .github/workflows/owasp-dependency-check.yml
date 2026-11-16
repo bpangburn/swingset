@@ -1,0 +1,75 @@
+name: OWASP Dependency-Check
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Every Wednesday, 08:30 UTC. Kept separate from Monday CodeQL.
+    - cron: '30 8 * * 3'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: owasp-dependency-check-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  dependency-check:
+    name: Scan Maven dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      # OWASP Dependency-Check 12.x requires JDK 11+, but compilation still
+      # targets Java 8 via the project's maven.compiler.release setting.
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Restore vulnerability database cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/owasp-dependency-check
+          key: owasp-nvd-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            owasp-nvd-${{ runner.os }}-
+
+      - name: Scan reactor dependencies
+        env:
+          # Optional repository Actions secret. Recommended to avoid NVD
+          # anonymous API rate limits. Never put the key in Maven arguments.
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: |
+          mvn -B -ntp -Powasp-check \
+            -DskipTests \
+            -DfailBuildOnCVSS=11 \
+            -DfailOnError=true \
+            -Dformat=HTML,JSON \
+            -DossIndexAnalyzerEnabled=false \
+            -DdataDirectory="$HOME/.cache/owasp-dependency-check" \
+            -DnvdApiKeyEnvironmentVariable=NVD_API_KEY \
+            verify
+
+      - name: Upload vulnerability reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owasp-dependency-check-report
+          path: |
+            **/target/dependency-check-report.html
+            **/target/dependency-check-report.json
+          if-no-files-found: warn
+          retention-days: 30
+
+# Scanning uses the existing -Powasp-check aggregate profile and its
+# dependency-check-suppressions.xml file. Findings remain visible in reports
+# but do not fail the scan (CVSS 11 is above the maximum score of 10).
+# Infrastructure/configuration errors still fail the run. OSS Index is
+# disabled here to avoid unauthenticated Sonatype rate limits; NVD scanning
+# remains enabled. Add the NVD_API_KEY repository secret for reliable updates.
