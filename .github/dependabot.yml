@@ -3,12 +3,23 @@ version: 2
 # Keep the default branch and maintained release/development lines
 # independent; updates still require compatibility checks before merging.
 updates:
+  # Group routine minor/patch updates; security, application and major
+  # version updates remain independently reviewable.
   - package-ecosystem: maven
     directory: /
     target-branch: master
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      maven-build-tools:
+        applies-to: version-updates
+        patterns:
+          - "org.apache.maven.plugins:*"
+          - "org.codehaus.mojo:versions-maven-plugin"
+        update-types:
+          - minor
+          - patch
 
   - package-ecosystem: github-actions
     directory: /
@@ -16,6 +27,14 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      routine-actions:
+        applies-to: version-updates
+        patterns:
+          - "actions/*"
+        update-types:
+          - minor
+          - patch
 
   # Java 8 core compatibility branch. Review all proposed upgrades for
   # Java 8 bytecode/runtime requirements and verify the core CI matrix.
@@ -25,6 +44,15 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      maven-build-tools:
+        applies-to: version-updates
+        patterns:
+          - "org.apache.maven.plugins:*"
+          - "org.codehaus.mojo:versions-maven-plugin"
+        update-types:
+          - minor
+          - patch
 
   - package-ecosystem: github-actions
     directory: /
@@ -32,6 +60,14 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      routine-actions:
+        applies-to: version-updates
+        patterns:
+          - "actions/*"
+        update-types:
+          - minor
+          - patch
 
   # SeeSaw wrapper: frgaal compiles Java 25 sources to Java 17 target.
   - package-ecosystem: maven
@@ -40,6 +76,18 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      maven-build-tools:
+        applies-to: version-updates
+        patterns:
+          - "org.apache.maven.plugins:*"
+          - "org.codehaus.mojo:versions-maven-plugin"
+        # Review compiler/frgaal compatibility separately.
+        exclude-patterns:
+          - "org.apache.maven.plugins:maven-compiler-plugin"
+        update-types:
+          - minor
+          - patch
 
   - package-ecosystem: github-actions
     directory: /
@@ -47,3 +95,11 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      routine-actions:
+        applies-to: version-updates
+        patterns:
+          - "actions/*"
+        update-types:
+          - minor
+          - patch
