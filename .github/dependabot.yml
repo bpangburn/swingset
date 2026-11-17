@@ -11,6 +11,11 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # JUnit 5 remains the test framework while Java 8 is supported.
+    ignore:
+      - dependency-name: "org.junit.jupiter:junit-jupiter"
+        update-types:
+          - "version-update:semver-major"
     groups:
       maven-build-tools:
         applies-to: version-updates
@@ -44,6 +49,11 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # JUnit 5 remains the test framework while Java 8 is supported.
+    ignore:
+      - dependency-name: "org.junit.jupiter:junit-jupiter"
+        update-types:
+          - "version-update:semver-major"
     groups:
       maven-build-tools:
         applies-to: version-updates
@@ -76,6 +86,12 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # Temporary: reconsider JUnit 6 for future major release (SS5.x & SeeSaw 1.x?)
+    # and JDK 25 / Java 17-targeted test execution is verified.
+    ignore:
+      - dependency-name: "org.junit.jupiter:junit-jupiter"
+        update-types:
+          - "version-update:semver-major"
     groups:
       maven-build-tools:
         applies-to: version-updates
