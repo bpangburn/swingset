@@ -20,8 +20,9 @@ bin/
 # These generated preferences are redundant with Maven or m2e defaults.
 # Do NOT ignore the whole .settings/ directory: custom JDT / APT
 # preferences remain intentionally version-controlled.
-.settings/org.eclipse.core.resources.prefs
-.settings/org.eclipse.m2e.core.prefs
+# Generated Eclipse preferences (root and all modules)
+**/.settings/org.eclipse.core.resources.prefs
+**/.settings/org.eclipse.m2e.core.prefs
 
 # NetBeans generated metadata (custom run/config files retained)
 nbproject/
