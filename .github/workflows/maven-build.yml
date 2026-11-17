@@ -1,0 +1,42 @@
+name: Maven Build (SS-5-TESTING)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [SS-5-TESTING]
+  pull_request:
+    branches: [SS-5-TESTING]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maven-ss5-testing-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and test with JDK 25
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Verify toolchain
+        run: |
+          java -version
+          mvn -version
+
+      # This experimental 5.0.x branch uses frgaal with Java 24 source
+      # and a Java 17 bytecode target. Build using JDK 25, not JDK 17.
+      - name: Build and test full reactor
+        run: mvn -B -ntp clean verify
