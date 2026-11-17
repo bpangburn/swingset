@@ -46,7 +46,7 @@
                 <version.visdb>0.5.2</version.visdb>
 		<version.glazedlists>1.11.1203</version.glazedlists>
 		<version.table-sort-header>1.0.1</version.table-sort-header>
-		<version.google-guava>33.6.0-jre</version.google-guava>
+		<version.google-guava>33.8.0-jre</version.google-guava>
 		<version.netbeans>RELEASE320</version.netbeans>
 		<version.weak-event-bus-receiver>1.0.0</version.weak-event-bus-receiver>
                 <!--        Demo -->
