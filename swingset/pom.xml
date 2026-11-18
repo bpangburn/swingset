@@ -67,14 +67,10 @@
 			<groupId>com.raelity.3rdparty.com.glazedlists</groupId>
 			<artifactId>glazedlists</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.netbeans.api</groupId>
-			<artifactId>org-openide-util-lookup</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.netbeans.api</groupId>
-			<artifactId>org-openide-util</artifactId>
-		</dependency>
+                <dependency>
+                    <groupId>com.raelity.3rdparty.org.netbeans</groupId>
+                    <artifactId>util-lookup</artifactId>
+                </dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
