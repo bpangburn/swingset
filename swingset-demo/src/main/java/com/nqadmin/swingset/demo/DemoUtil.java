@@ -558,7 +558,7 @@ public class DemoUtil {
     //			break;
     //		}
 
-    Screens.translateToPrefScreen(result);
+    Screens.translateToScreen(result, Screens.getPrefScreen());
     return result;
   }
 

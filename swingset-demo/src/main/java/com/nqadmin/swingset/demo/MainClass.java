@@ -866,7 +866,7 @@ public class MainClass extends JFrame {
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
   public static void main(String[] _args) {
     configureJavaUtilLogger();
-    Screens.setPrefGraphicsDev("SWINGSET_PREFERRED_SCREEN");
+    Screens.setPrefScreen("SWINGSET_PREFERRED_SCREEN");
 
     Globals.setOption(LoadDemoImages.class, new LoadDemoImages());
     Globals.setOption(H2Trace.class, new H2Trace());
