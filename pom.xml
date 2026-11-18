@@ -255,8 +255,6 @@
 	        <configuration>
 	        	<nvdApiServerId>nvd</nvdApiServerId>
 	            <failBuildOnCVSS>7.0</failBuildOnCVSS>
-			    <ossIndexServerId>sonatype-guide</ossIndexServerId>
-			    <ossIndexAnalyzerUrl>https://api.guide.sonatype.com</ossIndexAnalyzerUrl>
 			    <suppressionFiles>
 			        <suppressionFile>./dependency-check-suppressions.xml</suppressionFile>
 			    </suppressionFiles>
