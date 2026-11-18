@@ -169,7 +169,7 @@
 	-->
 			<dependency>
 				<groupId>com.raelity.logman</groupId>
-				<artifactId>logman-lib</artifactId>
+				<artifactId>logman-core</artifactId>
 				<version>${version.logman}</version>
 			</dependency>
 

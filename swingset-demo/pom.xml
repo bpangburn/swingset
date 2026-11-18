@@ -108,7 +108,7 @@
     <dependency>
       <!-- TODO: don't include simplevalidation -->
       <groupId>com.raelity.logman</groupId>
-      <artifactId>logman-lib</artifactId>
+      <artifactId>logman-core</artifactId>
     </dependency>
 
     <dependency>
