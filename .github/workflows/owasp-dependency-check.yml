@@ -80,7 +80,7 @@ jobs:
             -DskipTests \
             -DfailBuildOnCVSS=11 \
             -DfailOnError=true \
-            -Dformat=HTML,JSON \
+            -Dformats=HTML,JSON \
             -DossIndexAnalyzerEnabled=false \
             -DdataDirectory="$HOME/.cache/owasp-dependency-check" \
             "${nvd_options[@]}" \
