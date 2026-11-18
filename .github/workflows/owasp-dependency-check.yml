@@ -58,11 +58,24 @@ jobs:
             owasp-nvd-${{ runner.os }}-
 
       - name: Scan reactor dependencies
+        shell: bash
         env:
-          # Optional repository Actions secret. Recommended to avoid NVD
-          # anonymous API rate limits. Never put the key in Maven arguments.
+          # Optional Actions secret. Pass it through the environment, not
+          # Maven command-line arguments, to keep the value out of logs.
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
+          set -euo pipefail
+          nvd_options=()
+          if [[ -n "${NVD_API_KEY:-}" ]]; then
+            echo "Using the NVD API with a configured repository secret"
+            nvd_options+=("-DnvdApiKeyEnvironmentVariable=NVD_API_KEY")
+          else
+            # OWASP's own mirror avoids the NVD API's empty-key/rate-limit
+            # failures. It is refreshed daily on a best-effort basis.
+            echo "::notice::NVD_API_KEY is unset; using OWASP's NVD data-feed mirror"
+            nvd_options+=("-DnvdDatafeedUrl=https://dependency-check.github.io/DependencyCheck_Builder/nvd_cache/nvdcve-{0}.json.gz")
+          fi
+
           mvn -B -ntp -Powasp-check \
             -DskipTests \
             -DfailBuildOnCVSS=11 \
@@ -70,7 +83,7 @@ jobs:
             -Dformat=HTML,JSON \
             -DossIndexAnalyzerEnabled=false \
             -DdataDirectory="$HOME/.cache/owasp-dependency-check" \
-            -DnvdApiKeyEnvironmentVariable=NVD_API_KEY \
+            "${nvd_options[@]}" \
             verify
 
       - name: Upload vulnerability reports
@@ -88,5 +101,6 @@ jobs:
 # dependency-check-suppressions.xml file. Findings remain visible in reports
 # but do not fail the scan (CVSS 11 is above the maximum score of 10).
 # Infrastructure/configuration errors still fail the run. OSS Index is
-# disabled here to avoid unauthenticated Sonatype rate limits; NVD scanning
-# remains enabled. Add the NVD_API_KEY repository secret for reliable updates.
+# disabled here to avoid unauthenticated Sonatype rate limits. A configured
+# NVD_API_KEY secret uses NVD directly; otherwise OWASP's best-effort mirror
+# supplies vulnerability data without an API key.
