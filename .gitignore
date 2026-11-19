@@ -1,1 +1,16 @@
-/target/
+# Maven output from the parent and both reactor modules
+target/
+
+# Local IDE and JVM-generated files (already tracked project settings stay tracked)
+.classpath
+bin/
+.settings/org.eclipse.core.resources.prefs
+.settings/org.eclipse.m2e.core.prefs
+.idea/
+*.iml
+.vscode/
+out/
+*.log
+hs_err_pid*
+*.hprof
+.DS_Store
