@@ -7,6 +7,10 @@ Maven, and plugin version changes beginning with SwingSet 4.0.11 are tracked sep
 in [`CHANGELOG-POMS.md`](CHANGELOG-POMS.md).
 
 
+## SwingSet 4.0.14 — Unreleased
+
+1. Development snapshot for the next 4.0.x release; changes will be documented here as they are merged.
+
 ## SwingSet 4.0.13 — Released 2026-06-12
 
 1. SwingSet 4.0.13 is primarily a release-preparation, dependency, build-tool, and
