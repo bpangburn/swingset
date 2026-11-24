@@ -100,7 +100,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 			if (_value != null) {
 				// DATE CLASS DOESN'T HAVE A CONSTRUCTOR THAT TAKES A STRING
 				if (objectClass.equals(java.sql.Date.class)) {
-					newValue = Date.valueOf(_value);
+					newValue = SSTableModel.getSQLDate(_value);
 				} else {
 					// GET THE CONSTRUCTOR FOR THE CLASS WHICH TAKES A STRING
 					final Constructor<?> constructor = objectClass.getConstructor(new Class<?>[] { String.class });
