@@ -7,6 +7,13 @@ Latest non-beta versions were originally determined based on review of
 
 Starting with SwingSet 4.0.11, POM updates are tracked in this separate file.
 
+## SwingSet 4.0.14 — Unreleased
+
+### Maven and dependency maintenance
+
+1. Start the 4.0.14 development line at `4.0.14-SNAPSHOT` for the parent, core, and demo modules.
+2. Carry forward the dependency, plugin, and Java compatibility settings from `master`; additional 4.0.14 changes will be recorded as they land.
+
 ## SwingSet 4.0.13 — Released 2026-06-12
 
 ### All modules — Java and Maven version
