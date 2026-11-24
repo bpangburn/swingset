@@ -41,8 +41,11 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JTable;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 
 import org.junit.jupiter.api.Test;
@@ -107,7 +110,7 @@ class SSTableKeyAdapterTest {
 		final String[][] cells = SSTableKeyAdapter.parseClipboardCells(
 				"Smith\t\t11/23/2026\n\nJones\tAccounting\t2026-11-24\n");
 
-		SSTableKeyAdapter.pasteClipboardCells(table, cells, 0, 0, cells.length);
+		SSTableKeyAdapter.pasteClipboardCells(table, cells, 0, 0, cells.length, existing.length);
 
 		assertEquals("Smith", table.getValueAt(0, 0));
 		assertEquals("Keep department", table.getValueAt(0, 1));
@@ -117,5 +120,85 @@ class SSTableKeyAdapterTest {
 		assertEquals("Jones", table.getValueAt(2, 0));
 		assertEquals("Accounting", table.getValueAt(2, 1));
 		assertEquals(Date.valueOf("2026-11-24"), table.getValueAt(2, 2));
+	}
+
+	/**
+	 * Simulates SSTableModel's extra editable insertion row: writing the first
+	 * nonblank value at the end adds a real row and creates a new insertion row.
+	 */
+	private static class InsertingModel extends AbstractTableModel {
+		private static final long serialVersionUID = 1L;
+		private final List<Object[]> records = new ArrayList<>();
+
+		InsertingModel(final Object[]... existingRecords) {
+			for (final Object[] record : existingRecords) {
+				records.add(record);
+			}
+		}
+
+		@Override
+		public int getRowCount() {
+			return records.size() + 1;
+		}
+
+		@Override
+		public int getColumnCount() {
+			return 3;
+		}
+
+		@Override
+		public Class<?> getColumnClass(final int column) {
+			return column == 2 ? Date.class : String.class;
+		}
+
+		@Override
+		public Object getValueAt(final int row, final int column) {
+			return row == records.size() ? null : records.get(row)[column];
+		}
+
+		@Override
+		public void setValueAt(final Object value, final int row, final int column) {
+			if (row == records.size()) {
+				records.add(new Object[3]);
+				fireTableRowsInserted(row, row);
+			}
+			records.get(row)[column] = value;
+			fireTableCellUpdated(row, column);
+		}
+	}
+
+	@Test
+	void skipsBlankRowsDuringInsertionAndContinuesWithLaterRecords() throws Exception {
+		final JTable table = new JTable(new InsertingModel());
+		final String[][] cells = SSTableKeyAdapter.parseClipboardCells(
+				"\t\t\nSmith\t\t11/23/2026\n \t \t \nJones\tAccounting\t2026-11-24\n");
+		assertEquals(2, SSTableKeyAdapter.destinationRowsNeeded(cells, 0, 0));
+
+		SSTableKeyAdapter.pasteClipboardCells(table, cells, 0, 0, cells.length, 0);
+
+		assertEquals(3, table.getRowCount()); // two inserted records plus insertion row
+		assertEquals("Smith", table.getValueAt(0, 0));
+		assertEquals(Date.valueOf("2026-11-23"), table.getValueAt(0, 2));
+		assertEquals("Jones", table.getValueAt(1, 0));
+		assertEquals("Accounting", table.getValueAt(1, 1));
+		assertEquals(Date.valueOf("2026-11-24"), table.getValueAt(1, 2));
+	}
+
+	@Test
+	void preservesBlankExistingRowThenSkipsBlankInsertionRow() throws Exception {
+		final JTable table = new JTable(new InsertingModel(
+				new Object[] { "Original", "Preserve", Date.valueOf("2026-01-01") }));
+		final String[][] cells = SSTableKeyAdapter.parseClipboardCells(
+				"\t\t\n\t\t\nNew\tDept\t11/24/2026\n");
+		assertEquals(2, SSTableKeyAdapter.destinationRowsNeeded(cells, 0, 1));
+
+		SSTableKeyAdapter.pasteClipboardCells(table, cells, 0, 0, cells.length, 1);
+
+		assertEquals(3, table.getRowCount()); // original, new record, insertion row
+		assertEquals("Original", table.getValueAt(0, 0));
+		assertEquals("Preserve", table.getValueAt(0, 1));
+		assertEquals(Date.valueOf("2026-01-01"), table.getValueAt(0, 2));
+		assertEquals("New", table.getValueAt(1, 0));
+		assertEquals("Dept", table.getValueAt(1, 1));
 	}
 }

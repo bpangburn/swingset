@@ -169,21 +169,66 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 		return columns;
 	}
 
+	/** Whether a clipboard field contains no non-whitespace characters. */
+	static boolean isBlankClipboardCell(final String value) {
+		return value == null || value.trim().isEmpty();
+	}
+
+	/** Whether every clipboard field in a row is blank. */
+	static boolean isBlankClipboardRow(final String[] row) {
+		for (final String value : row) {
+			if (!isBlankClipboardCell(value)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	/**
-	 * Pastes nonempty cells at their clipboard offsets. An empty source cell
-	 * leaves its destination unchanged instead of shifting later fields.
+	 * Calculates how many destination rows a paste will occupy. Blank source
+	 * rows preserve existing destination rows but do not require a new record.
+	 */
+	static int destinationRowsNeeded(final String[][] cells, final int startRow,
+			final int existingRowCount) {
+		int destinationRow = startRow;
+		for (final String[] row : cells) {
+			if (destinationRow < existingRowCount || !isBlankClipboardRow(row)) {
+				destinationRow++;
+			}
+		}
+		return destinationRow - startRow;
+	}
+
+	/**
+	 * Pastes nonblank cells while retaining their original column positions.
+	 * An entirely blank source row leaves an existing row unchanged; beyond the
+	 * existing rows it does not consume the synthetic insertion row. Subsequent
+	 * populated rows can therefore continue inserting without a missing index.
+	 *
+	 * @param existingRowCount number of real destination rows before the paste,
+	 *                         excluding any synthetic insertion row
 	 */
 	static void pasteClipboardCells(final JTable table, final String[][] cells,
-			final int startRow, final int startColumn, final int numRowsToCopy) throws Exception {
+			final int startRow, final int startColumn, final int numRowsToCopy,
+			final int existingRowCount) throws Exception {
+		int destinationRow = startRow;
 		for (int i = 0; i < numRowsToCopy; i++) {
-			for (int j = 0; j < cells[i].length; j++) {
-				final String cellText = cells[i][j];
-				if (cellText.isEmpty()) {
+			final String[] sourceRow = cells[i];
+			if (isBlankClipboardRow(sourceRow)) {
+				if (destinationRow < existingRowCount) {
+					destinationRow++;
+				}
+				continue;
+			}
+			for (int j = 0; j < sourceRow.length; j++) {
+				final String cellText = sourceRow[j];
+				if (isBlankClipboardCell(cellText)) {
 					continue;
 				}
 				final Object value = getObjectToSet(table, startColumn + j, cellText);
-				table.setValueAt(value, startRow + i, startColumn + j);
+				table.setValueAt(value, destinationRow, startColumn + j);
 			}
+			destinationRow++;
 		}
 	}
 
@@ -341,7 +386,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 				int numRowsToCopy = numRows;
 
 				// SEE IF SUFFICENT ROWS ARE PRESENT.
-				if (rowCount < (numRows + selectedRows[0])) {
+				if (rowCount < (destinationRowsNeeded(clipboardRows, selectedRows[0], rowCount) + selectedRows[0])) {
 					JOptionPane.showMessageDialog(jTable, "There are not enough rows in the table to copy into.\n");
 					if (allowInsertion) {
 						final int option = JOptionPane.showConfirmDialog(jTable, "Do you want to insert new rows?",
@@ -369,7 +414,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 
 				// COPY THE DATA FROM CLIP BOARD TO JTABLE
 				try {
-					pasteClipboardCells(jTable, clipboardRows, selectedRows[0], selectedColumns[0], numRowsToCopy);
+					pasteClipboardCells(jTable, clipboardRows, selectedRows[0], selectedColumns[0], numRowsToCopy, rowCount);
 
 					// UPDATE THE UI AS WE HAVE UPDATED UNDERLIYING DATA
 					// THIS HAS TO PROPOGATE TO THE SCREEN.
