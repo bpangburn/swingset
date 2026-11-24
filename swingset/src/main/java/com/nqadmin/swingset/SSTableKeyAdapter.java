@@ -50,7 +50,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.sql.Date;
-import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -114,10 +113,80 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 			newValue = _value;
 		}
 
+
 		// RETURN THE NEWLY CREATED OBJECT.
 		return newValue;
 
 	}
+
+	/**
+	 * Formats a grid selection as TSV, with null cells as empty fields rather
+	 * than the literal text "null".
+	 */
+	static String buildClipboardText(final JTable table, final int[] rows, final int[] columns) {
+		final StringBuilder text = new StringBuilder();
+		for (final int row : rows) {
+			for (int j = 0; j < columns.length; j++) {
+				if (j > 0) {
+					text.append("\t");
+				}
+				final Object value = table.getValueAt(row, columns[j]);
+				if (value != null) {
+					text.append(value);
+				}
+			}
+			text.append("\n");
+		}
+		return text.toString();
+	}
+
+	/**
+	 * Parses spreadsheet TSV, preserving blank cells and interior blank rows.
+	 * A final line separator is not an additional row.
+	 */
+	static String[][] parseClipboardCells(final String clipboardText) {
+		if (clipboardText == null || clipboardText.isEmpty()) {
+			return new String[0][];
+		}
+		final String[] lines = clipboardText.split("\\r\\n|\\n|\\r", -1);
+		int rowCount = lines.length;
+		if (lines[rowCount - 1].isEmpty()) {
+			rowCount--;
+		}
+		final String[][] rows = new String[rowCount][];
+		for (int i = 0; i < rowCount; i++) {
+			rows[i] = lines[i].split("\t", -1);
+		}
+		return rows;
+	}
+
+	/** Returns the widest row, including empty trailing cells. */
+	static int maxClipboardColumns(final String[][] rows) {
+		int columns = 0;
+		for (final String[] row : rows) {
+			columns = Math.max(columns, row.length);
+		}
+		return columns;
+	}
+
+	/**
+	 * Pastes nonempty cells at their clipboard offsets. An empty source cell
+	 * leaves its destination unchanged instead of shifting later fields.
+	 */
+	static void pasteClipboardCells(final JTable table, final String[][] cells,
+			final int startRow, final int startColumn, final int numRowsToCopy) throws Exception {
+		for (int i = 0; i < numRowsToCopy; i++) {
+			for (int j = 0; j < cells[i].length; j++) {
+				final String cellText = cells[i][j];
+				if (cellText.isEmpty()) {
+					continue;
+				}
+				final Object value = getObjectToSet(table, startColumn + j, cellText);
+				table.setValueAt(value, startRow + i, startColumn + j);
+			}
+		}
+	}
+
 
 	/**
 	 * Indicates whether or not row insertions are allowed via cut/copy and paste.
@@ -161,8 +230,6 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 	 */
 	@Override
 	public void keyReleased(final KeyEvent ke) {
-		final StringBuilder strBuf = new StringBuilder();
-
 		final JTable jTable = (JTable) ke.getSource();
 
 		logger.debug("Key Released on SSDataGrid. Key Released: {} {}.", () -> ke.getKeyCode(),
@@ -199,23 +266,14 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 				selectedColumns = jTable.getSelectedColumns();
 			}
 
-			// COPY THE DATA IN THE SELECTED ROWS AND COLUMNS
-			// APPEND A TAB AFTER EACH CELL AND A NEW LINE CHAR AT END OF EACH ROW.
-			for (int i = 0; i < selectedRows.length; i++) {
-				for (int j = 0; j < selectedColumns.length; j++) {
-					strBuf.append(jTable.getValueAt(selectedRows[i], selectedColumns[j]));
-					if (j < (numColumns - 1)) {
-						strBuf.append("\t");
-					}
-				}
-				strBuf.append("\n");
-			}
+			// PRESERVE EMPTY FIELDS WHEN COPYING A GRID SELECTION.
+			final String clipboardText = buildClipboardText(jTable, selectedRows, selectedColumns);
 
 			// GET THE SYSTEM CLIPBOARD
 			final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 
 			// CREATE A TRANSFERABLE OBJECT
-			final StringSelection stringSelection = new StringSelection(strBuf.toString());
+			final StringSelection stringSelection = new StringSelection(clipboardText);
 
 			// COPY THE DATA TO CLIP BOARD
 			clipboard.setContents(stringSelection, stringSelection);
@@ -254,30 +312,13 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 				final int[] selectedRows = jTable.getSelectedRows();
 				final int[] selectedColumns = jTable.getSelectedColumns();
 
-				// CREATE A STRING TOKENIZER TO BREAK THE DATA INTO ROWS.
-				StringTokenizer rowTokens = new StringTokenizer(strData, "\n", false);
-
-				// INITIALIZE THE NUMBER OF ROWS AND COLUMNS
-				int numRows = 0;
-				int numColumns = 0;
-
-				StringTokenizer columnTokens;
-
-				// SEE IF THE DATA HAS ATLEAST ONE ROW
-				// IF IT DOES GET THE NUMBER OF COLUMNS PRESENT.
-				if (rowTokens.hasMoreTokens()) {
-					numRows++;
-					columnTokens = new StringTokenizer(rowTokens.nextToken(), "\t", false);
-					// WHILE THERE ARE TOKENS INCREMENT THE COLUMN COUNT
-					for (; columnTokens.hasMoreTokens(); numColumns++) {
-						columnTokens.nextToken();
-					}
+				// PRESERVE BLANK CELLS/ROWS; COUNT THE WIDEST ROW FOR FIT CHECKS.
+				final String[][] clipboardRows = parseClipboardCells(strData);
+				final int numRows = clipboardRows.length;
+				if (numRows == 0) {
+					return;
 				}
-
-				// GET THE NUMBER OF ROWS PRESENT
-				for (; rowTokens.hasMoreTokens(); numRows++) {
-					rowTokens.nextToken();
-				}
+				final int numColumns = maxClipboardColumns(clipboardRows);
 
 				// GET THE NUMBER OF COLUMNS AND ROWS IN THE JTABLE.
 				int rowCount = jTable.getRowCount();
@@ -328,22 +369,7 @@ public class SSTableKeyAdapter extends KeyAdapter implements Serializable {
 
 				// COPY THE DATA FROM CLIP BOARD TO JTABLE
 				try {
-					// TOKENIZE DATA IN TO ROWS
-					rowTokens = new StringTokenizer(strData, "\n", false);
-
-					// WHILE THERE ARE ROWS IN THE CLIP BOARD DATA AND NUMBER OF ROWS
-					// COPIED IS LESS THEN WE SHOULD COPY DATA TO JTABLE.
-					for (int i = 0; rowTokens.hasMoreTokens() && (i < numRowsToCopy); i++) {
-						// TOKENIZE THE ROW INFORMATION IN TO COLUMNS
-						columnTokens = new StringTokenizer(rowTokens.nextToken(), "\t", false);
-						// PASTE THE DATA IN TO JTABLE ROW.
-						for (int j = 0; columnTokens.hasMoreTokens(); j++) {
-							// GET THE VALUE FOR THIS CELL IN THE FORM OF THIS COLUMN CLASS OBJECT
-							final Object newValue = getObjectToSet(jTable, selectedColumns[0] + j, columnTokens.nextToken());
-							// SET THE VALUE FOR THE COLUMN
-							jTable.setValueAt(newValue, selectedRows[0] + i, selectedColumns[0] + j);
-						}
-					}
+					pasteClipboardCells(jTable, clipboardRows, selectedRows[0], selectedColumns[0], numRowsToCopy);
 
 					// UPDATE THE UI AS WE HAVE UPDATED UNDERLIYING DATA
 					// THIS HAS TO PROPOGATE TO THE SCREEN.
