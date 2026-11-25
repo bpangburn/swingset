@@ -12,17 +12,11 @@ dependency-reduced-pom.xml
 .project
 .classpath
 .factorypath
+.settings/
 .metadata/
 bin/
 .apt_generated/
 .apt_generated_tests/
-
-# These generated preferences are redundant with Maven or m2e defaults.
-# Do NOT ignore the whole .settings/ directory: custom JDT / APT
-# preferences remain intentionally version-controlled.
-# Generated Eclipse preferences (root and all modules)
-**/.settings/org.eclipse.core.resources.prefs
-**/.settings/org.eclipse.m2e.core.prefs
 
 # NetBeans generated metadata (custom run/config files retained)
 nbproject/
