@@ -156,12 +156,13 @@ public class MainClass extends JFrame {
       } else if (source == btnExample4UsingHelper) {
         logger.log(DEBUG, "**** Opening Example4UsingHelper ****");
         JFrame e4JFrame = new JFrame("Example4 Using Helper");
-        e4JFrame.setLocation(DemoUtil.getChildScreenLocation("Example4UsingHelper"));
         Example4UsingHelper example4 = new Example4UsingHelper(dbConnection, e4JFrame);
         e4JFrame.setContentPane(SSUtils.createDecoratorPanel(example4));
         example4.showUp(e4JFrame.getContentPane());
         e4JFrame.pack();
         // screen dimensions handled by SSScreenHelperCommon.setScreenSize()
+        DemoUtil.initExampleFrame(e4JFrame, null);
+        DemoUtil.setChildScreenLocation(e4JFrame);
         e4JFrame.setVisible(true);
       } else if (source == btnExample5) {
         logger.log(DEBUG, "**** Opening Example5 ****");
@@ -177,10 +178,11 @@ public class MainClass extends JFrame {
         JFrame e7JFrame = new JFrame("Example7 Using Helper");
         Example7UsingHelper example7 = new Example7UsingHelper(dbConnection, null);
         e7JFrame.setContentPane(SSUtils.createDecoratorPanel(example7));
-        e7JFrame.setLocation(DemoUtil.getChildScreenLocation("Example7UsingHelper"));
         example7.showUp(e7JFrame.getContentPane());
         //e7JFrame.pack(); // NOT USING .pack() FOR DATA GRID SCREENS
         e7JFrame.setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
+        DemoUtil.initExampleFrame(e7JFrame, null);
+        DemoUtil.setChildScreenLocation(e7JFrame);
         e7JFrame.setVisible(true);
       } else if (source == btnTestBase) {
         logger.log(DEBUG, "**** Opening TestBaseComponents ****");

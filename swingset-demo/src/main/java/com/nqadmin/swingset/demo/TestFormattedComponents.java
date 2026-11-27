@@ -160,7 +160,7 @@ public class TestFormattedComponents extends JFrame {
     setSize(MainClass.childScreenWidth, MainClass.childScreenHeightTall);
 
     // SET SCREEN POSITION
-    setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+
 
     // INITIALIZE DATABASE CONNECTION AND COMPONENTS
     try {
@@ -351,6 +351,7 @@ public class TestFormattedComponents extends JFrame {
     // MAKE THE JFRAME VISIBLE
     setContentPane(SSUtils.createDecoratorPanel(contentPane));
     pack();
+    DemoUtil.setChildScreenLocation(this);
     setVisible(true);
   }
 

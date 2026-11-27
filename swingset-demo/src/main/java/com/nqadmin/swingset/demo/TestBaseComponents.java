@@ -355,7 +355,7 @@ public class TestBaseComponents extends JFrame {
     setSize(MainClass.childScreenWidth, MainClass.childScreenHeightTall);
 
     // set screen position
-    setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+
 
     // TEST DbOpsCreator
     DbOpsCreator creator = (RowSet rs, RowsModel rowsModel1) -> createDbNav();
@@ -538,6 +538,7 @@ public class TestBaseComponents extends JFrame {
     setMinimumSize(new Dimension(minWidth, minHeight));
 
     // Make the JFrame visible.
+    DemoUtil.setChildScreenLocation(this);
     setVisible(true);
   }
   int minWidth;
