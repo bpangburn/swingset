@@ -260,7 +260,7 @@ public class Example4 extends JFrame {
     setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 
     // SET SCREEN POSITION
-    setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+
 
     // SET CONNECTION
     connection = _dbConn;
@@ -415,6 +415,7 @@ public class Example4 extends JFrame {
     // MAKE THE JFRAME VISIBLE
     setContentPane(SSUtils.createDecoratorPanel(contentPane));
     pack();
+    DemoUtil.setChildScreenLocation(this);
     setVisible(true);
   }
 

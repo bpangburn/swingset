@@ -158,7 +158,7 @@ public class Example1 extends JFrame {
     setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 
     // Set screen position.
-    setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+
 
     // Set some validation criteria.
     txtSupplierName.setTextValidationCondition(
@@ -278,6 +278,7 @@ public class Example1 extends JFrame {
     // Make the jframe visible.
     frame.setContentPane(SSUtils.createDecoratorPanel(uiPanel));
     frame.pack();
+    DemoUtil.setChildScreenLocation(frame);
     frame.setVisible(true);
   }
 

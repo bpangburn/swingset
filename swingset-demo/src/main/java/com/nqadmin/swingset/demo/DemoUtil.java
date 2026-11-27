@@ -8,6 +8,8 @@ package com.nqadmin.swingset.demo;
 import com.nqadmin.swingset.utils.SSUtils;
 import java.awt.EventQueue;
 import java.awt.Point;
+import java.awt.Window;
+import java.awt.GraphicsConfiguration;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
@@ -560,6 +562,50 @@ public class DemoUtil {
 
     Screens.translateToScreen(result, Screens.getPrefScreen());
     return result;
+  }
+
+  // Cascade child windows on the preferred display; reset when all are closed.
+  private static final Point BASE_CHILD_POSITION = new Point(
+      MainClass.buttonWidth, MainClass.buttonHeight * MainClass.childScreenCount);
+  private static final Point childPosition = new Point(BASE_CHILD_POSITION);
+  private static int childCount;
+  private static int openWindowCount;
+
+  /** Position a fully sized example window once, before making it visible. */
+  public static void setChildScreenLocation(Window window) {
+    if (openWindowCount == 0) {
+      childPosition.setLocation(BASE_CHILD_POSITION);
+      childCount = 0;
+    }
+    openWindowCount++;
+    window.addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosed(WindowEvent e) {
+        openWindowCount--;
+      }
+    });
+
+    GraphicsConfiguration gc = Screens.getPrefScreen();
+    for (int i = 0; i < 2; i++) {
+      Point position = new Point(childPosition.x + childCount * MainClass.buttonHeight,
+          childPosition.y + childCount * MainClass.buttonHeight);
+      childCount++;
+      Screens.translateToScreen(position, gc);
+      window.setLocation(position);
+      if (gc.getBounds().contains(window.getBounds())) {
+        break;
+      }
+      childPosition.setLocation(childPosition.x + BASE_CHILD_POSITION.x, childPosition.y);
+      childCount = 0;
+    }
+
+    // Keep the title bar reachable even for windows larger than the display.
+    Rectangle bounds = gc.getBounds();
+    int x = Math.max(bounds.x, Math.min(window.getX(),
+        bounds.x + Math.max(0, bounds.width - window.getWidth())));
+    int y = Math.max(bounds.y, Math.min(window.getY(),
+        bounds.y + Math.max(0, bounds.height - window.getHeight())));
+    window.setLocation(x, y);
   }
 
   /**
