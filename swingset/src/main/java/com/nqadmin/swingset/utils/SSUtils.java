@@ -93,6 +93,43 @@ public class SSUtils {
     return dev.visdb.seesaw.utils.Globals.getOption(type);
   }
 
+  /** Component states used when choosing custom border colors. */
+  public enum BorderState { CLEAN, FOCUSED_CLEAN, MODIFIED, FOCUSED_MODIFIED, ERROR, FOCUSED_ERROR }
+
+  public static void setBorderColors(java.util.function.Function<BorderState, java.awt.Color> colors) {
+    dev.visdb.seesaw.utils.Globals.setOption(
+        dev.visdb.seesaw.decorators.BorderDecorator.BorderDecoratorPaint.class,
+        new dev.visdb.seesaw.decorators.BorderDecorator.BorderDecoratorPaint() {
+          @Override
+          public java.awt.Color getBorderColor(dev.visdb.seesaw.decorators.ComponentState state) {
+            return colors.apply(BorderState.valueOf(state.name()));
+          }
+        });
+  }
+
+  public static void resetBorderColors() {
+    dev.visdb.seesaw.utils.Globals.setOption(
+        dev.visdb.seesaw.decorators.BorderDecorator.BorderDecoratorPaint.class,
+        new dev.visdb.seesaw.decorators.BorderDecorator.BorderDecoratorPaint());
+  }
+
+  public static void addTextValidation(org.netbeans.validation.api.ui.ValidationGroup group,
+      com.nqadmin.swingset.SSTextField field, String name) {
+    group.addItem(dev.visdb.seesaw.contrib.simplevalidation.SVUtils.setTextDecorator(field, name), false);
+  }
+
+  public static void enableDebugBaseComponentValidation() {
+    dev.visdb.seesaw.utils.Globals.setOption(
+        dev.visdb.seesaw.SsTextField.DebugBaseComponentValidate.class,
+        new dev.visdb.seesaw.SsTextField.DebugBaseComponentValidate() {});
+  }
+
+  public static void setSimpleValidationBorderEnabled(boolean enabled) {
+    dev.visdb.seesaw.utils.Globals.setOption(
+        dev.visdb.seesaw.contrib.simplevalidation.SVUtils.SimpleValidationBorderEnable.class,
+        new dev.visdb.seesaw.contrib.simplevalidation.SVUtils.SimpleValidationBorderEnable(enabled));
+  }
+
   /** Wrap a screen in the configured component decorator panel. */
   public static javax.swing.JPanel createDecoratorPanel(java.awt.Component uiPanel) {
     return SsUtils.createDecoratorPanel(uiPanel);

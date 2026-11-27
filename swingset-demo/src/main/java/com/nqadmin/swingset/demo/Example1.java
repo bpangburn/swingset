@@ -65,13 +65,9 @@ import org.netbeans.validation.api.ui.swing.ValidationPanel;
 import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 
-import dev.visdb.seesaw.contrib.simplevalidation.SVUtils;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
-import dev.visdb.seesaw.decorators.BorderDecorator;
-import dev.visdb.seesaw.decorators.ComponentState;
 
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.JStuff;
 
 /**
@@ -121,25 +117,18 @@ public class Example1 extends JFrame {
     // After the first time, change modified color to BLUE
     switch (newBorderSet) {
       case 0 -> {
-        Globals.setOption(BorderDecorator.BorderDecoratorPaint.class,
-            new BorderDecorator.BorderDecoratorPaint() {
-              @Override
-              public Color getBorderColor(ComponentState state) {
-                return switch (state) {
+        SSUtils.setBorderColors(state -> switch (state) {
                   case CLEAN -> null;
                   case FOCUSED_CLEAN -> Color.GREEN;
                   case MODIFIED, FOCUSED_MODIFIED -> Color.BLUE;
                   case ERROR, FOCUSED_ERROR -> Color.RED;
-                };
-              }
-            });
+                });
       }
       case 1 -> {
         // Used to remove paint. Should keep the previous
       }
       case 2 -> {
-        Globals.setOption(BorderDecorator.BorderDecoratorPaint.class,
-            new BorderDecorator.BorderDecoratorPaint());
+        SSUtils.resetBorderColors();
       }
     }
     newBorderSet++;
@@ -281,7 +270,7 @@ public class Example1 extends JFrame {
       ValidationPanel valiPanel = new ValidationPanel();
       valiPanel.setInnerComponent(contentPane);
       ValidationGroup group = valiPanel.getValidationGroup();
-      group.addItem(SVUtils.setTextDecorator(txtSupplierName, "Supplier Name"), false);
+      SSUtils.addTextValidation(group, txtSupplierName, "Supplier Name");
       uiPanel = valiPanel;
     } else {
       uiPanel = (JPanel) contentPane;

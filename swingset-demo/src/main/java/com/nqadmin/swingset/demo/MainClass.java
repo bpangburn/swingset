@@ -96,8 +96,6 @@ import dev.visdb.seesaw.utils.JStuff;
 
 import com.nqadmin.swingset.utils.SSUtils;
 
-import dev.visdb.seesaw.SsTextField;
-import dev.visdb.seesaw.contrib.simplevalidation.SVUtils;
 import dev.visdb.seesaw.utils.Version;
 import gnu.getopt.Getopt;
 
@@ -869,11 +867,9 @@ public class MainClass extends JFrame {
     SSUtils.setOption(H2Trace.class, new H2Trace());
 
     // To allow force baseValidate() and componentValidate() erros.
-    if(Boolean.FALSE) SSUtils.setOption(SsTextField.DebugBaseComponentValidate.class,
-                                        new SsTextField.DebugBaseComponentValidate() {});
+    // SSUtils.enableDebugBaseComponentValidation();
 
-    if(Boolean.FALSE) SSUtils.setOption(SVUtils.SimpleValidationBorderEnable.class,
-                                        new SVUtils.SimpleValidationBorderEnable(false));
+    // SSUtils.setSimpleValidationBorderEnabled(false);
     // SSUtils.setDecoratorStyle(SSUtils.DecoratorStyle.SIMPLE_VALIDATION);
     // SSUtils.setDecoratorStyle(SSUtils.DecoratorStyle.BACKGROUND);
 

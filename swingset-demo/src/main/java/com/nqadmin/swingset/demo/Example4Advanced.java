@@ -57,7 +57,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 
-import dev.visdb.seesaw.SsComboBox2.MissingDisplayValueControl;
+import com.nqadmin.swingset.SSComboBox2;
 import dev.visdb.seesaw.models.ListItem;
 import dev.visdb.seesaw.models.ListItemFormat;
 
@@ -69,7 +69,7 @@ import static java.lang.System.Logger.Level.*;
  * Demonstrate some advanced features of SSCombobox
  * and using Navigator actions.<ul>
  <li>Using a custom ListItemFormat for null/missing Option</li>
- <li>MissingDisplayValueControl</li>
+ <li>SSComboBox2.MissingDisplayValueControl</li>
  <li>Assigning navigator actions to function keys</li>
  <li>Buttons that invoke navigation actions</li>
  </ul>
@@ -124,18 +124,18 @@ public class Example4Advanced extends Example4 {
     // Here we just get the current value, log it and put it back;
     // so we're still using the default handling. See javadoc as needed.
 
-    // Get previous value of MissingDisplayValueControl
-    EnumSet<MissingDisplayValueControl> mmc = cmbPartColor.setMissingDisplayValueControl(
-        EnumSet.noneOf(MissingDisplayValueControl.class));
+    // Get previous value of SSComboBox2.MissingDisplayValueControl
+    EnumSet<SSComboBox2.MissingDisplayValueControl> mmc = cmbPartColor.setMissingDisplayValueControl(
+        EnumSet.noneOf(SSComboBox2.MissingDisplayValueControl.class));
     // restore the default
     cmbPartColor.setMissingDisplayValueControl(mmc);
 
     // With the following two lines retain the missing mapping option in list
     // for all records, even those without a missing option.
-    //mmc.remove(MissingDisplayValueControl.MC_CLEANUP);
+    //mmc.remove(SSComboBox2.MissingDisplayValueControl.MC_CLEANUP);
     //cmbPartColor.setMissingDisplayValueControl(mmc);
 
-    // log the MissingDisplayValueControl values
+    // log the SSComboBox2.MissingDisplayValueControl values
     logger.log(INFO, () -> ("MissingMappingFlags: " + mmc));
 
     //////////////////////////////////////////////////////////////////////
