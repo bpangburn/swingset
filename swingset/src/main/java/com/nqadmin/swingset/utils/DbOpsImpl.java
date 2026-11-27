@@ -44,7 +44,6 @@ package com.nqadmin.swingset.utils;
 
 import java.awt.Container;
 import java.lang.System.Logger;
-import java.util.function.Consumer;
 
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.utils.SsUtils;
@@ -100,7 +99,7 @@ public abstract class DbOpsImpl implements DbOps {
   /**
    * In the specified container, clear/initialize SSComponents.
    * Typically done for a new record/row. Uses
-   * {@link SSUtils#visitSSComponents(Container, Consumer) }
+   * {@link SsUtils#visitSsComponents(Container, java.util.function.Consumer) }
    * to run {@link dev.visdb.seesaw.utils.SsComponent#cleanField() }.
    * <p>
    * This is done for all SwingSet components,
@@ -124,7 +123,7 @@ public abstract class DbOpsImpl implements DbOps {
   public void performPostInsertOps() {}
 
   /**
-   * @deprecated use performPostDeleteionOps(RowsModel)
+   * @deprecated use performPostDeletionOps(RowsModel)
    */
   @Deprecated
   public void performPostDeletionOps() {}

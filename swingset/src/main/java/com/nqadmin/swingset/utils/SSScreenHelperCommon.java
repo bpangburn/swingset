@@ -57,6 +57,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
+import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.navigate.RowsModel;
 
 import static java.lang.System.Logger.Level.*;
@@ -544,6 +545,17 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
     } catch (final PropertyVetoException pve) {
       logger.log(Level.ERROR, "Property Veto Exception.", pve);
     }
+  }
+
+  /**
+   * Create and execute the initial rowset using the screen's rowset factory.
+   * The caller supplies the database operations appropriate to its screen type.
+   */
+  final void initializeRowsModel(DbOps dbOps) throws Exception {
+    RowSet rs = getNewRowSet(getConnection());
+    rs.setCommand(getRowsetQuery());
+    rs.execute();
+    setRowsModel(RowsModel.create(rs, dbOps));
   }
 
   /**

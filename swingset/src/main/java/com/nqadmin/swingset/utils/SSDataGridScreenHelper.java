@@ -46,7 +46,6 @@ import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import javax.sql.RowSet;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
@@ -58,7 +57,6 @@ import javax.swing.table.TableCellEditor;
 import com.nqadmin.swingset.SSDataGrid;
 
 import dev.visdb.seesaw.datasources.DbOps;
-import dev.visdb.seesaw.navigate.RowsModel;
 
 /**
  * Helper class for designing SSDataGrid screens.
@@ -319,10 +317,7 @@ public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
    * @throws Exception exception thrown while initializing rowset
    */
   private void initRowsModel() throws SQLException, Exception {
-    RowSet rs = getNewRowSet(getConnection());
-    rs.setCommand(getRowsetQuery());
-    rs.execute();
-    setRowsModel(RowsModel.create(rs, new DbOps() {}));
+    initializeRowsModel(new DbOps() {});
   }
 
   /**

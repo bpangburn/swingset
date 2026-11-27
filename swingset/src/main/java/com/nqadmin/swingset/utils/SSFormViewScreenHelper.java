@@ -43,7 +43,6 @@ import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import javax.sql.RowSet;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -90,9 +89,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
      */
     @Override
     public boolean allowDelete() {
-      boolean allow;
-      allow = ssDBNavAllowDeletion();
-      return allow;
+      return ssDBNavAllowDeletion();
     }
 
     /**
@@ -101,9 +98,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
      */
     @Override
     public boolean allowInsert() {
-      boolean allow;
-      allow = ssDBNavAllowInsertion();
-      return allow;
+      return ssDBNavAllowInsertion();
     }
 
     /**
@@ -112,9 +107,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
      */
     @Override
     public boolean allowUpdate() {
-      boolean allow;
-      allow = ssDBNavAllowUpdate();
-      return allow;
+      return ssDBNavAllowUpdate();
     }
 
     /**
@@ -530,10 +523,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
    * @throws Exception exception thrown while initializing rowset
    */
   private void initRowsModel() throws SQLException, Exception {
-    RowSet rs = getNewRowSet(getConnection());
-    rs.setCommand(getRowsetQuery());
-    rs.execute();
-    setRowsModel(RowsModel.create(rs, new FormHelperSSDBNavImpl(this)));
+    initializeRowsModel(new FormHelperSSDBNavImpl(this));
   }
 
   /**
