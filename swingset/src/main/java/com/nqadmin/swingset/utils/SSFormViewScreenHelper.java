@@ -56,7 +56,6 @@ import com.nqadmin.swingset.SSTextField;
 
 import dev.visdb.seesaw.navigate.RowsAction.Navigation;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.JStuff;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -256,7 +255,7 @@ public abstract class SSFormViewScreenHelper extends SSScreenHelperCommon {
     }
   }
 
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(SSFormViewScreenHelper.class.getName());
 
   private SSDBComboBox comboNav; // Combo navigator.
   private String comboNavDisplayColumn1

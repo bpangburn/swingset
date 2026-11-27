@@ -59,7 +59,6 @@ import com.nqadmin.swingset.SSDataGrid;
 
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.JStuff;
 
 /**
  * Helper class for designing SSDataGrid screens.
@@ -67,7 +66,7 @@ import dev.visdb.seesaw.utils.JStuff;
 //public abstract class SSDataGridScreenHelper extends JInternalFrame {
 @SuppressWarnings("serial")
 public abstract class SSDataGridScreenHelper extends SSScreenHelperCommon {
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(SSDataGridScreenHelper.class.getName());
 
   /**  SSDataGrid used for this screen */
   protected SSDataGrid dataGrid = new SSDataGrid();
