@@ -47,7 +47,6 @@ import java.lang.System.Logger;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import dev.visdb.seesaw.utils.JStuff;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -58,7 +57,7 @@ public class SSProperties {
   /**
    * Log4j Logger for component
    */
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(SSProperties.class.getName());
 
   /**
    * SwingSet key/value pair properties from swingset.properties file.

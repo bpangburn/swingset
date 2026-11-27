@@ -250,7 +250,7 @@ public class SSUtils {
 
   public static List<KeyInfo> getPrimaryKeyInfoForTable(RowSet rs, String columnName)
       throws SQLException {
-    return getPrimaryKeyInfoForTable(rs, rs.findColumn(columnName));
+    return SsUtils.getPrimaryKeyInfoForTable(rs, columnName);
   }
   /**
    * Find {@link KeyInfo} for table associated with the specified column.

@@ -58,9 +58,7 @@ import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.JStuff;
 
-import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -88,7 +86,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
   public final static long hopefullyNoPKValue = -998877;
 
   /** Logger for component */
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(SSScreenHelperCommon.class.getName());
 
   /**
    * SwingSet properties
@@ -160,7 +158,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
       try {
         _jInternalFrame.setClosed(true);
       } catch (PropertyVetoException _pve) {
-        logger.log(WARNING, () -> sf("Unable to close %s.", _jInternalFrame.getTitle()));
+        logger.log(WARNING, () -> String.format("Unable to close %s.", _jInternalFrame.getTitle()));
       }
     });
   }
@@ -561,7 +559,7 @@ public abstract class SSScreenHelperCommon extends JInternalFrame {
    */
   protected void updateRowset() throws SQLException, Exception {
     String query = getRowsetQuery();
-    logger.log(DEBUG, () -> sf("Rowset query: [%s].", query));
+    logger.log(DEBUG, () -> String.format("Rowset query: [%s].", query));
     getRowsModel().getRowSet().setCommand(query);
     getRowsModel().getRowSet().execute();
   }

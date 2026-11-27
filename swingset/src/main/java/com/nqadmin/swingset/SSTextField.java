@@ -55,7 +55,6 @@ import javax.sql.RowSet;
 
 import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.JStuff;
 
 /**
  * SSTextField extends the JTextField.
@@ -105,7 +104,7 @@ public class SSTextField extends SsTextField {
 
   /** Logger for component */
   //private static final Logger logger = SSUtils.getLogger();
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(SSTextField.class.getName());
 
   /**
    * Use this if the text field contains decimal number and want to limit number

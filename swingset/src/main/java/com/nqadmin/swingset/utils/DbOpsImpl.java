@@ -47,7 +47,6 @@ import java.lang.System.Logger;
 import java.util.function.Consumer;
 
 import dev.visdb.seesaw.datasources.DbOps;
-import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsUtils;
 
 import static java.lang.System.Logger.Level.*;
@@ -72,7 +71,7 @@ public abstract class DbOpsImpl implements DbOps {
   /**
    * Logger for component
    */
-  protected static final Logger logger = JStuff.getLogger();
+  protected static final Logger logger = System.getLogger(DbOpsImpl.class.getName());
 
   /**
    * Screen where components to be cleared are located.
