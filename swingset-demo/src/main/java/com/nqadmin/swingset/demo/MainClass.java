@@ -180,7 +180,7 @@ public class MainClass extends JFrame {
         e4JFrame.setLocation(DemoUtil.getChildScreenLocation("Example4UsingHelper"));
         Example4UsingHelper example4 = new Example4UsingHelper(dbConnection, e4JFrame);
         e4JFrame.setContentPane(SSUtils.createDecoratorPanel(example4));
-        example4.showUp(e4JFrame);
+        example4.showUp(e4JFrame.getContentPane());
         e4JFrame.pack();
         // screen dimensions handled by SSScreenHelperCommon.setScreenSize()
         e4JFrame.setVisible(true);
@@ -199,7 +199,7 @@ public class MainClass extends JFrame {
         Example7UsingHelper example7 = new Example7UsingHelper(dbConnection, null);
         e7JFrame.setContentPane(SSUtils.createDecoratorPanel(example7));
         e7JFrame.setLocation(DemoUtil.getChildScreenLocation("Example7UsingHelper"));
-        example7.showUp(e7JFrame);
+        example7.showUp(e7JFrame.getContentPane());
         //e7JFrame.pack(); // NOT USING .pack() FOR DATA GRID SCREENS
         e7JFrame.setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
         e7JFrame.setVisible(true);
