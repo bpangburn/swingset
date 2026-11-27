@@ -37,6 +37,7 @@
  ******************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import com.nqadmin.swingset.utils.SSUtils;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -94,7 +95,6 @@ import dev.visdb.seesaw.models.DbCollection;
 import dev.visdb.seesaw.models.DbArray;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.Globals;
-import dev.visdb.seesaw.SsDataNavigator;
 import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
 
@@ -372,7 +372,7 @@ public class TestBaseComponents extends JFrame {
       rowset.execute();
       rowsModel = RowsModel.create(rowset, null);
       // navigator = new SSDataNavigator(rowsModel);
-      navigator = new SSDataNavigator(rowsModel, SsDataNavigator.Lines.TWO);
+      navigator = new SSDataNavigator(rowsModel, SSDataNavigator.Lines.TWO);
     } catch (final SQLException se) {
       logger.log(Level.ERROR, "SQL Exception.", se);
     }
@@ -506,8 +506,10 @@ public class TestBaseComponents extends JFrame {
 
     // Add the components, there's a special case with the list scroll panes.
     buildGui_add(mainPane, lstScrollPane, lstScrollPane2);
-    add(mainPane);
-    add(navigator, BorderLayout.SOUTH);
+    JPanel uiPanel = new JPanel(new BorderLayout());
+    uiPanel.add(mainPane, BorderLayout.CENTER);
+    uiPanel.add(navigator, BorderLayout.SOUTH);
+    setContentPane(SSUtils.createDecoratorPanel(uiPanel));
 
     pack();
 

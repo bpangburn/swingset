@@ -37,6 +37,7 @@
  ******************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import javax.swing.JPanel;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -368,7 +369,7 @@ public class Example4 extends JFrame {
     txtPartCity.setPreferredSize(MainClass.ssDim);
 
     // SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-    final Container contentPane = getContentPane();
+    final Container contentPane = new JPanel();
     final GridBagConstraints constraints = new GridBagConstraints();
     contentPane.setLayout(new GridBagLayout());
 
@@ -412,8 +413,9 @@ public class Example4 extends JFrame {
     txtPartID.setEnabled(false);
 
     // MAKE THE JFRAME VISIBLE
-    setVisible(true);
+    setContentPane(SSUtils.createDecoratorPanel(contentPane));
     pack();
+    setVisible(true);
   }
 
   private DbOps createDbNav() {

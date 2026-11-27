@@ -37,6 +37,8 @@
  ******************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import javax.swing.JPanel;
+import com.nqadmin.swingset.utils.SSUtils;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -182,7 +184,7 @@ public class Example3 extends JFrame {
     txtShipDate.setPreferredSize(MainClass.ssDim);
 
     // SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-    final Container contentPane = getContentPane();
+    final Container contentPane = new JPanel();
     contentPane.setLayout(new GridBagLayout());
     final GridBagConstraints constraints = new GridBagConstraints();
 
@@ -222,8 +224,9 @@ public class Example3 extends JFrame {
     //			cmbSupplierName.updateDisplayValue((long)55, "Hello");
 
     // MAKE THE JFRAME VISIBLE
-    setVisible(true);
+    setContentPane(SSUtils.createDecoratorPanel(contentPane));
     pack();
+    setVisible(true);
   }
 
   /**

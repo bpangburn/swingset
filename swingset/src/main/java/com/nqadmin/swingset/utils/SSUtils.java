@@ -65,6 +65,16 @@ import dev.visdb.seesaw.utils.SsUtils.KeyInfo;
 public class SSUtils {
   private SSUtils() {}
 
+  /** Initialize the SwingSet runtime once, before creating Swing components. */
+  public static void init() {
+    dev.visdb.seesaw.utils.LookupDefaults.init();
+  }
+
+  /** Wrap a screen in the configured component decorator panel. */
+  public static javax.swing.JPanel createDecoratorPanel(java.awt.Component uiPanel) {
+    return SsUtils.createDecoratorPanel(uiPanel);
+  }
+
   /**
    * Temporary for hiding SsCommon; used from SsDBComboBox.
    * @param comp component to update

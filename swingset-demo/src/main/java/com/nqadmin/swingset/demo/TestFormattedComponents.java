@@ -37,6 +37,8 @@
  ******************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import javax.swing.JPanel;
+import com.nqadmin.swingset.utils.SSUtils;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -261,7 +263,7 @@ public class TestFormattedComponents extends JFrame {
     fmtDebugFieldNull.setPreferredSize(MainClass.ssDim);
 
     // SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-    final Container contentPane = getContentPane();
+    final Container contentPane = new JPanel();
     contentPane.setLayout(new GridBagLayout());
     final GridBagConstraints constraints = new GridBagConstraints();
 
@@ -348,8 +350,9 @@ public class TestFormattedComponents extends JFrame {
     txtSwingSetFormattedTestPK.setEnabled(false);
 
     // MAKE THE JFRAME VISIBLE
-    setVisible(true);
+    setContentPane(SSUtils.createDecoratorPanel(contentPane));
     pack();
+    setVisible(true);
   }
 
   private DbOps createDbNav() {

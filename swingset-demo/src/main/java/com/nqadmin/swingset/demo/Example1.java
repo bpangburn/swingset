@@ -42,6 +42,7 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import com.nqadmin.swingset.utils.SSUtils;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
@@ -286,7 +287,7 @@ public class Example1 extends JFrame {
       uiPanel = (JPanel) contentPane;
     }
     // Make the jframe visible.
-    frame.add(uiPanel);
+    frame.setContentPane(SSUtils.createDecoratorPanel(uiPanel));
     frame.pack();
     frame.setVisible(true);
   }

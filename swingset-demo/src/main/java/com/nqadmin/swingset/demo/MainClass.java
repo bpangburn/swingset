@@ -93,7 +93,6 @@ import dev.visdb.seesaw.models.DbCollection;
 import dev.visdb.seesaw.models.DbStringCollection;
 import dev.visdb.seesaw.navigate.Utils;
 import dev.visdb.seesaw.utils.JStuff;
-import dev.visdb.seesaw.utils.LookupDefaults;
 
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -195,7 +194,7 @@ public class MainClass extends JFrame {
         JFrame e4JFrame = new JFrame("Example4 Using Helper");
         e4JFrame.setLocation(DemoUtil.getChildScreenLocation("Example4UsingHelper"));
         Example4UsingHelper example4 = new Example4UsingHelper(dbConnection, e4JFrame);
-        e4JFrame.add(example4);
+        e4JFrame.setContentPane(SSUtils.createDecoratorPanel(example4));
         example4.showUp(e4JFrame);
         e4JFrame.pack();
         // screen dimensions handled by SSScreenHelperCommon.setScreenSize()
@@ -890,7 +889,7 @@ public class MainClass extends JFrame {
     // For debug, enable this to force CachedRowSet conflict
     //Globals.setOption(new ForceConflict(1));
 
-    LookupDefaults.init();
+    SSUtils.init();
 
     boolean some_error = false;
     System.err.printf("java:%s vm:%s date:%s os:%s\n", System.getProperty("java.version"),
