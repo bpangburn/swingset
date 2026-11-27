@@ -57,7 +57,6 @@ import com.raelity.logman.ui.LogUI;
 import com.raelity.logman.ui.SwingLogTree;
 
 
-import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -123,7 +122,7 @@ public class DemoUtil {
     logger.log(INFO, () -> "RowSetSourceDefault: " + whichRowSetDefault);
     logger.log(INFO,
                ()
-                   -> sf("Connection pool: max active: %d, nOpen %d, nClose %d",
+                   -> String.format("Connection pool: max active: %d, nOpen %d, nClose %d",
                          DataSourcePool.cMax(), DataSourcePool.nOpen(), DataSourcePool.nClose()));
     for (String dsName : connMap.values()) {
       logger.log(INFO, () -> "Connection dsName: " + dsName);
@@ -249,7 +248,7 @@ public class DemoUtil {
       case POOL_JDBC -> {
         rs = rsFactory.createJdbcRowSet();
         rs.setDataSourceName(DataSourcePool.DATA_SOURCE_NAME);
-        logger.log(DEBUG, () -> sf("JDBC: DataSource: %s", DataSourcePool.DATA_SOURCE_NAME));
+        logger.log(DEBUG, () -> String.format("JDBC: DataSource: %s", DataSourcePool.DATA_SOURCE_NAME));
       }
       case NQADMIN -> {
         rs = new JdbcRowSetImpl(connection);

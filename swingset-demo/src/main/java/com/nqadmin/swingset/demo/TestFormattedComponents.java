@@ -69,7 +69,6 @@ import com.nqadmin.swingset.formatting.SSSSNField;
 import com.nqadmin.swingset.formatting.SSTimeField;
 import com.nqadmin.swingset.formatting.SSTimestampField;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.JStuff;
 
 /**
  * This example demonstrates all of the Formatted SwingSet Components.
@@ -86,7 +85,7 @@ public class TestFormattedComponents extends JFrame {
   /**
    * Log4j2 Logger
    */
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(TestFormattedComponents.class.getName());
 
   /**
    * screen label declarations

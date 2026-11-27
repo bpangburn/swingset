@@ -97,12 +97,10 @@ import dev.visdb.seesaw.decorators.TextStyles;
 import dev.visdb.seesaw.models.DbCollection;
 import dev.visdb.seesaw.models.DbArray;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
 
 import static com.nqadmin.swingset.demo.TestBaseComponents.CompDim.*;
 import static com.nqadmin.swingset.demo.TestBaseComponents.CompID.*;
-import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -198,7 +196,7 @@ public class TestBaseComponents extends JFrame {
   /**
    * Log4j2 Logger
    */
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(TestBaseComponents.class.getName());
 
   /**
    * map of 'hints' contianing info on which collection model to use
@@ -368,7 +366,7 @@ public class TestBaseComponents extends JFrame {
     // initialize database connection and components
     try {
       RowSet rowset = DemoUtil.getNewRowSet(connection);
-      String sql = sf("SELECT %s FROM swingset_base_test_data", getColumnsSQL());
+      String sql = String.format("SELECT %s FROM swingset_base_test_data", getColumnsSQL());
       logger.log(INFO, sql);
       rowset.setCommand(sql);
       rowset.execute();
@@ -380,7 +378,7 @@ public class TestBaseComponents extends JFrame {
     }
     String name = rowsModel.getDbOps().getClass().getSimpleName();
     if (!name.equals("TestBaseComponentsDbOps")) {
-      throw new IllegalStateException(sf("wrong customizer %s", name));
+      throw new IllegalStateException(String.format("wrong customizer %s", name));
     }
 
     if (prevCreator != null)

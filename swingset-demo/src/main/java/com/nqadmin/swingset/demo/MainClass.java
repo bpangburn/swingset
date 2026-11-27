@@ -74,14 +74,12 @@ import dev.visdb.seesaw.datasources.RowSetOps.ForceConflict;
 import dev.visdb.seesaw.datasources.products.DbSupportBase;
 import dev.visdb.seesaw.datasources.products.DbSupportFactory;
 import dev.visdb.seesaw.navigate.Utils;
-import dev.visdb.seesaw.utils.JStuff;
 
 import com.nqadmin.swingset.utils.SSUtils;
 
 import dev.visdb.seesaw.utils.Version;
 
 import static com.nqadmin.swingset.demo.DemoUtil.configureJavaUtilLogger;
-import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -324,7 +322,7 @@ public class MainClass extends JFrame {
   private JButton btnLogMan = new JButton("Manage Logging");
 
   /** Logger */
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(MainClass.class.getName());
 
   static DatabaseMetaData dbMeta;
 
@@ -345,7 +343,7 @@ public class MainClass extends JFrame {
     });
 
     // ECHO WORKING DIRECTORY
-    logger.log(INFO, () -> sf("Working Directory = %s", System.getProperty("user.dir")));
+    logger.log(INFO, () -> String.format("Working Directory = %s", System.getProperty("user.dir")));
 
     // INITIALIZE DATABASE
     dbConnection = getDatabase();
@@ -367,7 +365,7 @@ public class MainClass extends JFrame {
 
     DbSupport supp = DbSupportFactory.setDbSupportGlobalOption(dbConnection);
     if (supp == null) {
-      logger.log(Level.ERROR, sf("No SSDBSupport found for '%s'", databaseID));
+      logger.log(Level.ERROR, String.format("No SSDBSupport found for '%s'", databaseID));
       SSUtils.setOption(DbSupport.class, new DbSupportBase(dbConnection) {});
     }
 

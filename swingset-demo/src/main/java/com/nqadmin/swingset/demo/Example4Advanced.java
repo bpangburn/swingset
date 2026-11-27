@@ -63,7 +63,6 @@ import dev.visdb.seesaw.models.ListItem;
 import dev.visdb.seesaw.models.ListItemFormat;
 
 import static dev.visdb.seesaw.navigate.RowsAction.*;
-import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -272,7 +271,7 @@ public class Example4Advanced extends Example4 {
   private void changeListFormatter(String tag) {
     countChange++;
     int captureCountChange = countChange;
-    logger.log(INFO, sf("change%s formatter: %d", tag, countChange));
+    logger.log(INFO, String.format("change%s formatter: %d", tag, countChange));
     EventQueue.invokeLater(() -> {
       cmbPartColor.setListItemFormat(new ListItemFormat() {
         @Override
