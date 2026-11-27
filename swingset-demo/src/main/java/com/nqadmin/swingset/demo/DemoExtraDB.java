@@ -41,12 +41,10 @@ import javax.sql.rowset.RowSetProvider;
 import com.google.common.collect.MapMaker;
 
 import dev.visdb.seesaw.navigate.RowSetState;
-import dev.visdb.seesaw.utils.JStuff;
 
 import com.nqadmin.swingset.utils.SSUtils;
 
 import static com.nqadmin.swingset.demo.H2Demo.dbUrl;
-import static dev.visdb.seesaw.utils.JStuff.sf;
 
 /**
  * x
@@ -54,7 +52,7 @@ import static dev.visdb.seesaw.utils.JStuff.sf;
 public class DemoExtraDB {
   private DemoExtraDB() {}
 
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(DemoExtraDB.class.getName());
 
   // NOTE: During play, might not want the RowSet to just disapear.
   //private static final Map<Integer,RowSet> simpleSupplierData = new MapMaker().weakValues().makeMap();
@@ -67,7 +65,7 @@ public class DemoExtraDB {
     simpleSupplierData.forEach((idx, rs) -> {
       try {
         if (rs.getRow() != idx) {
-          String s = sf("*********** %s MISMATCHED ROW POSITION ***********",
+          String s = String.format("*********** %s MISMATCHED ROW POSITION ***********",
                         rs.getMetaData().getTableName(1));
           System.err.println(s);
           logger.log(Level.ERROR, s);
@@ -103,7 +101,7 @@ public class DemoExtraDB {
       if (rs != keepRS) {
         // TODO: Could monitor rowSet objects and check this when collected.
         if (RowSetState.isDirty(rs))
-          logger.log(Level.WARNING, () -> sf("deref dirty RowSet %s", SSUtils.objectID(rs)));
+          logger.log(Level.WARNING, () -> String.format("deref dirty RowSet %s", SSUtils.objectID(rs)));
         it.remove();
       }
     }
@@ -131,11 +129,11 @@ public class DemoExtraDB {
       return null;
     RowSet rowSet = simpleSupplierData.get(idxTbl);
     if (rowSet != null) {
-      logger.log(Level.INFO, () -> sf("Reuse tbl%d, nRows %d", idxTbl, nRow));
+      logger.log(Level.INFO, () -> String.format("Reuse tbl%d, nRows %d", idxTbl, nRow));
       return rowSet;
     }
 
-    logger.log(Level.INFO, () -> sf("Query tbl%d", idxTbl));
+    logger.log(Level.INFO, () -> String.format("Query tbl%d", idxTbl));
     rowSet = RowSetProvider.newFactory().createJdbcRowSet();
     rowSet.setUrl(dbUrl());
     rowSet.setCommand("SELECT * FROM tbl" + String.valueOf(idxTbl));

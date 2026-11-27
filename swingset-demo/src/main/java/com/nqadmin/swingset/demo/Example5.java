@@ -43,6 +43,7 @@ import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.sql.RowSet;
 import javax.swing.JFrame;
@@ -50,7 +51,6 @@ import javax.swing.JFrame;
 import com.nqadmin.swingset.SSDataGrid;
 
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.JStuff;
 
 /**
  * This example demonstrates the use of an SSDataGrid to display a tabular view
@@ -61,7 +61,7 @@ import dev.visdb.seesaw.utils.JStuff;
  */
 @SuppressWarnings("serial")
 public class Example5 extends JFrame {
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(Example5.class.getName());
 
   /**
    * data grid
@@ -92,16 +92,15 @@ public class Example5 extends JFrame {
     setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 
     // SET SCREEN POSITION
-    setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+
 
     // INITIALIZE SCREEN & DATAGRID
     init();
   }
 
   private Object getNewPrimaryKey() {
-    try (final ResultSet rs
-         = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-               .executeQuery("SELECT nextval('part_data_seq') as nextVal;")) {
+    try (Statement statement = connection.createStatement();
+         ResultSet rs = statement.executeQuery("SELECT nextval('part_data_seq') as nextVal;")) {
       // GET THE NEW RECORD ID.
       rs.next();
       return rs.getInt("nextVal");
@@ -154,9 +153,12 @@ public class Example5 extends JFrame {
 
     } catch (final SQLException se) {
       logger.log(Level.ERROR, "SQL Exception.", se);
+      dispose();
+      return;
     }
 
     // MAKE THE JFRAME VISIBLE
+    DemoUtil.setChildScreenLocation(this);
     setVisible(true);
   }
 }

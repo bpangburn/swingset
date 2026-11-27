@@ -8,10 +8,20 @@ This repository is a multi-module Maven project:
 
 | Module | Description |
 | --- | --- |
-| [`swingset`](swingset/) | Core SwingSet library components. Start here for usage, dependency, build, and component documentation. |
+| [`swingset`](swingset/) | Core SwingSet library components. |
 | [`swingset-demo`](swingset-demo/) | Sample/demo application showing the SwingSet components with an in-memory H2 database. |
 
-For library documentation, see [`swingset/README.md`](swingset/README.md).
+## SwingSet 5 date picker
+
+`com.nqadmin.swingset.formatting.SSLGoodDatePicker` exposes Seesaw's database-aware LGoodDatePicker integration through SwingSet. It supports JDBC `DATE` columns and uses `java.time.LocalDate` for date values. The existing `SSDateField` remains available.
+
+```java
+import com.nqadmin.swingset.formatting.SSLGoodDatePicker;
+
+SSLGoodDatePicker picker = new SSLGoodDatePicker(rowsModel, "effective_date");
+```
+
+A no-argument constructor is also available for subsequent binding via the existing rows model. The LGoodDatePicker integration is a transitive dependency of SwingSet; Maven applications do not need a separate dependency declaration. See TestBaseComponents in the demo for a working example.
 
 ## Quick build
 

@@ -43,16 +43,14 @@ import com.nqadmin.swingset.demo.Example1.DbOpsAllows;
 
 import dev.visdb.seesaw.navigate.RowSetState;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.JStuff;
 
-import static dev.visdb.seesaw.utils.JStuff.sf;
 
 /**
  * x
  */
 @SuppressWarnings("serial")
 public abstract class RowSetButtons extends JPanel {
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(RowSetButtons.class.getName());
 
   record AppInfo(Logger logger, RowsModel rowsModel, DbOpsAllows dbOps) {}
   abstract AppInfo getAppInfo();
@@ -115,7 +113,7 @@ public abstract class RowSetButtons extends JPanel {
   private void outStuff() {
     logger.log(Level.INFO,
                ()
-                   -> sf("Active: RSState %d, NavState %d, RModel %d", RowSetState.count(),
+                   -> String.format("Active: RSState %d, NavState %d, RModel %d", RowSetState.count(),
                          RowsModel.navCount(), RowsModel.count()));
   }
 
@@ -200,7 +198,7 @@ public abstract class RowSetButtons extends JPanel {
                                          tableLoopRowCountBase + tableLoopIndex);
     logger.log(Level.INFO,
                ()
-                   -> sf("Creating tbl%d, nRows %d", tableLoopBase + tableLoopIndex,
+                   -> String.format("Creating tbl%d, nRows %d", tableLoopBase + tableLoopIndex,
                          tableLoopRowCountBase + tableLoopIndex));
   }
 
@@ -212,7 +210,7 @@ public abstract class RowSetButtons extends JPanel {
                                                    tableLoopRowCountBase + tableLoopIndex);
     logger.log(Level.INFO,
                ()
-                   -> sf("Using tbl%d, nRows %d", tableLoopBase + tableLoopIndex,
+                   -> String.format("Using tbl%d, nRows %d", tableLoopBase + tableLoopIndex,
                          tableLoopRowCountBase + tableLoopIndex));
     return rs;
   }

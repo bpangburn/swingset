@@ -61,7 +61,6 @@ import com.nqadmin.swingset.SSComboBox;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.utils.SSFormViewScreenHelper;
 
-import dev.visdb.seesaw.utils.JStuff;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -79,7 +78,7 @@ public class Example4UsingHelper extends SSFormViewScreenHelper {
   private static final long serialVersionUID = -5528806265008339747L;
 
   // Log4j2 Logger
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(Example4UsingHelper.class.getName());
 
   // String Constants
   private static final String rowsetQuery = "SELECT * FROM part_data ORDER BY part_id;";

@@ -60,7 +60,6 @@ import com.nqadmin.swingset.SSTextField;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.JStuff;
 
 /**
  * This example displays data from the supplier_data table.
@@ -74,7 +73,7 @@ public class Example2 extends JFrame {
   /**
    * Log4j2 Logger
    */
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(Example2.class.getName());
 
   /**
    * screen label declarations
@@ -117,7 +116,7 @@ public class Example2 extends JFrame {
     setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 
     // SET SCREEN POSITION
-    setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+
 
     // Set some validation criteria.
     txtSupplierName.setTextValidationCondition(
@@ -200,6 +199,7 @@ public class Example2 extends JFrame {
     // MAKE THE JFRAME VISIBLE
     setContentPane(SSUtils.createDecoratorPanel(contentPane));
     pack();
+    DemoUtil.setChildScreenLocation(this);
     setVisible(true);
   }
 

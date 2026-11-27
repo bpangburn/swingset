@@ -50,7 +50,6 @@ import javax.swing.JFrame;
 import com.nqadmin.swingset.SSDataGrid;
 
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.JStuff;
 
 /**
  * This example is similar to Example5, demonstrating the use of an SSDataGrid
@@ -62,7 +61,7 @@ public class Example6 extends JFrame {
   /**
    * Log4j2 Logger
    */
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(Example6.class.getName());
 
   /**
    * unique serial id
@@ -95,7 +94,7 @@ public class Example6 extends JFrame {
     connection = _dbConn;
 
     // SET SCREEN POSITION
-    setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+
 
     // SET SCREEN DIMENSIONS
     setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
@@ -144,10 +143,8 @@ public class Example6 extends JFrame {
 
         try {
           // GET THE NEW RECORD ID.
-          Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                                                           ResultSet.CONCUR_UPDATABLE);
-          try (ResultSet rs
-               = statement.executeQuery("SELECT nextval('part_data_seq') as nextVal;")) {
+          try (Statement statement = connection.createStatement();
+               ResultSet rs = statement.executeQuery("SELECT nextval('part_data_seq') as nextVal;")) {
             rs.next();
             partID = rs.getInt("nextVal");
           }
@@ -162,14 +159,16 @@ public class Example6 extends JFrame {
         return partID;
       });
 
+      // SETUP THE CONTAINER AND ADD THE DATAGRID
+      getContentPane().add(dataGrid.getComponent());
     } catch (final SQLException se) {
       logger.log(Level.ERROR, "SQL Exception.", se);
+      dispose();
+      return;
     }
 
-    // SETUP THE CONTAINER AND ADD THE DATAGRID
-    getContentPane().add(dataGrid.getComponent());
-
     // MAKE THE JFRAME VISIBLE
+    DemoUtil.setChildScreenLocation(this);
     setVisible(true);
   }
 }

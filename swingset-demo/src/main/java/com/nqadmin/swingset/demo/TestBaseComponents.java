@@ -84,22 +84,23 @@ import com.nqadmin.swingset.SSTextArea;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.utils.SSSyncManager;
 
-import dev.visdb.seesaw.contrib.lgooddatepicker.SsLGoodDatePicker;
+import com.nqadmin.swingset.formatting.SSLGoodDatePicker;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.datasources.products.DbOpsCreator;
+import javax.swing.text.AttributeSet;
+
+import dev.visdb.seesaw.decorators.BaseTextDecorator;
 import dev.visdb.seesaw.decorators.ComponentState;
 import dev.visdb.seesaw.decorators.ComponentStateTextDecorator;
 import dev.visdb.seesaw.decorators.TextStyles;
 import dev.visdb.seesaw.models.DbCollection;
 import dev.visdb.seesaw.models.DbArray;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.JStuff;
 import dev.visdb.seesaw.utils.SsComponent;
 
 import static com.nqadmin.swingset.demo.TestBaseComponents.CompDim.*;
 import static com.nqadmin.swingset.demo.TestBaseComponents.CompID.*;
-import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -195,7 +196,7 @@ public class TestBaseComponents extends JFrame {
   /**
    * Log4j2 Logger
    */
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(TestBaseComponents.class.getName());
 
   /**
    * map of 'hints' contianing info on which collection model to use
@@ -283,7 +284,7 @@ public class TestBaseComponents extends JFrame {
   SSTextArea txtSSTextArea = new SSTextArea();
   SSTextField txtSSTextField = new SSTextField();
   SSTextField txtSSTextFieldB = new SSTextField();
-  SsLGoodDatePicker dpDatePicker = new SsLGoodDatePicker();
+  SSLGoodDatePicker dpDatePicker = new SSLGoodDatePicker();
 
   /**
    * database component declarations
@@ -355,7 +356,7 @@ public class TestBaseComponents extends JFrame {
     setSize(MainClass.childScreenWidth, MainClass.childScreenHeightTall);
 
     // set screen position
-    setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+
 
     // TEST DbOpsCreator
     DbOpsCreator creator = (RowSet rs, RowsModel rowsModel1) -> createDbNav();
@@ -365,7 +366,7 @@ public class TestBaseComponents extends JFrame {
     // initialize database connection and components
     try {
       RowSet rowset = DemoUtil.getNewRowSet(connection);
-      String sql = sf("SELECT %s FROM swingset_base_test_data", getColumnsSQL());
+      String sql = String.format("SELECT %s FROM swingset_base_test_data", getColumnsSQL());
       logger.log(INFO, sql);
       rowset.setCommand(sql);
       rowset.execute();
@@ -377,7 +378,7 @@ public class TestBaseComponents extends JFrame {
     }
     String name = rowsModel.getDbOps().getClass().getSimpleName();
     if (!name.equals("TestBaseComponentsDbOps")) {
-      throw new IllegalStateException(sf("wrong customizer %s", name));
+      throw new IllegalStateException(String.format("wrong customizer %s", name));
     }
 
     if (prevCreator != null)
@@ -448,6 +449,18 @@ public class TestBaseComponents extends JFrame {
     // This is used by a text field for the ComponentStateTextDecorator
     try {
       setupOurTextStyles();
+      if (activeComps.contains(ENUM_COMBO)) {
+        cmbEnumSSComboBox.setTextDecorator(new BaseTextDecorator() {
+          @Override
+          public void decorateText() {
+            Integer key = cmbEnumSSComboBox.getChosenKey();
+            AttributeSet style = key == null ? null
+                : TextStyles.getStyle("testComponents_" + ((key & 1) == 0));
+            TextStyles.applyStyle(jComp(), style != null ? style : TextStyles.RESET);
+          }
+        });
+        cmbEnumSSComboBox.getTextDecorator().decorateText();
+      }
     } catch (IOException ex) {
       logger.log(Level.ERROR, (String) null, ex);
     }
@@ -538,6 +551,7 @@ public class TestBaseComponents extends JFrame {
     setMinimumSize(new Dimension(minWidth, minHeight));
 
     // Make the JFrame visible.
+    DemoUtil.setChildScreenLocation(this);
     setVisible(true);
   }
   int minWidth;
@@ -548,19 +562,31 @@ public class TestBaseComponents extends JFrame {
    */
   @SuppressWarnings("CallToPrintStackTrace")
   private void setupOurTextStyles() throws IOException {
-    if (TextStyles.getStyle("testComponents_componentStateError") != null)
+    if (TextStyles.getStyle("testComponents_ErrorStyle") != null)
       return;
     StringReader reader = new StringReader("""
         {
-          "testComponents_componentStateError": {
+          "testComponents_ErrorStyle": {
             "fontSize": 14,
             "italic": false,
             "strikethrough": true
           },
-          "testComponents_componentStateModified": {
+          "testComponents_ModifiedStyle": {
             "fontSize": "default",
             "italic": true,
             "strikethrough": false
+          },
+          "testComponents_true": {
+            "fontSize": "default",
+            "italic": false,
+            "underline": true,
+            "bold": false
+          },
+          "testComponents_false": {
+            "fontSize": "default",
+            "italic": true,
+            "underline": false,
+            "bold": false
           }
         }
         """);
