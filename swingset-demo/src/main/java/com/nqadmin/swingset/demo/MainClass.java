@@ -45,11 +45,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -58,17 +53,13 @@ import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
-import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
-import java.util.function.Supplier;
 
 import javax.sql.rowset.spi.SyncFactory;
 import javax.sql.rowset.spi.SyncFactoryException;
@@ -89,8 +80,6 @@ import dev.visdb.seesaw.datasources.DbSupport;
 import dev.visdb.seesaw.datasources.RowSetOps.ForceConflict;
 import dev.visdb.seesaw.datasources.products.DbSupportBase;
 import dev.visdb.seesaw.datasources.products.DbSupportFactory;
-import dev.visdb.seesaw.models.DbCollection;
-import dev.visdb.seesaw.models.DbStringCollection;
 import dev.visdb.seesaw.navigate.Utils;
 import dev.visdb.seesaw.utils.JStuff;
 
@@ -116,8 +105,8 @@ public class MainClass extends JFrame {
 
   private static final boolean USE_IN_MEMORY_DATABASE = true;
 
-  private static final String DATABASE_SCRIPT_DEMO = "suppliers_and_parts.sql";
-  private static final String DATABASE_SCRIPT_TEST = "swingset_tests.sql";
+  static final String DATABASE_SCRIPT_DEMO = "suppliers_and_parts.sql";
+  static final String DATABASE_SCRIPT_TEST = "swingset_tests.sql";
   private static final String DATABASE_SCRIPT_TEST_IMAGES = "swingset_tests_load_blobs.sql";
   private static final String DATABASE_SCRIPT_DEBUG = "swingset_debug.sql";
 
@@ -581,219 +570,6 @@ public class MainClass extends JFrame {
     return result;
   }
 
-  static abstract class DatabaseSetup implements Runnable {
-    private Connection conn;
-
-    abstract Properties getDatabaseProperties();
-
-    abstract List<String> getScripts();
-
-    Connection getConnection() {
-      return conn;
-    }
-
-    /**
-     * Find resource; an alternate implementation could take the resource as a file.
-     *
-     * @param resourceName name of resource
-     * @return BufferReader for specified resource
-     */
-    @SuppressWarnings("UseOfSystemOutOrSystemErr")
-    BufferedReader getBufferedReader(String resourceName) {
-      InputStream stream = MainClass.class.getResourceAsStream(resourceName);
-      if (stream == null) {
-        System.err.println("Script '" + resourceName + "' not found. Exiting.");
-        return null;
-      }
-      BufferedReader br = new BufferedReader(new InputStreamReader(stream));
-      return br;
-    }
-
-    @Override
-    @SuppressWarnings("UseOfSystemOutOrSystemErr")
-    public void run() {
-      Properties info = getDatabaseProperties();
-      if (info == null) {
-        return;
-      }
-      String clazz = info.getProperty("DB_DRIVER_CLASS", "");
-
-      if (clazz.isEmpty()) {
-        System.err.println("'DB_DRIVER_CLASS' not found in property file");
-        conn = null;
-        return;
-      }
-
-      try {
-        Class.forName(clazz);
-      } catch (ClassNotFoundException ex) {
-        System.err.println("Class '" + clazz + "' not found");
-        conn = null;
-        return;
-      }
-
-      conn = DemoUtil.getConnection(info.getProperty("DB_URL"), info);
-      if (conn == null) {
-        return;
-      }
-
-      if (no_initialize_db) {
-        return;
-      }
-
-      boolean ok = false;
-      for (String script : getScripts()) {
-        ok = false;
-        BufferedReader br = getBufferedReader(script);
-        if (br != null) {
-          ok = DemoUtil.runSqlStatements(conn, br, verbose);
-        }
-        if (!ok) {
-          break;
-        }
-      }
-
-      if (ok && !no_load_images) {
-        // Load up the images
-        String sql = "UPDATE swingset_base_test_data"
-                     + " SET ss_image = ? WHERE swingset_base_test_pk = ?";
-        ok = DemoUtil.loadBinaries(conn, "/swingset-demo-images.txt", sql, verbose);
-      }
-
-      if (!ok) {
-        conn = null;
-      }
-    }
-
-    @SuppressWarnings("UseOfSystemOutOrSystemErr")
-    Properties getFileProperties(String fname) {
-      try {
-        Properties props = new Properties();
-        FileReader reader = new FileReader(fname);
-        props.load(reader);
-        return props;
-      } catch (FileNotFoundException ex) {
-        System.err.println("Property file '" + fname + "' not found");
-      } catch (IOException ex) {
-        logger.log(Level.ERROR, "IO exception.", ex);
-      }
-      return null;
-    }
-
-    void dump() {
-      for (String script : getScripts()) {
-        boolean ok = false;
-        try (BufferedReader br = getBufferedReader(script)) {
-          if (br != null) {
-            String name = "dump." + new File(script).getName();
-            try (FileWriter fout = new FileWriter(name)) {
-              char buf[] = new char[4 * 1024];
-              int n;
-              while ((n = br.read(buf)) > 0) {
-                fout.write(buf, 0, n);
-              }
-            }
-          }
-          ok = true;
-        } catch (IOException ex) {
-          logger.log(Level.ERROR, "IO exception.", ex);
-        }
-        if (!ok) {
-          break;
-        }
-      }
-    }
-  }
-
-  static class ExternalSetup extends DatabaseSetup {
-    List<String> sqlFiles;
-
-    public ExternalSetup(List<String> _sqlFiles) {
-      sqlFiles = _sqlFiles;
-    }
-
-    @Override
-    @SuppressWarnings("UseOfSystemOutOrSystemErr")
-    BufferedReader getBufferedReader(String fileName) {
-      try {
-        return new BufferedReader(new FileReader(fileName));
-      } catch (FileNotFoundException ex) {
-        System.err.println("Script '" + fileName + "' not found. Exiting.");
-        return null;
-      }
-    }
-
-    @Override
-    Properties getDatabaseProperties() {
-      Properties info = getFileProperties(propertyFile);
-      return info;
-    }
-
-    @Override
-    List<String> getScripts() {
-      return sqlFiles;
-    }
-  }
-
-  /**
-   * This is only used to dump H2 sql files
-   */
-  static class H2Setup extends DatabaseSetup {
-    @Override
-    Properties getDatabaseProperties() {
-      return null;
-    }
-
-    @Override
-    public void run() {}
-
-    @Override
-    List<String> getScripts() {
-      return Arrays.asList(new String[] {"/" + DATABASE_SCRIPT_DEMO, "/" + DATABASE_SCRIPT_TEST,
-                                         "/" + DATABASE_SCRIPT_TEST_IMAGES});
-    }
-  }
-
-  static class MysqlSetup extends DatabaseSetup {
-    @Override
-    public void run() {
-      super.run();
-      globalHints.put(
-          "collectionModel",
-          (Supplier<DbCollection>) ()
-              -> new DbStringCollection(JDBCType.INTEGER, DbStringCollection.COMMA_SEP));
-      // () -> new SSStringArrayModel(JDBCType.INTEGER));
-    }
-
-    @Override
-    Properties getDatabaseProperties() {
-      // <dependency>
-      // <groupId>mysql</groupId>
-      // <artifactId>mysql-connector-java</artifactId>
-      // <version>8.0.21</version>
-      // </dependency>
-      Properties info;
-      if (propertyFile != null) {
-        info = getFileProperties(propertyFile);
-      } else {
-        info = new Properties();
-        info.put("DB_DRIVER_CLASS", "com.mysql.cj.jdbc.Driver");
-        info.put("DB_URL", "jdbc:mysql://localhost/swingset_demo_suppliers_and_parts");
-        // DB_NAME NOT USED
-        info.put("DB_NAME", "swingset_demo_suppliers_and_parts");
-        info.put("user", "root");
-        info.put("serverTimezone", "UTC");
-      }
-      return info;
-    }
-
-    @Override
-    List<String> getScripts() {
-      return Arrays.asList(
-          new String[] {"/mysql.swingset-demo-app.sql", "/mysql.swingset-demo-components.sql"});
-    }
-  }
-
   private static final String DBMS_MYSQL = "mysql";
   private static final String DBMS_H2 = "h2";
   private static final String DBMS_EXTERNAL = "external";
@@ -809,7 +585,7 @@ public class MainClass extends JFrame {
   private static String dbname = DBMS_H2;
   private static String propertyFile = null;
   private static List<String> userSqlFiles = new ArrayList<>();
-  private static DatabaseSetup databaseSetup = null;
+  private static DemoDatabase.DatabaseSetup databaseSetup = null;
 
   private static String cmdName = "SwingSetDemo";
 
@@ -972,10 +748,12 @@ public class MainClass extends JFrame {
       }
     }
 
+    DemoDatabase.Options options = new DemoDatabase.Options(verbose, no_load_images,
+        no_initialize_db, propertyFile);
     databaseSetup = switch (dbname) {
-      case DBMS_MYSQL -> new MysqlSetup();
-      case DBMS_EXTERNAL -> new ExternalSetup(userSqlFiles);
-      case DBMS_H2 -> new H2Setup();
+      case DBMS_MYSQL -> new DemoDatabase.MysqlSetup(options, globalHints);
+      case DBMS_EXTERNAL -> new DemoDatabase.ExternalSetup(options, userSqlFiles);
+      case DBMS_H2 -> new DemoDatabase.H2Setup(options);
       default -> null;
     };
     if (databaseSetup == null) {
