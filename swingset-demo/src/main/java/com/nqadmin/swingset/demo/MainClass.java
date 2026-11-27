@@ -364,7 +364,7 @@ public class MainClass extends JFrame {
   @SuppressWarnings({"LeakingThisInConstructor", "OverridableMethodCallInConstructor"})
   public MainClass() {
     // SETUP WINDOW
-    super("SeeSaw SwingSet Demo");
+    super("SwingSet Demo");
     setSize(300, 300);
     setDefaultCloseOperation(EXIT_ON_CLOSE);
     addWindowListener(new WindowAdapter() {
