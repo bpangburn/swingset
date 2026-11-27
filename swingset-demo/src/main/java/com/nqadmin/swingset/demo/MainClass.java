@@ -107,7 +107,7 @@ public class MainClass extends JFrame {
 
   static final String DATABASE_SCRIPT_DEMO = "suppliers_and_parts.sql";
   static final String DATABASE_SCRIPT_TEST = "swingset_tests.sql";
-  private static final String DATABASE_SCRIPT_TEST_IMAGES = "swingset_tests_load_blobs.sql";
+  static final String DATABASE_SCRIPT_TEST_IMAGES = "swingset_tests_load_blobs.sql";
   private static final String DATABASE_SCRIPT_DEBUG = "swingset_debug.sql";
 
   private static final boolean RUN_DEMO_SQL_SCRIPTS = true;
