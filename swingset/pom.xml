@@ -63,6 +63,10 @@
                   <groupId>dev.visdb.seesaw</groupId>
                   <artifactId>seesaw</artifactId>
                 </dependency>
+                <dependency>
+                  <groupId>dev.visdb.seesaw.contrib</groupId>
+                  <artifactId>simplevalidation</artifactId>
+                </dependency>
 		<dependency>
 			<groupId>com.raelity.3rdparty.com.glazedlists</groupId>
 			<artifactId>glazedlists</artifactId>

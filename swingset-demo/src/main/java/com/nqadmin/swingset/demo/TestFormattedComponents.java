@@ -37,6 +37,8 @@
  ******************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import javax.swing.JPanel;
+import com.nqadmin.swingset.utils.SSUtils;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -57,16 +59,15 @@ import com.nqadmin.swingset.utils.SSSyncManager;
 
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
-import dev.visdb.seesaw.formatting.SsCurrencyField;
-import dev.visdb.seesaw.formatting.SsDateField;
-import dev.visdb.seesaw.formatting.SsFormat;
-import dev.visdb.seesaw.formatting.SsFormattedTextField;
-import dev.visdb.seesaw.formatting.SsIntegerField;
-import dev.visdb.seesaw.formatting.SsNumericField;
-import dev.visdb.seesaw.formatting.SsPercentField;
-import dev.visdb.seesaw.formatting.SsSSNField;
-import dev.visdb.seesaw.formatting.SsTimeField;
-import dev.visdb.seesaw.formatting.SsTimestampField;
+import com.nqadmin.swingset.formatting.SSCurrencyField;
+import com.nqadmin.swingset.formatting.SSDateField;
+import com.nqadmin.swingset.formatting.SSFormattedTextField;
+import com.nqadmin.swingset.formatting.SSIntegerField;
+import com.nqadmin.swingset.formatting.SSNumericField;
+import com.nqadmin.swingset.formatting.SSPercentField;
+import com.nqadmin.swingset.formatting.SSSSNField;
+import com.nqadmin.swingset.formatting.SSTimeField;
+import com.nqadmin.swingset.formatting.SSTimestampField;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
 
@@ -93,18 +94,18 @@ public class TestFormattedComponents extends JFrame {
   JLabel lblSSDBComboNav = new JLabel("SSDBComboNav"); // SSDBComboBox used just for navigation
   JLabel lblSwingSetFormattedTestPK = new JLabel("Record ID");
   //JLabel lblSSCuitField = new JLabel("SSCuitField");
-  JLabel lblSSCurrencyField = new JLabel("SsCurrencyField");
+  JLabel lblSSCurrencyField = new JLabel("SSCurrencyField");
   JLabel lblSSCurrencyFieldNull = new JLabel("SSCurrencyFieldNull");
-  JLabel lblSSDateField = new JLabel("SsDateField");
+  JLabel lblSSDateField = new JLabel("SSDateField");
   JLabel lblSSDateFieldNull = new JLabel("SSDateFieldNull");
-  JLabel lblSSFormattedTextField = new JLabel("SsFormattedTextField");
-  JLabel lblSSIntegerField = new JLabel("SsIntegerField");
+  JLabel lblSSFormattedTextField = new JLabel("SSFormattedTextField");
+  JLabel lblSSIntegerField = new JLabel("SSIntegerField");
   JLabel lblSSIntegerFieldNull = new JLabel("SSIntegerFieldNull");
-  JLabel lblSSNumericField = new JLabel("SsNumericField");
-  JLabel lblSSPercentField = new JLabel("SsPercentField");
-  JLabel lblSSSSNField = new JLabel("SsSSNField");
-  JLabel lblSSTimeField = new JLabel("SsTimeField");
-  JLabel lblSSTimestampField = new JLabel("SsTimestampField");
+  JLabel lblSSNumericField = new JLabel("SSNumericField");
+  JLabel lblSSPercentField = new JLabel("SSPercentField");
+  JLabel lblSSSSNField = new JLabel("SSSSNField");
+  JLabel lblSSTimeField = new JLabel("SSTimeField");
+  JLabel lblSSTimestampField = new JLabel("SSTimestampField");
   JLabel lblDebugField = new JLabel("DebugField");
   JLabel lblDebugFieldNull = new JLabel("DebugFieldNull");
 
@@ -113,18 +114,18 @@ public class TestFormattedComponents extends JFrame {
    */
   SSTextField txtSwingSetFormattedTestPK = new SSTextField();
   //SSCuitField fmtSSCuitField = new SSCuitField();
-  SsCurrencyField fmtSSCurrencyField = new SsCurrencyField();
-  SsCurrencyField fmtSSCurrencyFieldNull = new SsCurrencyField();
-  SsDateField fmtSSDateField = new SsDateField(SsFormat.DATE_MMDDYYYY_SLASH);
-  SsDateField fmtSSDateFieldNull = new SsDateField(SsFormat.DATE_YYYYMMDD_STROKE);
-  SsFormattedTextField fmtSSFormattedTextField = new SsFormattedTextField();
-  SsIntegerField fmtSSIntegerField = new SsIntegerField();
-  SsIntegerField fmtSSIntegerFieldNull = new SsIntegerField();
-  SsNumericField fmtSSNumericField = new SsNumericField();
-  SsPercentField fmtSSPercentField = new SsPercentField();
-  SsSSNField fmtSSSSNField = new SsSSNField();
-  SsTimeField fmtSSTimeField = new SsTimeField();
-  SsTimestampField fmtSSTimestampField = new SsTimestampField();
+  SSCurrencyField fmtSSCurrencyField = new SSCurrencyField();
+  SSCurrencyField fmtSSCurrencyFieldNull = new SSCurrencyField();
+  SSDateField fmtSSDateField = new SSDateField(SSDateField.MMDDYYYY);
+  SSDateField fmtSSDateFieldNull = new SSDateField(SSDateField.YYYYMMDD);
+  SSFormattedTextField fmtSSFormattedTextField = new SSFormattedTextField();
+  SSIntegerField fmtSSIntegerField = new SSIntegerField();
+  SSIntegerField fmtSSIntegerFieldNull = new SSIntegerField();
+  SSNumericField fmtSSNumericField = new SSNumericField();
+  SSPercentField fmtSSPercentField = new SSPercentField();
+  SSSSNField fmtSSSSNField = new SSSSNField();
+  SSTimeField fmtSSTimeField = new SSTimeField();
+  SSTimestampField fmtSSTimestampField = new SSTimestampField();
   DebugField fmtDebugField = new DebugField();
   DebugField fmtDebugFieldNull = new DebugField();
 
@@ -261,7 +262,7 @@ public class TestFormattedComponents extends JFrame {
     fmtDebugFieldNull.setPreferredSize(MainClass.ssDim);
 
     // SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-    final Container contentPane = getContentPane();
+    final Container contentPane = new JPanel();
     contentPane.setLayout(new GridBagLayout());
     final GridBagConstraints constraints = new GridBagConstraints();
 
@@ -348,8 +349,9 @@ public class TestFormattedComponents extends JFrame {
     txtSwingSetFormattedTestPK.setEnabled(false);
 
     // MAKE THE JFRAME VISIBLE
-    setVisible(true);
+    setContentPane(SSUtils.createDecoratorPanel(contentPane));
     pack();
+    setVisible(true);
   }
 
   private DbOps createDbNav() {

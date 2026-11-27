@@ -37,6 +37,8 @@
  ******************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import javax.swing.JPanel;
+import com.nqadmin.swingset.utils.SSUtils;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -56,12 +58,11 @@ import com.nqadmin.swingset.SSTextField;
 
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
-import dev.visdb.seesaw.formatting.SsDateField;
-import dev.visdb.seesaw.formatting.SsIntegerField;
+import com.nqadmin.swingset.formatting.SSDateField;
+import com.nqadmin.swingset.formatting.SSIntegerField;
 import dev.visdb.seesaw.navigate.RowsModel;
 import dev.visdb.seesaw.utils.JStuff;
 
-import static dev.visdb.seesaw.formatting.SsFormat.DATE_MMDDYYYY_SLASH;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -95,8 +96,8 @@ public class Example3 extends JFrame {
   SSDBComboBox cmbSupplierName = null;
   SSDBComboBox cmbPartName = null;
 
-  SsIntegerField txtQuantity = new SsIntegerField();
-  SsDateField txtShipDate = new SsDateField(DATE_MMDDYYYY_SLASH);
+  SSIntegerField txtQuantity = new SSIntegerField();
+  SSDateField txtShipDate = new SSDateField(SSDateField.MMDDYYYY);
 
   /**
    * database component declarations
@@ -182,7 +183,7 @@ public class Example3 extends JFrame {
     txtShipDate.setPreferredSize(MainClass.ssDim);
 
     // SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-    final Container contentPane = getContentPane();
+    final Container contentPane = new JPanel();
     contentPane.setLayout(new GridBagLayout());
     final GridBagConstraints constraints = new GridBagConstraints();
 
@@ -222,8 +223,9 @@ public class Example3 extends JFrame {
     //			cmbSupplierName.updateDisplayValue((long)55, "Hello");
 
     // MAKE THE JFRAME VISIBLE
-    setVisible(true);
+    setContentPane(SSUtils.createDecoratorPanel(contentPane));
     pack();
+    setVisible(true);
   }
 
   /**

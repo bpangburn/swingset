@@ -37,6 +37,7 @@
  ******************************************************************************/
 package com.nqadmin.swingset.demo;
 
+import javax.swing.JPanel;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -58,8 +59,8 @@ import com.nqadmin.swingset.SSDataNavigator;
 import com.nqadmin.swingset.SSTextField;
 import com.nqadmin.swingset.utils.SSSyncManager;
 
-import dev.visdb.seesaw.SsComboBox2;
-import dev.visdb.seesaw.SsDbComboBox2;
+import com.nqadmin.swingset.SSComboBox2;
+import com.nqadmin.swingset.SSDBComboBox2;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.navigate.RowsModel;
@@ -89,7 +90,7 @@ public class Example4 extends JFrame {
   /** Logger */
   static final Logger logger = JStuff.getLogger();
 
-  static SsComboBox2.ModelType comboModelType = SsComboBox2.ModelType.GLAZED;
+  static SSComboBox2.ModelType comboModelType = SSComboBox2.ModelType.GLAZED;
 
   /**
    * screen label declarations
@@ -101,9 +102,9 @@ public class Example4 extends JFrame {
   JLabel lblPartWeight = new JLabel("Weight");
   JLabel lblPartCity = new JLabel("City");
 
-  static class MyComboBox2<D2> extends SsComboBox2<Integer, String, D2> {
+  static class MyComboBox2<D2> extends SSComboBox2<Integer, String, D2> {
     public static class Builder<D2>
-        extends SsComboBox2.AbstractBuilder<Integer, String, D2, Builder<D2>> {
+        extends SSComboBox2.AbstractBuilder<Integer, String, D2, Builder<D2>> {
       @Override
       protected Builder<D2> self() {
         return this;
@@ -118,9 +119,9 @@ public class Example4 extends JFrame {
     }
   }
 
-  static class MyDbComboBox extends SsDbComboBox2<Integer, String, Byte> {
+  static class MyDbComboBox extends SSDBComboBox2<Integer, String, Byte> {
     public static class Builder
-        extends SsDbComboBox2.AbstractBuilder<Integer, String, Byte, Builder> {
+        extends SSDBComboBox2.AbstractBuilder<Integer, String, Byte, Builder> {
       @Override
       protected Builder self() {
         return this;
@@ -137,12 +138,12 @@ public class Example4 extends JFrame {
 
   // Concrete class, additional generric type, with type capture, extendable
 
-  static class DbComboBox2Extra<D2, D3> extends SsDbComboBox2<Integer, String, D2> {
+  static class DbComboBox2Extra<D2, D3> extends SSDBComboBox2<Integer, String, D2> {
     private final D3 d3Value; // Note: not part of combo list item.
     private final TypeToken<D3> d3TypeToken;
 
     public abstract static class AbstractBuilder<D2, D3, T extends AbstractBuilder<D2, D3, T>>
-        extends SsDbComboBox2.AbstractBuilder<Integer, String, D2, T> {
+        extends SSDBComboBox2.AbstractBuilder<Integer, String, D2, T> {
       private D3 d3Value;
       // captures D3 for whatever runtime class extends this Abstractbuilder
       private final TypeToken<D3> d3TypeToken = new TypeToken<D3>(getClass()) {};
@@ -192,11 +193,11 @@ public class Example4 extends JFrame {
     new DbComboBox2Extra.Builder<Double, List<Double>>() {};
 
     @SuppressWarnings("unused")
-    SsDbComboBox2.Builder<Integer, String, Byte> b
-        = new SsDbComboBox2.Builder<Integer, String, Byte>() {};
+    SSDBComboBox2.Builder<Integer, String, Byte> b
+        = new SSDBComboBox2.Builder<Integer, String, Byte>() {};
 
     @SuppressWarnings("unused")
-    SsDbComboBox2<Integer, String, Byte> x1 = new SsDbComboBox2.Builder<Integer, String, Byte>() {
+    SSDBComboBox2<Integer, String, Byte> x1 = new SSDBComboBox2.Builder<Integer, String, Byte>() {
     }.primaryKeyColumnName("aaa").displayColumnName("bbb").build();
 
     MyDbComboBox dbCombo = new MyDbComboBox
@@ -368,7 +369,7 @@ public class Example4 extends JFrame {
     txtPartCity.setPreferredSize(MainClass.ssDim);
 
     // SETUP THE CONTAINER AND LAYOUT THE COMPONENTS
-    final Container contentPane = getContentPane();
+    final Container contentPane = new JPanel();
     final GridBagConstraints constraints = new GridBagConstraints();
     contentPane.setLayout(new GridBagLayout());
 
@@ -412,8 +413,9 @@ public class Example4 extends JFrame {
     txtPartID.setEnabled(false);
 
     // MAKE THE JFRAME VISIBLE
-    setVisible(true);
+    setContentPane(SSUtils.createDecoratorPanel(contentPane));
     pack();
+    setVisible(true);
   }
 
   private DbOps createDbNav() {

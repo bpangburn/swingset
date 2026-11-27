@@ -5,6 +5,7 @@
  */
 package com.nqadmin.swingset.demo;
 
+import com.nqadmin.swingset.utils.SSUtils;
 import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -53,7 +54,6 @@ import com.raelity.logman.LogUtil;
 import com.raelity.logman.ui.LogUI;
 import com.raelity.logman.ui.SwingLogTree;
 
-import dev.visdb.seesaw.utils.Globals;
 
 import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
@@ -236,7 +236,7 @@ public class DemoUtil {
       case POOL_CACHED -> {
         rs = rsFactory.createCachedRowSet();
         rs.setDataSourceName(DataSourcePool.DATA_SOURCE_NAME);
-        if (Globals.getOption(MainClass.H2Workaround.class) != null) {
+        if (SSUtils.getOption(MainClass.H2Workaround.class) != null) {
           // https://github.com/h2database/h2database/issues/4010
           // fixed in H2 Version 2.3.230 (2024-07-15)
           rs.setTypeMap(Map.of());
@@ -804,7 +804,7 @@ public class DemoUtil {
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
   public static boolean loadBinaries(Connection conn, String resourceName, String sql,
                                      boolean verbose) {
-    if (Globals.getOption(MainClass.LoadDemoImages.class) == null)
+    if (SSUtils.getOption(MainClass.LoadDemoImages.class) == null)
       return false;
     boolean ok = false;
 

@@ -19,6 +19,9 @@ public class SSDateField extends SSFormattedTextField {
   /** Day/month/year format. */
   public static final int DDMMYYYY = 1;
 
+  /** Year-month-day format. */
+  public static final int YYYYMMDD = 2;
+
   /** Creates a date field using month/day/year format. */
   public SSDateField() {
     this(MMDDYYYY);
@@ -44,6 +47,7 @@ public class SSDateField extends SSFormattedTextField {
     return switch (format) {
       case MMDDYYYY -> SsFormat.DATE_MMDDYYYY_SLASH;
       case DDMMYYYY -> SsFormat.DATE_DDMMYYYY_SLASH;
+      case YYYYMMDD -> SsFormat.DATE_YYYYMMDD_STROKE;
       default -> throw new IllegalArgumentException("Unknown date format: " + format);
     };
   }

@@ -65,6 +65,76 @@ import dev.visdb.seesaw.utils.SsUtils.KeyInfo;
 public class SSUtils {
   private SSUtils() {}
 
+  /** Initialize the SwingSet runtime once, before creating Swing components. */
+  public static void init() {
+    dev.visdb.seesaw.SeeSaw.init();
+  }
+
+  /** Configure the decorator style before constructing screens. */
+  public enum DecoratorStyle { BORDER, BACKGROUND, SIMPLE_VALIDATION }
+
+  public static void setDecoratorStyle(DecoratorStyle style) {
+    dev.visdb.seesaw.utils.Globals.setOption(
+        dev.visdb.seesaw.decorators.Decorator.DecoratorStyle.class,
+        switch (style) {
+          case BORDER -> dev.visdb.seesaw.decorators.Decorator.DecoratorStyle.BORDER;
+          case BACKGROUND -> dev.visdb.seesaw.decorators.Decorator.DecoratorStyle.BACKGROUND;
+          case SIMPLE_VALIDATION -> dev.visdb.seesaw.contrib.simplevalidation.SVUtils.SIMPLE_VALIDATION;
+        });
+  }
+
+  /** Set a runtime option shared by SwingSet and its underlying implementation. */
+  public static <T> void setOption(Class<T> type, T value) {
+    dev.visdb.seesaw.utils.Globals.setOption(type, value);
+  }
+
+  /** Read a runtime option. */
+  public static <T> T getOption(Class<T> type) {
+    return dev.visdb.seesaw.utils.Globals.getOption(type);
+  }
+
+  /** Component states used when choosing custom border colors. */
+  public enum BorderState { CLEAN, FOCUSED_CLEAN, MODIFIED, FOCUSED_MODIFIED, ERROR, FOCUSED_ERROR }
+
+  public static void setBorderColors(java.util.function.Function<BorderState, java.awt.Color> colors) {
+    dev.visdb.seesaw.utils.Globals.setOption(
+        dev.visdb.seesaw.decorators.BorderDecorator.BorderDecoratorPaint.class,
+        new dev.visdb.seesaw.decorators.BorderDecorator.BorderDecoratorPaint() {
+          @Override
+          public java.awt.Color getBorderColor(dev.visdb.seesaw.decorators.ComponentState state) {
+            return colors.apply(BorderState.valueOf(state.name()));
+          }
+        });
+  }
+
+  public static void resetBorderColors() {
+    dev.visdb.seesaw.utils.Globals.setOption(
+        dev.visdb.seesaw.decorators.BorderDecorator.BorderDecoratorPaint.class,
+        new dev.visdb.seesaw.decorators.BorderDecorator.BorderDecoratorPaint());
+  }
+
+  public static void addTextValidation(org.netbeans.validation.api.ui.ValidationGroup group,
+      com.nqadmin.swingset.SSTextField field, String name) {
+    group.addItem(dev.visdb.seesaw.contrib.simplevalidation.SVUtils.setTextDecorator(field, name), false);
+  }
+
+  public static void enableDebugBaseComponentValidation() {
+    dev.visdb.seesaw.utils.Globals.setOption(
+        dev.visdb.seesaw.SsTextField.DebugBaseComponentValidate.class,
+        new dev.visdb.seesaw.SsTextField.DebugBaseComponentValidate() {});
+  }
+
+  public static void setSimpleValidationBorderEnabled(boolean enabled) {
+    dev.visdb.seesaw.utils.Globals.setOption(
+        dev.visdb.seesaw.contrib.simplevalidation.SVUtils.SimpleValidationBorderEnable.class,
+        new dev.visdb.seesaw.contrib.simplevalidation.SVUtils.SimpleValidationBorderEnable(enabled));
+  }
+
+  /** Wrap a screen in the configured component decorator panel. */
+  public static javax.swing.JPanel createDecoratorPanel(java.awt.Component uiPanel) {
+    return SsUtils.createDecoratorPanel(uiPanel);
+  }
+
   /**
    * Temporary for hiding SsCommon; used from SsDBComboBox.
    * @param comp component to update
