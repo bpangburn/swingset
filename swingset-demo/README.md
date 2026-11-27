@@ -68,7 +68,7 @@ swingset#NO-SPAM#@pangburngroup.com
 
 ## EXECUTION
 
-The SwingSet samples/demo requires Java 1.8 or later.
+For the SwingSet 5 wrapper branch, use JDK 25 for development and local demo execution. See [IDE_SETUP.md](../IDE_SETUP.md) for compiler configuration.
 
   1. Beginning with SwingSet 3.0.0. we're providing an executable jar with all dependencies.
   2. Download/save swingset-demo-x.y.z-jar-with-dependencies.jar to a local folder
@@ -78,13 +78,13 @@ The swingset-demo uses an in-memory H2 database by default, but can be run using
 
 See "USING ALTERNATE DATABASE SERVERS" at the end of this document for more information.
 
-Note that the default screen for placement of the demo can be specified using the environment variable: `JAVA_PREFERRED_SCREEN`.
-For example, in a dual monitor Linux environment, you can type `export JAVA_PREFERRED_SCREEN=1` prior to running the demo, and the SwingSet demo will appear on the right screen (presuming the left monitor is the default). 
+Note that the default screen for placement of the demo can be specified using the environment variable: `SWINGSET_PREFERRED_SCREEN`.
+For example, in a dual monitor Linux environment, you can type `export SWINGSET_PREFERRED_SCREEN=1` prior to running the demo, and the SwingSet demo will appear on the right screen (presuming the left monitor is the default). 
 If the environment variable is not present or out of bound, the default is used.
 
 ## COMPILATION
 
-The SwingSet samples/demo requires Java 1.8 or later.
+For the SwingSet 5 wrapper branch, use JDK 25 for development and local demo execution. See [IDE_SETUP.md](../IDE_SETUP.md) for compiler configuration.
 
 Git/Maven:
   `git clone https://github.com/bpangburn/swingset.git`
@@ -172,7 +172,7 @@ Same as Example7, but built by extending the SSDataGridScreenHelper helper class
 
 This example demonstrates all of the Base SwingSet Components except for the SSDataGrid.
 
-There is a separate example screen to demonstrate the Formatted SwingSet Components.
+The screen also demonstrates `SSLGoodDatePicker` for a nullable JDBC `DATE` column, custom text styles on the enum combo box, and modified/error styles on the second text field. Enter `Testoops` in that field and leave it to exercise validation. There is a separate example screen to demonstrate the Formatted SwingSet Components.
 
 ### Test Formatted Components
 
@@ -236,4 +236,4 @@ There are other options...
 
 ### SwingSet application initialization and decoration
 
-Call `SSUtils.init()` on the main thread before creating Swing components. To select a non-default decorator style, use `SSUtils.setDecoratorStyle(SSUtils.DecoratorStyle.BACKGROUND)` (or `BORDER` or `SIMPLE_VALIDATION`) before creating screens. Wrap a completed screen panel using `frame.setContentPane(SSUtils.createDecoratorPanel(uiPanel))` before packing/showing the frame. See MainClass and Examples 1–4. The two helper examples and NQADMIN RowSet option remain available. SwingSet 5 wraps SeeSaw; some database/model and advanced validation types are still exposed during the migration.
+Call `SSUtils.init()` on the main thread before creating Swing components. To select a non-default decorator style, use `SSUtils.setDecoratorStyle(SSUtils.DecoratorStyle.BACKGROUND)` (or `BORDER` or `SIMPLE_VALIDATION`) before creating screens. Wrap a completed screen panel using `frame.setContentPane(SSUtils.createDecoratorPanel(uiPanel))` before packing/showing the frame. See MainClass and Examples 1–4. The two helper examples and NQADMIN RowSet option remain available. SwingSet 5 wraps Seesaw; public database/model, navigation and advanced validation extension APIs may be used directly where an additional wrapper would duplicate functionality. Child demo windows cascade on the preferred display.

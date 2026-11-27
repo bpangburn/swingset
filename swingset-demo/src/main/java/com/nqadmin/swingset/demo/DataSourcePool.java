@@ -69,13 +69,11 @@ import org.h2.jdbcx.JdbcDataSource;
 
 import com.nqadmin.swingset.demo.MainClass.H2Trace;
 
-import dev.visdb.seesaw.utils.JStuff;
 
 import com.nqadmin.swingset.utils.SSUtils;
 
 import dev.visdb.seesaw.utils.Globals;
 
-import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -86,7 +84,7 @@ public class DataSourcePool {
 
   /** Data source name for binding lookup.  */
   public static final String DATA_SOURCE_NAME = "PoolDataSource";
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(DataSourcePool.class.getName());
 
   private static DataSource ds;
   private static JdbcConnectionPool cp;
@@ -166,7 +164,7 @@ public class DataSourcePool {
       int activeConnections = cp.getActiveConnections();
       if (activeConnections > cMax) {
         cMax = activeConnections;
-        logger.log(INFO, () -> sf("ConnectionPool new max: %s", activeConnections));
+        logger.log(INFO, () -> String.format("ConnectionPool new max: %s", activeConnections));
       }
     }
 
@@ -228,7 +226,7 @@ public class DataSourcePool {
 
     public MyConnection(Connection _delegate) {
       this.delegate = _delegate;
-      logger.log(TRACE, () -> sf("open connection: %s - %s", SSUtils.objectID(delegate), delegate));
+      logger.log(TRACE, () -> String.format("open connection: %s - %s", SSUtils.objectID(delegate), delegate));
     }
 
     // Count the closes
@@ -237,7 +235,7 @@ public class DataSourcePool {
     public void close() throws SQLException {
       nClose++;
       logger.log(TRACE,
-                 () -> sf("close connection: %s - %s", SSUtils.objectID(delegate), delegate));
+                 () -> String.format("close connection: %s - %s", SSUtils.objectID(delegate), delegate));
       delegate.close();
     }
 

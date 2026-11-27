@@ -50,7 +50,6 @@ import javax.swing.JFrame;
 import com.nqadmin.swingset.SSDataGrid;
 
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.JStuff;
 
 /**
  * This example demonstrates the use of an SSDataGrid to display a tabular view
@@ -64,7 +63,7 @@ public class Example7 extends JFrame {
   /**
    * Log4j2 Logger
    */
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(Example7.class.getName());
 
   /**
    * data grid
@@ -95,7 +94,7 @@ public class Example7 extends JFrame {
     setSize(MainClass.childScreenWidth, MainClass.childScreenHeight);
 
     // SET SCREEN POSITION
-    setLocation(DemoUtil.getChildScreenLocation(this.getName()));
+
 
     // INITIALIZE SCREEN & DATAGRID
     init();
@@ -172,14 +171,16 @@ public class Example7 extends JFrame {
         }
       }
 
+      // SETUP THE CONTAINER AND ADD THE DATAGRID
+      getContentPane().add(dataGrid.getComponent());
     } catch (final SQLException se) {
       logger.log(Level.ERROR, "SQL Exception.", se);
+      dispose();
+      return;
     }
 
-    // SETUP THE CONTAINER AND ADD THE DATAGRID
-    getContentPane().add(dataGrid.getComponent());
-
     // MAKE THE JFRAME VISIBLE
+    DemoUtil.setChildScreenLocation(this);
     setVisible(true);
   }
 }

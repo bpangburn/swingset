@@ -60,11 +60,10 @@ import java.util.function.Supplier;
 
 import dev.visdb.seesaw.models.DbCollection;
 import dev.visdb.seesaw.models.DbStringCollection;
-import dev.visdb.seesaw.utils.JStuff;
 
 /** Database setup for the demo, separate from Swing window construction. */
 final class DemoDatabase {
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(DemoDatabase.class.getName());
   private DemoDatabase() {}
 
   private static final String DATABASE_PATH = "//localhost/~/h2/databases/";

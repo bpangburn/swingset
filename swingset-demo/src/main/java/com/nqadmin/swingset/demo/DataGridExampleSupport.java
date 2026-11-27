@@ -65,7 +65,6 @@ import com.nqadmin.swingset.SSTableModel;
 
 import dev.visdb.seesaw.datasources.RowSetOps;
 
-import static dev.visdb.seesaw.utils.JStuff.sf;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -231,7 +230,7 @@ class DataGridExampleSupport {
       int row = rowSel != -1 ? dataGrid.convertRowIndexToModel(rowSel) : -1;
       if (row == -1 || !dataGrid.isAllowDeletion()) {
         String msg = row == -1 ? "No row is selected."
-                               : sf("Deletion (%d --> %d) no allowed", rowSel, row);
+                               : String.format("Deletion (%d --> %d) no allowed", rowSel, row);
         JOptionPane.showMessageDialog((Component) e.getSource(), msg, "Can not delete",
                                       JOptionPane.ERROR_MESSAGE);
       } else {

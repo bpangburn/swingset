@@ -52,7 +52,6 @@ import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import com.nqadmin.swingset.utils.SSDataGridScreenHelper;
 
-import dev.visdb.seesaw.utils.JStuff;
 
 /**
  * This example demonstrates the use of an SSDataGrid to display a tabular view
@@ -69,7 +68,7 @@ public class Example7UsingHelper extends SSDataGridScreenHelper {
   /**
    * Log4j2 Logger
    */
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(Example7UsingHelper.class.getName());
 
   /**
    * unique serial id
