@@ -70,6 +70,29 @@ public class SSUtils {
     dev.visdb.seesaw.utils.LookupDefaults.init();
   }
 
+  /** Configure the decorator style before constructing screens. */
+  public enum DecoratorStyle { BORDER, BACKGROUND, SIMPLE_VALIDATION }
+
+  public static void setDecoratorStyle(DecoratorStyle style) {
+    dev.visdb.seesaw.utils.Globals.setOption(
+        dev.visdb.seesaw.decorators.Decorator.DecoratorStyle.class,
+        switch (style) {
+          case BORDER -> dev.visdb.seesaw.decorators.Decorator.DecoratorStyle.BORDER;
+          case BACKGROUND -> dev.visdb.seesaw.decorators.Decorator.DecoratorStyle.BACKGROUND;
+          case SIMPLE_VALIDATION -> dev.visdb.seesaw.contrib.simplevalidation.SVUtils.SIMPLE_VALIDATION;
+        });
+  }
+
+  /** Set a runtime option shared by SwingSet and its underlying implementation. */
+  public static <T> void setOption(Class<T> type, T value) {
+    dev.visdb.seesaw.utils.Globals.setOption(type, value);
+  }
+
+  /** Read a runtime option. */
+  public static <T> T getOption(Class<T> type) {
+    return dev.visdb.seesaw.utils.Globals.getOption(type);
+  }
+
   /** Wrap a screen in the configured component decorator panel. */
   public static javax.swing.JPanel createDecoratorPanel(java.awt.Component uiPanel) {
     return SsUtils.createDecoratorPanel(uiPanel);

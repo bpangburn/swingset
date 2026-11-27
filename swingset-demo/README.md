@@ -232,3 +232,8 @@ You can use them as in this example
 The user supplied connection properties and sql scripts initialize the database and then the demo is started.
 
 There are other options...
+
+
+### SwingSet application initialization and decoration
+
+Call `SSUtils.init()` on the main thread before creating Swing components. To select a non-default decorator style, use `SSUtils.setDecoratorStyle(SSUtils.DecoratorStyle.BACKGROUND)` (or `BORDER` or `SIMPLE_VALIDATION`) before creating screens. Wrap a completed screen panel using `frame.setContentPane(SSUtils.createDecoratorPanel(uiPanel))` before packing/showing the frame. See MainClass and Examples 1–4. The two helper examples and NQADMIN RowSet option remain available. SwingSet 5 wraps SeeSaw; some database/model and advanced validation types are still exposed during the migration.

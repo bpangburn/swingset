@@ -98,8 +98,6 @@ import com.nqadmin.swingset.utils.SSUtils;
 
 import dev.visdb.seesaw.SsTextField;
 import dev.visdb.seesaw.contrib.simplevalidation.SVUtils;
-import dev.visdb.seesaw.decorators.Decorator;
-import dev.visdb.seesaw.utils.Globals;
 import dev.visdb.seesaw.utils.Version;
 import gnu.getopt.Getopt;
 
@@ -143,7 +141,7 @@ public class MainClass extends JFrame {
 
   static class LoadDemoImages {}
   // https://h2database.com/html/features.html#trace_options
-  // Globals.setOption(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
+  // SSUtils.setOption(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
   static class H2Trace {
     private final String flags;
     H2Trace() {
@@ -212,7 +210,7 @@ public class MainClass extends JFrame {
         logger.log(DEBUG, "**** Opening Example7UsingHelper ****");
         JFrame e7JFrame = new JFrame("Example7 Using Helper");
         Example7UsingHelper example7 = new Example7UsingHelper(dbConnection, null);
-        e7JFrame.add(example7);
+        e7JFrame.setContentPane(SSUtils.createDecoratorPanel(example7));
         e7JFrame.setLocation(DemoUtil.getChildScreenLocation("Example7UsingHelper"));
         example7.showUp(e7JFrame);
         //e7JFrame.pack(); // NOT USING .pack() FOR DATA GRID SCREENS
@@ -407,7 +405,7 @@ public class MainClass extends JFrame {
     DbSupport supp = DbSupportFactory.setDbSupportGlobalOption(dbConnection);
     if (supp == null) {
       logger.log(Level.ERROR, sf("No SSDBSupport found for '%s'", databaseID));
-      Globals.setOption(DbSupport.class, new DbSupportBase(dbConnection) {});
+      SSUtils.setOption(DbSupport.class, new DbSupportBase(dbConnection) {});
     }
 
     // ADD ACTION LISTENERS FOR BUTTONS
@@ -538,7 +536,7 @@ public class MainClass extends JFrame {
 
       if (USE_IN_MEMORY_DATABASE) {
         result = DriverManager.getConnection("jdbc:h2:mem:" + DATABASE_NAME
-                                             + Globals.getOption(H2Trace.class).getTraceUrlFlags());
+                                             + SSUtils.getOption(H2Trace.class).getTraceUrlFlags());
         logger.log(INFO, "Established connection to in-memory database.");
       } else {
         // ASSUMING DATABASE IS IN LOCAL ./h2/databases/ FOLDER WITH DEFAULT USERNAME OF
@@ -867,27 +865,25 @@ public class MainClass extends JFrame {
     configureJavaUtilLogger();
     Screens.setPrefScreen("SWINGSET_PREFERRED_SCREEN");
 
-    Globals.setOption(LoadDemoImages.class, new LoadDemoImages());
-    Globals.setOption(H2Trace.class, new H2Trace());
+    SSUtils.setOption(LoadDemoImages.class, new LoadDemoImages());
+    SSUtils.setOption(H2Trace.class, new H2Trace());
 
     // To allow force baseValidate() and componentValidate() erros.
-    if(Boolean.FALSE) Globals.setOption(SsTextField.DebugBaseComponentValidate.class,
+    if(Boolean.FALSE) SSUtils.setOption(SsTextField.DebugBaseComponentValidate.class,
                                         new SsTextField.DebugBaseComponentValidate() {});
 
-    if(Boolean.FALSE) Globals.setOption(SVUtils.SimpleValidationBorderEnable.class,
+    if(Boolean.FALSE) SSUtils.setOption(SVUtils.SimpleValidationBorderEnable.class,
                                         new SVUtils.SimpleValidationBorderEnable(false));
-    if(Boolean.FALSE) Globals.setOption(Decorator.DecoratorStyle.class,
-                                        SVUtils.SIMPLE_VALIDATION);
-    if(Boolean.FALSE) Globals.setOption(Decorator.DecoratorStyle.class,
-                                        Decorator.DecoratorStyle.BACKGROUND);
+    // SSUtils.setDecoratorStyle(SSUtils.DecoratorStyle.SIMPLE_VALIDATION);
+    // SSUtils.setDecoratorStyle(SSUtils.DecoratorStyle.BACKGROUND);
 
-    //Globals.setOption(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
+    //SSUtils.setOption(H2Trace.class, new H2Trace(";TRACE_LEVEL_SYSTEM_OUT=3"));
     //SELECT VALUE FROM INFORMATION_SCHEMA.SETTINGS WHERE NAME = 'info.VERSION';
-    //Globals.setOption(new H2Workaround()); // fixed in H2 Version 2.3.230 (2024-07-15
-    //Globals.setOption(new SsUtils.DebugRowSetListenerFlag());
+    //SSUtils.setOption(new H2Workaround()); // fixed in H2 Version 2.3.230 (2024-07-15
+    //SSUtils.setOption(new SsUtils.DebugRowSetListenerFlag());
 
     // For debug, enable this to force CachedRowSet conflict
-    //Globals.setOption(new ForceConflict(1));
+    //SSUtils.setOption(new ForceConflict(1));
 
     SSUtils.init();
 
