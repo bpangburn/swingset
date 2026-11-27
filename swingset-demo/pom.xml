@@ -116,10 +116,6 @@
       <artifactId>simplevalidation</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>dev.visdb.seesaw.contrib</groupId>
-      <artifactId>lgooddatepicker</artifactId>
-    </dependency>
   </dependencies>
 
   <build>
