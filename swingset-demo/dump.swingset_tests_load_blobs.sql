@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2003-2020, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
+ * Copyright (C) 2003-2021, Prasanth R. Pasala, Brian E. Pangburn, & The Pangburn Group
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -33,59 +33,16 @@
  *   Brian E. Pangburn
  *   Diego Gil
  *   Man "Bee" Vo
+ *   Ernie R. Rael
  ******************************************************************************/
 
-package com.nqadmin.swingSet;
 
-import java.beans.BeanInfo;
-import java.beans.SimpleBeanInfo;
+/* This SQL script is used to load the images/blobs for the swingset testing tables. */
 
-/**
- * SSLabelBeanInfo.java
- * 
- * SwingSet - Open Toolkit For Making Swing Controls Database-Aware
- * 
- * Contains & controls various bean properties for SSLabel.
- */
- public class SSLabelBeanInfo extends SimpleBeanInfo {
-
-    /**
-     * Provides the icon representation for the related bean.
-     *
-     * @param _iconKind The kind of icon requested. This should be one of the constant values ICON_COLOR_16x16, ICON_COLOR_32x32, ICON_MONO_16x16, or ICON_MONO_32x32.
-     *
-     * @return An image object representing the requested icon. May return null if no suitable icon is available.
-     */
-    public java.awt.Image getIcon(int _iconKind) {
-        
-        if (_iconKind == BeanInfo.ICON_MONO_16x16 ||
-            _iconKind == BeanInfo.ICON_COLOR_16x16 )
-        {
-            java.awt.Image img = loadImage("/images/icons/sslabel.gif");
-            return img;
-        }
-        if (_iconKind == BeanInfo.ICON_MONO_32x32 ||
-            _iconKind == BeanInfo.ICON_COLOR_32x32 )
-        {
-            java.awt.Image img = loadImage("/images/icons/sslabel32.gif");
-            return img;
-        }
-        
-        return null;
-        
-    } // end public java.awt.Image getIcon(int _iconKind) {
-
-}
-
-/*
- * $Log$
- * Revision 1.4  2005/02/07 19:56:02  yoda2
- * Fixing JavaDoc errors with _iconKind parameter name.
- *
- * Revision 1.3  2005/02/04 22:41:07  yoda2
- * Updated Copyright info.
- *
- * Revision 1.2  2005/02/02 23:18:02  yoda2
- * Fixed log tag.
- *
- */
+/* swingset_base_test_data images/blobs */
+UPDATE swingset_base_test_data SET ss_image = FILE_READ('classpath:/sample_image_1.png') WHERE swingset_base_test_pk = '1';
+UPDATE swingset_base_test_data SET ss_image = FILE_READ('classpath:/sample_image_2.png') WHERE swingset_base_test_pk = '3';
+UPDATE swingset_base_test_data SET ss_image = FILE_READ('classpath:/sample_image_3.png') WHERE swingset_base_test_pk = '4';
+UPDATE swingset_base_test_data SET ss_image = FILE_READ('classpath:/sample_image_4.png') WHERE swingset_base_test_pk = '5';
+UPDATE swingset_base_test_data SET ss_image = FILE_READ('classpath:/sample_image_5.png') WHERE swingset_base_test_pk = '6';
+UPDATE swingset_base_test_data SET ss_image = FILE_READ('classpath:/sample_image_6.png') WHERE swingset_base_test_pk = '7';
