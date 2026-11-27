@@ -68,7 +68,6 @@ import com.nqadmin.swingset.SSTextField;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.JStuff;
 
 /**
  * This example displays data from the supplier_data table.
@@ -80,7 +79,7 @@ import dev.visdb.seesaw.utils.JStuff;
 
 @SuppressWarnings("serial")
 public class Example1 extends JFrame {
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(Example1.class.getName());
 
   /**
    * screen label declarations

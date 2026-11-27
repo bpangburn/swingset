@@ -50,7 +50,6 @@ import javax.swing.JFrame;
 import com.nqadmin.swingset.SSDataGrid;
 
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.JStuff;
 
 /**
  * This example is similar to Example5, demonstrating the use of an SSDataGrid
@@ -62,7 +61,7 @@ public class Example6 extends JFrame {
   /**
    * Log4j2 Logger
    */
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(Example6.class.getName());
 
   /**
    * unique serial id

@@ -51,7 +51,6 @@ import javax.swing.JFrame;
 import com.nqadmin.swingset.SSDataGrid;
 
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.JStuff;
 
 /**
  * This example demonstrates the use of an SSDataGrid to display a tabular view
@@ -62,7 +61,7 @@ import dev.visdb.seesaw.utils.JStuff;
  */
 @SuppressWarnings("serial")
 public class Example5 extends JFrame {
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(Example5.class.getName());
 
   /**
    * data grid

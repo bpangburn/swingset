@@ -61,7 +61,6 @@ import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import com.nqadmin.swingset.formatting.SSDateField;
 import com.nqadmin.swingset.formatting.SSIntegerField;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.JStuff;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -78,7 +77,7 @@ public class Example3 extends JFrame {
   /**
    * Log4j2 Logger
    */
-  private static final Logger logger = JStuff.getLogger();
+  private static final Logger logger = System.getLogger(Example3.class.getName());
 
   /**
    * screen label declarations

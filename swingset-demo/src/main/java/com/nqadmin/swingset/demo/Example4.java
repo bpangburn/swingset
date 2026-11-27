@@ -64,7 +64,6 @@ import com.nqadmin.swingset.SSDBComboBox2;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.navigate.RowsModel;
-import dev.visdb.seesaw.utils.JStuff;
 
 import com.nqadmin.swingset.utils.SSUtils;
 
@@ -88,7 +87,7 @@ import com.nqadmin.swingset.utils.SSUtils;
 @SuppressWarnings("serial")
 public class Example4 extends JFrame {
   /** Logger */
-  static final Logger logger = JStuff.getLogger();
+  static final Logger logger = System.getLogger(Example4.class.getName());
 
   static SSComboBox2.ModelType comboModelType = SSComboBox2.ModelType.GLAZED;
 
