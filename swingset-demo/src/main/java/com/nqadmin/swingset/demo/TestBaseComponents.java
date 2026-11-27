@@ -88,6 +88,9 @@ import dev.visdb.seesaw.contrib.lgooddatepicker.SsLGoodDatePicker;
 import dev.visdb.seesaw.datasources.DbOps;
 import dev.visdb.seesaw.datasources.products.DbOpsBase;
 import dev.visdb.seesaw.datasources.products.DbOpsCreator;
+import javax.swing.text.AttributeSet;
+
+import dev.visdb.seesaw.decorators.BaseTextDecorator;
 import dev.visdb.seesaw.decorators.ComponentState;
 import dev.visdb.seesaw.decorators.ComponentStateTextDecorator;
 import dev.visdb.seesaw.decorators.TextStyles;
@@ -448,6 +451,18 @@ public class TestBaseComponents extends JFrame {
     // This is used by a text field for the ComponentStateTextDecorator
     try {
       setupOurTextStyles();
+      if (activeComps.contains(ENUM_COMBO)) {
+        cmbEnumSSComboBox.setTextDecorator(new BaseTextDecorator() {
+          @Override
+          public void decorateText() {
+            Integer key = cmbEnumSSComboBox.getChosenKey();
+            AttributeSet style = key == null ? null
+                : TextStyles.getStyle("testComponents_" + ((key & 1) == 0));
+            TextStyles.applyStyle(jComp(), style != null ? style : TextStyles.RESET);
+          }
+        });
+        cmbEnumSSComboBox.getTextDecorator().decorateText();
+      }
     } catch (IOException ex) {
       logger.log(Level.ERROR, (String) null, ex);
     }
@@ -549,19 +564,31 @@ public class TestBaseComponents extends JFrame {
    */
   @SuppressWarnings("CallToPrintStackTrace")
   private void setupOurTextStyles() throws IOException {
-    if (TextStyles.getStyle("testComponents_componentStateError") != null)
+    if (TextStyles.getStyle("testComponents_ErrorStyle") != null)
       return;
     StringReader reader = new StringReader("""
         {
-          "testComponents_componentStateError": {
+          "testComponents_ErrorStyle": {
             "fontSize": 14,
             "italic": false,
             "strikethrough": true
           },
-          "testComponents_componentStateModified": {
+          "testComponents_ModifiedStyle": {
             "fontSize": "default",
             "italic": true,
             "strikethrough": false
+          },
+          "testComponents_true": {
+            "fontSize": "default",
+            "italic": false,
+            "underline": true,
+            "bold": false
+          },
+          "testComponents_false": {
+            "fontSize": "default",
+            "italic": true,
+            "underline": false,
+            "bold": false
           }
         }
         """);
