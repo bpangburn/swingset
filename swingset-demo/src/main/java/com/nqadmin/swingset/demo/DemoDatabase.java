@@ -51,7 +51,6 @@ import java.sql.Connection;
 import java.sql.JDBCType;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import org.h2.tools.RunScript;
 import com.nqadmin.swingset.utils.SSUtils;
 import java.util.List;
@@ -68,9 +67,6 @@ final class DemoDatabase {
   private static final Logger logger = JStuff.getLogger();
   private DemoDatabase() {}
 
-  record Options(boolean verbose, boolean noLoadImages, boolean noInitializeDb,
-                 String propertyFile) {}
-
   private static final String DATABASE_PATH = "//localhost/~/h2/databases/";
 
   private static final boolean USE_IN_MEMORY_DATABASE = true;
@@ -86,9 +82,9 @@ final class DemoDatabase {
 
   static abstract class DatabaseSetup implements Runnable {
     private Connection conn;
-    final Options options;
+    final DemoOptions options;
 
-    DatabaseSetup(Options options) {
+    DatabaseSetup(DemoOptions options) {
       this.options = options;
     }
 
@@ -234,7 +230,7 @@ final class DemoDatabase {
   static class ExternalSetup extends DatabaseSetup {
     List<String> sqlFiles;
 
-    public ExternalSetup(Options options, List<String> _sqlFiles) {
+    public ExternalSetup(DemoOptions options, List<String> _sqlFiles) {
       super(options);
       sqlFiles = List.copyOf(_sqlFiles);
     }
@@ -263,7 +259,7 @@ final class DemoDatabase {
   }
 
   static class H2Setup extends DatabaseSetup {
-    H2Setup(Options options) { super(options); }
+    H2Setup(DemoOptions options) { super(options); }
 
     @Override
     Properties getDatabaseProperties() {
@@ -314,7 +310,7 @@ final class DemoDatabase {
   static class MysqlSetup extends DatabaseSetup {
     private final Map<String, Object> globalHints;
 
-    MysqlSetup(Options options, Map<String, Object> globalHints) {
+    MysqlSetup(DemoOptions options, Map<String, Object> globalHints) {
       super(options);
       this.globalHints = globalHints;
     }
@@ -353,8 +349,7 @@ final class DemoDatabase {
 
     @Override
     List<String> getScripts() {
-      return Arrays.asList(
-          new String[] {"/mysql.swingset-demo-app.sql", "/mysql.swingset-demo-components.sql"});
+      return List.of("/mysql.swingset-demo-app.sql", "/mysql.swingset-demo-components.sql");
     }
   }
 

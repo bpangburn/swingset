@@ -50,10 +50,8 @@ import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -81,7 +79,6 @@ import dev.visdb.seesaw.utils.JStuff;
 import com.nqadmin.swingset.utils.SSUtils;
 
 import dev.visdb.seesaw.utils.Version;
-import gnu.getopt.Getopt;
 
 import static com.nqadmin.swingset.demo.DemoUtil.configureJavaUtilLogger;
 import static dev.visdb.seesaw.utils.JStuff.sf;
@@ -438,75 +435,19 @@ public class MainClass extends JFrame {
   protected Connection getDatabase() {
     if (databaseSetup == null) {
       databaseSetup = new DemoDatabase.H2Setup(
-          new DemoDatabase.Options(verbose, no_load_images, no_initialize_db, propertyFile));
+          DemoOptions.defaults());
     }
     databaseSetup.run();
     return databaseSetup.getConnection();
   }
 
-  private static final String DBMS_MYSQL = "mysql";
-  private static final String DBMS_H2 = "h2";
-  private static final String DBMS_EXTERNAL = "external";
-
-  /*
-   * defaults for optional command line arguments
-   */
-  private static boolean verbose = false;
-  private static boolean dump = false;
-  private static boolean no_load_images = false;
-  private static boolean no_initialize_db = false;
-  // private static boolean readme = false;
-  private static String dbname = DBMS_H2;
-  private static String propertyFile = null;
-  private static List<String> userSqlFiles = new ArrayList<>();
-  private static DemoDatabase.DatabaseSetup databaseSetup = null;
-
-  private static String cmdName = "SwingSetDemo";
-
-  @SuppressWarnings({"ResultOfMethodCallIgnored", "UseOfSystemOutOrSystemErr"})
-  private static void usage() {
-    // TODO: specify don't load images
-    String usage = """
-        
-        Run the SwingSet demo. With no options/args use the self contained
-        in memory database.
-        
-        CMD_NAME [-h] [-v] [-d] [-n] [-i] [-r] [-p fname] [-s sql]* [dbms-server]
-        
-            -h             help
-            -v             verbose; output initialization sql as executed
-            -d             dump/create sql scripts in local directory, exit
-            -n             do NOT initialize database, just run demo
-            -i             do NOT load images
-            -p fname       properties file for jdbc database connection
-                           'DB_URL', 'DB_DRIVER_CLASS' keys required
-            -s sqlScript   sql file to initialize database, multiple OK
-        
-        If specified, dbms-server in {mysql}
-        Internal mysql properties use database swingset_demo_suppliers_and_parts.
-        After the sql files are run, the images are loaded, unless '-i'.
-        Use '-n -p props' to run demo with a previously initialized database.
-        Use '-d' or '-d mysql' to create local files with sql initialization.
-        See swingset-demo/README.txt for more information.
-        
-        Examples: (ss.jar like swingset-demo-vers-jar-with-dependencies.jar)
-            java -jar ss.jar -d   # dump sql that creates in memory database
-            java -jar ss.jar -d mysql   # dump sql to create mysql database
-            java -cp jdbc_driver:ss.jar com.nqadmin.swingset.demo.MainClass \\
-                -p db_props -s initializer.sql
-        
-        """;
-    usage = usage.replace("CMD_NAME", cmdName);
-    System.err.println(usage);
-    System.exit(1);
-  }
+  private static DemoDatabase.DatabaseSetup databaseSetup;
 
   /**
    * Main method for SwingSet samples/demo
    * <p>
    *
-   * @param _args - optional command line arguments, which are ignored by this
-   *              program
+   * @param _args optional command-line arguments
    */
   @SuppressWarnings("UseOfSystemOutOrSystemErr")
   public static void main(String[] _args) {
@@ -533,7 +474,6 @@ public class MainClass extends JFrame {
 
     SSUtils.init();
 
-    boolean some_error = false;
     System.err.printf("java:%s vm:%s date:%s os:%s\n", System.getProperty("java.version"),
                       System.getProperty("java.vm.version"),
                       System.getProperty("java.version.date"), System.getProperty("os.name"));
@@ -551,95 +491,26 @@ public class MainClass extends JFrame {
       logger.log(DEBUG, "SyncFactory.getRegisteredProviders()", ex);
     }
 
-    Getopt g = new Getopt(cmdName, _args, "hvdinrp:s:");
-
-    int c;
-    while ((c = g.getopt()) != -1) {
-      switch (c) {
-        case 'v': verbose = true; break;
-        case 'd': dump = true; break;
-        case 'n': no_initialize_db = true; break;
-        case 'i': no_load_images = true; break;
-        // case 'r': readme = true; break;
-        case 'p': propertyFile = g.getOptarg(); break;
-        case 's': userSqlFiles.add(g.getOptarg()); break;
-        case '?':
-        case 'h':
-        default: // TODO: not sure if default is OK here meaning all other characters indicate an
-          // error??
-          some_error = true;
-          break; // getopt() already printed an error
-      }
-    }
-
-    if (verbose) {
-      StringBuilder sb = new StringBuilder();
-      sb.append('\n').append(cmdName);
-      for (String arg : _args) {
-        sb.append(' ').append(arg);
-      }
-      System.err.println(sb.toString());
-    }
-
-    if (some_error) {
-      usage();
-    }
-
-    // if (readme) {
-    // return;
-    // }
-
-    boolean databaseServerSpecified = false;
-
-    int i = g.getOptind();
-    if (i != _args.length) {
-      // There are positional arguemnts. Can only be one.
-      if (i + 1 != _args.length) {
-        usage();
-      }
-      dbname = _args[i];
-      databaseServerSpecified = true;
-    }
-
-    boolean useInternalSql = userSqlFiles.isEmpty();
-
-    if (!useInternalSql) {
-      if (propertyFile == null) {
-        System.err.println("-p required if -s is used. Exiting.");
-        some_error = true;
-      } else {
-        // there's both a property file and sql files
-        if (databaseServerSpecified) {
-          System.err.println("-s not allowed if database specified. Exiting.");
-          some_error = true;
-        } else {
-          dbname = DBMS_EXTERNAL;
-        }
-      }
-      if (dump) {
-        System.err.println("-d not allowed when -s is used. Exiting.");
-        some_error = true;
-      }
-    }
-
-    DemoDatabase.Options options = new DemoDatabase.Options(verbose, no_load_images,
-        no_initialize_db, propertyFile);
-    databaseSetup = switch (dbname) {
-      case DBMS_MYSQL -> new DemoDatabase.MysqlSetup(options, globalHints);
-      case DBMS_EXTERNAL -> new DemoDatabase.ExternalSetup(options, userSqlFiles);
-      case DBMS_H2 -> new DemoDatabase.H2Setup(options);
-      default -> null;
-    };
-    if (databaseSetup == null) {
-      System.err.println("Unknown database server '" + dbname + "' . Exiting.");
-      some_error = true;
-    }
-
-    if (some_error) {
+    DemoOptions options;
+    try {
+      options = DemoOptions.parse(_args);
+    } catch (IllegalArgumentException ex) {
+      System.err.println(ex.getMessage());
+      DemoOptions.usage();
       System.exit(1);
+      return;
+    }
+    if (options == null) {
+      DemoOptions.usage();
+      return;
     }
 
-    if (dump) {
+    databaseSetup = switch (options.database()) {
+      case "mysql" -> new DemoDatabase.MysqlSetup(options, globalHints);
+      case "external" -> new DemoDatabase.ExternalSetup(options, options.userSqlFiles());
+      default -> new DemoDatabase.H2Setup(options);
+    };
+    if (options.dump()) {
       databaseSetup.dump();
       return;
     }
