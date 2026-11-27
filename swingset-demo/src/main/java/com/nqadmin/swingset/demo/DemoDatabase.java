@@ -50,7 +50,10 @@ import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.JDBCType;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import org.h2.tools.RunScript;
+import com.nqadmin.swingset.utils.SSUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -68,9 +71,18 @@ final class DemoDatabase {
   record Options(boolean verbose, boolean noLoadImages, boolean noInitializeDb,
                  String propertyFile) {}
 
-  private static final String DATABASE_SCRIPT_DEMO = MainClass.DATABASE_SCRIPT_DEMO;
-  private static final String DATABASE_SCRIPT_TEST = MainClass.DATABASE_SCRIPT_TEST;
-  private static final String DATABASE_SCRIPT_TEST_IMAGES = MainClass.DATABASE_SCRIPT_TEST_IMAGES;
+  private static final String DATABASE_PATH = "//localhost/~/h2/databases/";
+
+  private static final boolean USE_IN_MEMORY_DATABASE = true;
+
+  private static final String DATABASE_SCRIPT_DEMO = "suppliers_and_parts.sql";
+  private static final String DATABASE_SCRIPT_TEST = "swingset_tests.sql";
+  private static final String DATABASE_SCRIPT_TEST_IMAGES = "swingset_tests_load_blobs.sql";
+  private static final String DATABASE_SCRIPT_DEBUG = "swingset_debug.sql";
+
+  private static final boolean RUN_DEMO_SQL_SCRIPTS = true;
+  private static final boolean RUN_TEST_SQL_SCRIPTS = true;
+  private static final boolean RUN_DEBUG_SQL_SCRIPTS = false;
 
   static abstract class DatabaseSetup implements Runnable {
     private Connection conn;
@@ -83,6 +95,14 @@ final class DemoDatabase {
     abstract Properties getDatabaseProperties();
 
     abstract List<String> getScripts();
+
+    List<String> getDumpScripts() { return getScripts(); }
+
+    boolean executeScript(Connection connection, BufferedReader reader) throws SQLException {
+      return DemoUtil.runSqlStatements(connection, reader, options.verbose());
+    }
+
+    boolean shouldLoadImages() { return !options.noLoadImages(); }
 
     Connection getConnection() {
       return conn;
@@ -137,22 +157,23 @@ final class DemoDatabase {
         return;
       }
 
-      boolean ok = false;
+      boolean ok = true;
       for (String script : getScripts()) {
         ok = false;
         try (BufferedReader br = getBufferedReader(script)) {
           if (br != null) {
-            ok = DemoUtil.runSqlStatements(conn, br, options.verbose());
+            ok = executeScript(conn, br);
           }
-        } catch (IOException ex) {
-          logger.log(Level.ERROR, "IO exception.", ex);
+        } catch (IOException | SQLException ex) {
+          ok = false;
+          logger.log(Level.ERROR, "Error executing demo script.", ex);
         }
         if (!ok) {
           break;
         }
       }
 
-      if (ok && !options.noLoadImages()) {
+      if (ok && shouldLoadImages()) {
         // Load up the images
         String sql = "UPDATE swingset_base_test_data"
                      + " SET ss_image = ? WHERE swingset_base_test_pk = ?";
@@ -186,7 +207,7 @@ final class DemoDatabase {
     }
 
     void dump() {
-      for (String script : getScripts()) {
+      for (String script : getDumpScripts()) {
         boolean ok = false;
         try (BufferedReader br = getBufferedReader(script)) {
           if (br != null) {
@@ -241,24 +262,52 @@ final class DemoDatabase {
     }
   }
 
-  /**
-   * This is only used to dump H2 sql files
-   */
   static class H2Setup extends DatabaseSetup {
     H2Setup(Options options) { super(options); }
 
     @Override
     Properties getDatabaseProperties() {
-      return null;
+      if (options.propertyFile() != null) {
+        return getFileProperties(options.propertyFile());
+      }
+      Properties info = new Properties();
+      info.setProperty("DB_DRIVER_CLASS", "org.h2.Driver");
+      if (USE_IN_MEMORY_DATABASE) {
+        MainClass.H2Trace trace = SSUtils.getOption(MainClass.H2Trace.class);
+        info.setProperty("DB_URL", "jdbc:h2:mem:" + MainClass.DATABASE_NAME
+            + (trace == null ? "" : trace.getTraceUrlFlags()));
+      } else {
+        info.setProperty("DB_URL", "jdbc:h2:tcp:" + DATABASE_PATH + MainClass.DATABASE_NAME);
+        info.setProperty("user", "sa");
+        info.setProperty("password", "");
+      }
+      return info;
     }
 
     @Override
-    public void run() {}
+    List<String> getScripts() {
+      List<String> scripts = new ArrayList<>();
+      if (RUN_DEMO_SQL_SCRIPTS) scripts.add("/" + DATABASE_SCRIPT_DEMO);
+      if (RUN_TEST_SQL_SCRIPTS) scripts.add("/" + DATABASE_SCRIPT_TEST);
+      if (RUN_DEBUG_SQL_SCRIPTS) scripts.add("/" + DATABASE_SCRIPT_DEBUG);
+      return scripts;
+    }
 
     @Override
-    List<String> getScripts() {
-      return Arrays.asList(new String[] {"/" + DATABASE_SCRIPT_DEMO, "/" + DATABASE_SCRIPT_TEST,
-                                         "/" + DATABASE_SCRIPT_TEST_IMAGES});
+    List<String> getDumpScripts() {
+      return List.of("/" + DATABASE_SCRIPT_DEMO, "/" + DATABASE_SCRIPT_TEST,
+          "/" + DATABASE_SCRIPT_TEST_IMAGES);
+    }
+
+    @Override
+    boolean executeScript(Connection connection, BufferedReader reader) throws SQLException {
+      RunScript.execute(connection, reader);
+      return true;
+    }
+
+    @Override
+    boolean shouldLoadImages() {
+      return RUN_TEST_SQL_SCRIPTS && super.shouldLoadImages();
     }
   }
 

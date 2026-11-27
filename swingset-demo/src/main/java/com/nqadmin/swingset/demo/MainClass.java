@@ -45,14 +45,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,7 +68,6 @@ import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.SwingUtilities;
 
-import org.h2.tools.RunScript;
 
 import com.raelity.lib.ui.Screens;
 
@@ -101,19 +96,6 @@ public class MainClass extends JFrame {
    * database
    */
   public static final String DATABASE_NAME = "suppliers_and_parts";
-  private static final String DATABASE_PATH = "//localhost/~/h2/databases/";
-
-  private static final boolean USE_IN_MEMORY_DATABASE = true;
-
-  static final String DATABASE_SCRIPT_DEMO = "suppliers_and_parts.sql";
-  static final String DATABASE_SCRIPT_TEST = "swingset_tests.sql";
-  static final String DATABASE_SCRIPT_TEST_IMAGES = "swingset_tests_load_blobs.sql";
-  private static final String DATABASE_SCRIPT_DEBUG = "swingset_debug.sql";
-
-  private static final boolean RUN_DEMO_SQL_SCRIPTS = true;
-  private static final boolean RUN_TEST_SQL_SCRIPTS = true;
-  private static final boolean RUN_DEBUG_SQL_SCRIPTS = false;
-
   private static final Map<String, Object> globalHints = new HashMap<>();
 
   static {
@@ -367,12 +349,7 @@ public class MainClass extends JFrame {
     logger.log(INFO, () -> sf("Working Directory = %s", System.getProperty("user.dir")));
 
     // INITIALIZE DATABASE
-    if ("h2".equals(dbname)) {
-      dbConnection = getDatabase();
-    } else {
-      databaseSetup.run();
-      dbConnection = databaseSetup.getConnection();
-    }
+    dbConnection = getDatabase();
     if (dbConnection == null) {
       logger.log(Level.ERROR, "Error initializing database. Exiting.");
       System.exit(1);
@@ -457,117 +434,14 @@ public class MainClass extends JFrame {
     Screens.translateToPrefScreen(this);
   }
 
-  /**
-   * Class to initialize the database connection and load the database content
-   * from a script
-   *
-   * @return database connection
-   */
+  /** Initialize the selected database and return its connection. */
   protected Connection getDatabase() {
-    Connection result = null;
-
-    // INITIALIZE DATABASE CONNECTION AND COMPONENTS
-    try {
-      Class.forName("org.h2.Driver");
-
-      logger.log(DEBUG, () -> sf("Resource path: %s.", getClass().getPackage().getName()));
-      logger.log(DEBUG, "Resource path: %s.",
-                 getClass().getClassLoader().getResource(DATABASE_SCRIPT_DEMO));
-
-      InputStream inStreamDemo = null;
-      InputStream inStreamTest = null;
-      InputStream inStreamDebug = null;
-
-      boolean has_startup_error = false;
-
-      if (RUN_DEMO_SQL_SCRIPTS) {
-        inStreamDemo = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEMO);
-        if (inStreamDemo == null) {
-          logger.log(Level.ERROR,
-                     ()
-                         -> "Please add the file " + DATABASE_SCRIPT_DEMO
-                                + " to the classpath, package "
-                                + getClass().getPackage().getName());
-          has_startup_error = true;
-        }
-      }
-
-      if (RUN_TEST_SQL_SCRIPTS) {
-        inStreamTest = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_TEST);
-        if (inStreamTest == null) {
-          logger.log(Level.ERROR,
-                     ()
-                         -> "Please add the file " + DATABASE_SCRIPT_TEST + " and "
-                                + DATABASE_SCRIPT_TEST_IMAGES + " to the classpath, package "
-                                + getClass().getPackage().getName());
-          has_startup_error = true;
-        }
-      }
-
-      if (RUN_DEBUG_SQL_SCRIPTS) {
-        inStreamDebug = getClass().getClassLoader().getResourceAsStream(DATABASE_SCRIPT_DEBUG);
-        if (inStreamDebug == null) {
-          logger.log(Level.ERROR,
-                     ()
-                         -> "Please add the file " + DATABASE_SCRIPT_DEBUG
-                                + " to the classpath, package "
-                                + getClass().getPackage().getName());
-          has_startup_error = true;
-        }
-      }
-
-      if (has_startup_error) {
-        logger.log(Level.ERROR, "\n*******\n*******\n*******");
-        System.exit(1);
-      }
-
-      if (USE_IN_MEMORY_DATABASE) {
-        result = DriverManager.getConnection("jdbc:h2:mem:" + DATABASE_NAME
-                                             + SSUtils.getOption(H2Trace.class).getTraceUrlFlags());
-        logger.log(INFO, "Established connection to in-memory database.");
-      } else {
-        // ASSUMING DATABASE IS IN LOCAL ./h2/databases/ FOLDER WITH DEFAULT USERNAME OF
-        // sa AND BLANK PASSWORD
-        // USEFUL FOR WORKING WITH DATASET FOR SWINGSET TESTS
-        result
-            = DriverManager.getConnection("jdbc:h2:tcp:" + DATABASE_PATH + DATABASE_NAME, "sa", "");
-        logger.log(INFO, "Established connection to database server.");
-      }
-
-      // RUN SCRIPTS AND CLOSE STREAMS
-      if (RUN_DEMO_SQL_SCRIPTS) {
-        assert inStreamDemo != null;
-        RunScript.execute(result, new InputStreamReader(inStreamDemo));
-        inStreamDemo.close();
-      }
-
-      if (RUN_TEST_SQL_SCRIPTS) {
-        assert inStreamTest != null;
-        RunScript.execute(result, new InputStreamReader(inStreamTest));
-        inStreamTest.close();
-
-        if (!no_load_images) {
-          String sql = "UPDATE swingset_base_test_data"
-                       + " SET ss_image = ? WHERE swingset_base_test_pk = ?";
-          DemoUtil.loadBinaries(result, "/swingset-demo-images.txt", sql, verbose);
-        }
-      }
-
-      if (RUN_DEBUG_SQL_SCRIPTS) {
-        assert inStreamDebug != null;
-        RunScript.execute(result, new InputStreamReader(inStreamDebug));
-        inStreamDebug.close();
-      }
-
-    } catch (final IOException ioe) {
-      logger.log(Level.ERROR, "IO Exception.", ioe);
-    } catch (final SQLException se) {
-      logger.log(Level.ERROR, "SQL Exception.", se);
-    } catch (final ClassNotFoundException cnfe) {
-      logger.log(Level.ERROR, "Class Not Found Exception.", cnfe);
+    if (databaseSetup == null) {
+      databaseSetup = new DemoDatabase.H2Setup(
+          new DemoDatabase.Options(verbose, no_load_images, no_initialize_db, propertyFile));
     }
-
-    return result;
+    databaseSetup.run();
+    return databaseSetup.getConnection();
   }
 
   private static final String DBMS_MYSQL = "mysql";
