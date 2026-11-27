@@ -15,6 +15,16 @@ import javax.swing.text.NumberFormatter;
 final class SSNumberFormatters {
   private SSNumberFormatters() {}
 
+  // Shared compatibility behavior for fields that retain SSFormattedTextField
+  // instead of extending Seesaw's NumberField hierarchy.
+  static void cleanField(SSFormattedTextField field) {
+    field.setValue(field.getAllowNull() ? null : Integer.valueOf(0));
+  }
+
+  static boolean validate(SSFormattedTextField field) {
+    return field.getValue() != null || field.getAllowNull();
+  }
+
   static int getParameter(AbstractFormatterFactory factory, ToIntFunction<NumberFormat> parameter) {
     if (factory instanceof DefaultFormatterFactory defaults
         && defaults.getEditFormatter() instanceof NumberFormatter formatter

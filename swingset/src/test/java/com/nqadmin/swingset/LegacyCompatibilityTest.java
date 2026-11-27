@@ -33,13 +33,13 @@ import com.nqadmin.swingset.formatting.SSTimestampField;
 import com.nqadmin.swingset.models.SSListItem;
 import com.nqadmin.swingset.utils.SSEnums.Navigation;
 
-import dev.visdb.seesaw.utils.LookupDefaults;
+import com.nqadmin.swingset.utils.SSUtils;
 import dev.visdb.seesaw.utils.SsComponent;
 
 class LegacyCompatibilityTest {
   @BeforeAll
   static void initializeSeeSawDefaults() {
-    LookupDefaults.init();
+    SSUtils.init();
   }
 
   @Test
@@ -214,7 +214,7 @@ class LegacyCompatibilityTest {
   void numericFieldsClearAccordingToNullability() throws Exception {
     SwingUtilities.invokeAndWait(() -> {
       for (SSFormattedTextField field : new SSFormattedTextField[] {
-          new SSNumericField(), new SSCurrencyField()}) {
+          new SSNumericField(), new SSCurrencyField(), new SSIntegerField()}) {
         field.setAllowNull(false);
         field.cleanField();
         assertEquals(0, ((Number) field.getValue()).intValue());

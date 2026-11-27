@@ -69,12 +69,12 @@ public class SSNumericField extends SSFormattedTextField {
   /** Clear to null when allowed, otherwise to zero, as in SeeSaw NumberField. */
   @Override
   public void cleanField() {
-    super.setValue(super.getAllowNull() ? null : Integer.valueOf(0));
+    SSNumberFormatters.cleanField(this);
   }
 
   /** Retain SeeSaw's formatted-number null validation. */
   @Override
   public boolean componentValidate() {
-    return super.getValue() != null || super.getAllowNull();
+    return SSNumberFormatters.validate(this);
   }
 }
