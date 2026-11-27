@@ -67,7 +67,7 @@ public class SSUtils {
 
   /** Initialize the SwingSet runtime once, before creating Swing components. */
   public static void init() {
-    dev.visdb.seesaw.utils.LookupDefaults.init();
+    dev.visdb.seesaw.SeeSaw.init();
   }
 
   /** Configure the decorator style before constructing screens. */
