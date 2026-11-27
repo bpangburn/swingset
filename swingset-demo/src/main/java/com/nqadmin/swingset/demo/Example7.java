@@ -172,12 +172,13 @@ public class Example7 extends JFrame {
         }
       }
 
+      // SETUP THE CONTAINER AND ADD THE DATAGRID
+      getContentPane().add(dataGrid.getComponent());
     } catch (final SQLException se) {
       logger.log(Level.ERROR, "SQL Exception.", se);
+      dispose();
+      return;
     }
-
-    // SETUP THE CONTAINER AND ADD THE DATAGRID
-    getContentPane().add(dataGrid.getComponent());
 
     // MAKE THE JFRAME VISIBLE
     setVisible(true);

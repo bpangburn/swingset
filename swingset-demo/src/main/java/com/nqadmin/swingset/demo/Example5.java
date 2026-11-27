@@ -43,6 +43,7 @@ import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.sql.RowSet;
 import javax.swing.JFrame;
@@ -99,9 +100,8 @@ public class Example5 extends JFrame {
   }
 
   private Object getNewPrimaryKey() {
-    try (final ResultSet rs
-         = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)
-               .executeQuery("SELECT nextval('part_data_seq') as nextVal;")) {
+    try (Statement statement = connection.createStatement();
+         ResultSet rs = statement.executeQuery("SELECT nextval('part_data_seq') as nextVal;")) {
       // GET THE NEW RECORD ID.
       rs.next();
       return rs.getInt("nextVal");
@@ -154,6 +154,8 @@ public class Example5 extends JFrame {
 
     } catch (final SQLException se) {
       logger.log(Level.ERROR, "SQL Exception.", se);
+      dispose();
+      return;
     }
 
     // MAKE THE JFRAME VISIBLE

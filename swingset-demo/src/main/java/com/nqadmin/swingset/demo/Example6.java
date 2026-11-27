@@ -144,10 +144,8 @@ public class Example6 extends JFrame {
 
         try {
           // GET THE NEW RECORD ID.
-          Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
-                                                           ResultSet.CONCUR_UPDATABLE);
-          try (ResultSet rs
-               = statement.executeQuery("SELECT nextval('part_data_seq') as nextVal;")) {
+          try (Statement statement = connection.createStatement();
+               ResultSet rs = statement.executeQuery("SELECT nextval('part_data_seq') as nextVal;")) {
             rs.next();
             partID = rs.getInt("nextVal");
           }
@@ -162,12 +160,13 @@ public class Example6 extends JFrame {
         return partID;
       });
 
+      // SETUP THE CONTAINER AND ADD THE DATAGRID
+      getContentPane().add(dataGrid.getComponent());
     } catch (final SQLException se) {
       logger.log(Level.ERROR, "SQL Exception.", se);
+      dispose();
+      return;
     }
-
-    // SETUP THE CONTAINER AND ADD THE DATAGRID
-    getContentPane().add(dataGrid.getComponent());
 
     // MAKE THE JFRAME VISIBLE
     setVisible(true);
