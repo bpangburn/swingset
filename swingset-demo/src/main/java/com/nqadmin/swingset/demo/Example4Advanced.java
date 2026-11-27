@@ -37,7 +37,6 @@
  * ****************************************************************************/
 package com.nqadmin.swingset.demo;
 
-import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.beans.PropertyChangeEvent;
@@ -48,6 +47,8 @@ import java.util.Objects;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
+import com.nqadmin.swingset.utils.SSUtils;
 import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -169,7 +170,7 @@ public class Example4Advanced extends Example4 {
     navigator.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
         .put(KeyStroke.getKeyStroke("F11"), ACT_DELETE);
 
-    final Container contentPane = getContentPane();
+    final JPanel contentPane = SSUtils.getInnerComponent(getContentPane());
     final GridBagConstraints constraints = new GridBagConstraints();
 
     // Do something with the "Extra" buttons

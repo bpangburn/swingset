@@ -135,6 +135,11 @@ public class SSUtils {
     return SsUtils.createDecoratorPanel(uiPanel);
   }
 
+  /** Return the UI panel wrapped by a decorator panel, or null if not recognized. */
+  public static javax.swing.JPanel getInnerComponent(java.awt.Component decoratorPanel) {
+    return SsUtils.getInnerComponent(decoratorPanel);
+  }
+
   /**
    * Temporary for hiding SsCommon; used from SsDBComboBox.
    * @param comp component to update
